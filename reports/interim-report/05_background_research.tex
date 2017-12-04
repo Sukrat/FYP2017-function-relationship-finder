@@ -1,0 +1,112 @@
+\section{Proof}
+The following proofs are for the different approaches that will be imployed to understand and find any descrepancy in the dataset to negate our hypothesis.
+
+First proof:
+
+\textbf{Prove:} We need to prove that finding atleast 2 equal dynamic energys with different performance events ensures that there exists no functional relationship in the dataset:
+
+\textbf{Proof:}\\We know that the data will be in the following format:
+
+Let \(k\) be the number of parameters for the energy and \(n\) be the number of tuples in the dataset
+
+\(E_1,x_{11}, x_{12}, \ldots x_{1k}\)\\
+\ldots\\
+\(E_n,x_{n1}, x_{n2}, \ldots x_{nk}\)\\
+where \(E_n\) is the dynamic energy for the nth tuple and \(x_{nk}\) corresponds to the \(k\)th performance event for \(n\)th tuple.
+
+Let us assume that there exists a functional relation such that:\\
+\(f(x_{n1}, x_{n2}, \ldots x_{nk}) = E_n\)\\
+where \(f\) is the functional relations for the dataset.
+
+Our task is to find \(f(x_{i1}, x_{i2}, \ldots x_{ik}) = E_i\) and \(f(x_{j1}, x_{j2}, \ldots x_{jk}) = E_j\) 
+where \(i \neq j\) and \(E_i = E_j\).
+
+If we are able to find one in the dataset.
+Then we compare the parameters \(x_{i1}, x_{i2}, \ldots x_{ik}\) and \(x_{j1}, x_{j2}, \ldots x_{jk}\) of \(E_i\) and \(E_j\) respectively.
+
+If the parameter tuples are not equal to each other meaning:\\
+\(f(x_{i1}, x_{i2}, \ldots x_{ik}) = f(x_{j1}, x_{j2}, \ldots x_{jk}) = E_i = E_j\) with the parameter tuple not equal that is \(x_{i1}, x_{i2}, \ldots x_{ik} \neq x_{j1}, x_{j2}, \ldots x_{jk}\)
+
+From this we can conclude that the function \(f\) is not a function by using the definition of a function as this assumed function has two images.
+
+Which contradicts from our hypothesis stated above.
+Hence by proof of contradiction we could say that \(f\) is not a function on the dataset.
+
+Restating the above we can say dataset does not contain a functional relation.
+
+\newpage
+
+Second proof:
+
+\textbf{Prove:} Assuming that the dataset given has linear relationship and if we are able to find the constant for any one of the events. And if it does not apply to the other tuples of data that means linear relationship doesnot exist between the dataset.
+
+\textbf{Proof:}\\Lets first visualize and assume our dataset:
+Let \(k\) be the number of parameters for the energy and \(n\) be the number of tuples in the dataset
+
+\(E_1,x_{11}, x_{12}, \ldots x_{1k}\)\\
+\ldots\\
+\(E_n,x_{n1}, x_{n2}, \ldots x_{nk}\)\\
+where \(E_n\) is the dynamic energy for the nth tuple and \(x_{nk}\) corresponds to the \(k\)th performance event for \(n\)th tuple.
+
+Let us assume that the energy consumption is a linear combination of the performance events.
+\(f(x_{i1}, x_{i2}, \ldots x_{ik}) = E_i\)\\
+\(f(x_{i1}, x_{i2}, \ldots x_{ik}) = \alpha _1\times x_{i1} + \alpha_2\times x_{i2} + \cdots + \alpha_k\times x_{ik} + \alpha_{k+1}\)\\
+where \(\alpha_i\) are the constants in the linear combination of performance events and \(i\in[1\ldots k+1]\)
+
+Lets find \(\alpha_i\) where \(i\in[1\ldots k+1]\)\\
+To find this we will have to find atleast 3 records which have their parameter events equal \(x_{1}, x_{2}, \ldots x_{k}\) except \(x_{i}\) where this \(x\) values are value belonging to a row in the dataset.
+
+Suppose we found three records:\\
+\(E_m,x_{m1}, x_{m2}, \ldots x_{mk}\)\\
+\(E_n,x_{n1}, x_{n2}, \ldots x_{nk}\)\\
+\(E_o,x_{o1}, x_{o2}, \ldots x_{ok}\)\\
+where the tuples (\(x_{m1}, x_{m2}, \ldots x_{mk}\)), (\(x_{n1}, x_{n2}, \ldots x_{nk}\)) and (\(x_{o1}, x_{o2}, \ldots x_{ok}\)) are equal to (\(x_{1}, x_{2}, \ldots x_{k}\)) except \(x_{i}\) for some \(i\in[1\ldots k+1]\) where \(m, n, o \in [1, n]\) and \(m, n, o\) are not equal to each other.
+
+Then\\
+\(E_m - E_n\)\\
+\(= f(x_{m1}, x_{m2}, \ldots x_{mk}) - f(x_{n1}, x_{n2}, \ldots x_{nk})\)\\
+{\footnotesize \{ By our assumption that \(E\) is a linear combination of its parameters \} }\\
+\(= (\alpha _1\times x_{m1} + \alpha_2\times x_{m2} + \cdots + \alpha_k\times x_{mk} + \alpha_{k+1}) - (\alpha _1\times x_{n1} + \alpha_2\times x_{n2} + \cdots + \alpha_k\times x_{nk} + \alpha_{k+1})\)\\
+{\footnotesize \{ Gathering terms \}}\\
+\(= \alpha_1 \times (x_{m1} - x_{n1}) + \ldots + \alpha_k \times (x_{mk} - x_{nk}) + (\alpha_{k+1} - \alpha_{k+1})\)\\
+{\footnotesize \{ Since we know except \(x_{mi}\) and \(x_{ni}\) all are equal \}}\\
+\(= \alpha_i \times (x_{mi} - x_{ni})\)
+
+From the above we get:\\
+\(\alpha_i = (E_m - E_n)/(x_{mi} - x_{ni})\)\\
+where \((x_{mi} - x_{ni}) \neq 0\) as \(x_{mi} \neq x_{ni}\) by above during our finding phase.
+
+Then we know that using the \(\alpha_i\) and applying to result to this equation \(E_m - E_o = \alpha_i \times (x_{mi} - x_{oi})\) must be true as well.
+
+If this is false then \(\alpha_i\) is not a constant which contradicts our assumption that our \(E\) is linear combination of its parameter is false.
+
+Hence using proof by contradiction we can say that the dataset is not linear combination of its parameters.
+
+\newpage
+
+Third proof:
+
+\textbf{Prove:} Keeping our assumption that the dataset is linear. Creating Pseudo records by simple addition or subtraction with other records if results into a record whose energy consumption lies in the dataset but with different performance events shows that the dataset is not linear.
+
+\textbf{Proof:}\\Let us assume that the energy consumption is a linear combination of the performance events.
+
+\(f(x_{i1}, x_{i2}, \ldots x_{ik}) = E_i\)\\
+\(f(x_{i1}, x_{i2}, \ldots x_{ik}) = \alpha _1\times x_{i1} + \alpha_2\times x_{i2} + \cdots + \alpha_k\times x_{ik} + \alpha_{k+1}\)\\
+where \(\alpha_i\) are the constants in the linear combination of performance events and \(i\in[1\ldots k+1]\)
+
+We know that if \(f\) is linear combination of its parameters they can be added and subtracted with each other to generate other data points.\\
+\(f(x_{i1}, x_{i2}, \ldots x_{ik}) = E_i\)\\
+\(f(x_{j1}, x_{j2}, \ldots x_{jk}) = E_j\)
+
+Adding above to equations we get:\\
+\(f(x_{i1} + x_{j1},x_{i2} + x_{j2}, \ldots x_{ik} + x_{jk}) = E_j + E_i\)
+
+we will not prove this as it is a know property of linear function \(f\).
+Lets rename it as:\\
+\(f(x_{1}, x_{2}, \ldots x_{k}) = E\)
+
+Now if we are able to find data record with \(E = E_m\) where \(m \in [1, n]\) in the dataset provided.
+
+Then if after comparing the parameters we find that \((x_{1}, x_{2}, \ldots x_{k})\neq(x_{m1}, x_{m2}, \ldots x_{mk})\).
+
+Then by the proof provided above, \(f\) has two images. So, above dataset is not linear combination.
