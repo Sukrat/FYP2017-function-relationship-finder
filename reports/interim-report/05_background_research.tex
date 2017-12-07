@@ -1,112 +1,113 @@
-\section{Proof}
-The following proofs are for the different approaches that will be imployed to understand and find any descrepancy in the dataset to negate our hypothesis.
+Many designers are increasingly utilizing dynamic hardware adaptations to improve performance while limiting the power consumption. Some are using software to decrease power usage for e.g. putting the system in sleep mode when its in idle state. The main goal remains the same, which is to extract maximum performance while minimizing the temperature and power. Whereas, we want to study and examine the relationship affecting the consumption and then analyse the result to minimize or predict the consumption of energy.
 
-First proof:
+\section{Energy consumption and Performance Events}
 
-\textbf{Prove:} We need to prove that finding atleast 2 equal dynamic energys with different performance events ensures that there exists no functional relationship in the dataset:
+First let's look at energy consumption. Energy consumption is the power (Usually in watts) consumed by a system. This system could be the processor/CPU, memory, disk, I/O (Input/Output) system, chipset or the whole computer system itself. So, one can take any of the peripherals and read the power consumption for various performance events. Then analyse if there exists a functional dependence to begin with. If the system is not able to disprove the dataset, one could then try to find a function which could help understand relation between each event and also predict for any given system. Reading of these performance events can be during a idle state as well as running certain computations.
 
-\textbf{Proof:}\\We know that the data will be in the following format:
+Now let's look at what are performance events, performance events can be any event which can affect the consumption of energy in some way. Selection of performance events is quite challenging. A simple example would be the effect of cache misses in the processor. For a typical processor, the highest level of cache would be L3 or L2 depending on the type of processor. Now for some transaction which could not be found in the highest level of cache (cache miss) would cause a cache block size access to the main memory. Thus, number of main memory access would be directly proportional to the cache misses. Since these memory access is off-chip, power is consumed in the memory controller and DRAM. Even though, the relation is not simple as it seems but we can see a strong casual relationship between the cache miss and the main memory power consumption~\cite{bircher2007complete}.
 
-Let \(k\) be the number of parameters for the energy and \(n\) be the number of tuples in the dataset
+We can use number of other performance events like Instructions executed. As we know on each instruction being executed, more units of the system are on. Hence, power is consumed as opposed to when the processor is in its idle state~\cite{gilberto2005power}. 
 
-\(E_1,x_{11}, x_{12}, \ldots x_{1k}\)\\
+Cache miss, TLB misses are also a good performance events as they seem to have a strong relationship between the power consumption as processor needs to handle memory page walks. Same can be said for Page faults where a program is not able to find mapped address in physical memory as it has not been loaded yet. This causes a trap which can result into number of situations, one of them which is to get the data from disk. In simple terms it is longer walks from cache miss. This walk to the disk and raising of exceptions would consume more energy by the disk as well as the CPU.
+
+\section{Proofs}
+
+The Proofs below are for different approaches that have been discussed to find the non-existence of a functional relations between energy consumption and number of performance events.
+
+But first let's look at our dataset that will be provided.
+We know that the data will be in the following format:
+
+Let \(k\) be the number of parameters for the energy and \(n\) be the number of records in the dataset
+
+\(E_1,\ x_{11},\ x_{12},\ \ldots x_{1k}\)\\
+\(E_2,\ x_{21},\ x_{22},\ \ldots x_{2k}\)\\
 \ldots\\
-\(E_n,x_{n1}, x_{n2}, \ldots x_{nk}\)\\
-where \(E_n\) is the dynamic energy for the nth tuple and \(x_{nk}\) corresponds to the \(k\)th performance event for \(n\)th tuple.
+\(E_n,\ x_{n1},\ x_{n2},\ \ldots x_{nk}\)\\
+where \(E_n\) is the dynamic energy for the nth tuple and \(x_{nk}\) corresponds to the \(k\)th performance event for \(n\)th record.
 
-Let us assume that there exists a functional relation such that:\\
-\(f(x_{n1}, x_{n2}, \ldots x_{nk}) = E_n\)\\
-where \(f\) is the functional relations for the dataset.
+We will use mathematical definition of functional relationship to prove the approaches:
 
-Our task is to find \(f(x_{i1}, x_{i2}, \ldots x_{ik}) = E_i\) and \(f(x_{j1}, x_{j2}, \ldots x_{jk}) = E_j\) 
-where \(i \neq j\) and \(E_i = E_j\).
+\textbf{Definition}: \textit{Given a dataset of pairs \((x_i, y_i)\) where \(i \in [1, n]\) of two variables \(x\) and \(y\), and the range \(X\) of \(x\), \(y\) is a function of \(x\) iff for each \(x_0 \in X\), there is exactly one value of \(y\), say \(y_0\), such that \((x_0, y_0)\) is in dataset.}~\cite{zembowicz1993testing}
 
-If we are able to find one in the dataset.
-Then we compare the parameters \(x_{i1}, x_{i2}, \ldots x_{ik}\) and \(x_{j1}, x_{j2}, \ldots x_{jk}\) of \(E_i\) and \(E_j\) respectively.
+\textbf{Prove:} We need to prove that finding atleast 2 equal performance events with different dynamic energies ensures that there exists no functional relationship in the dataset.
 
-If the parameter tuples are not equal to each other meaning:\\
-\(f(x_{i1}, x_{i2}, \ldots x_{ik}) = f(x_{j1}, x_{j2}, \ldots x_{jk}) = E_i = E_j\) with the parameter tuple not equal that is \(x_{i1}, x_{i2}, \ldots x_{ik} \neq x_{j1}, x_{j2}, \ldots x_{jk}\)
+\textbf{Proof:}\\
+Let us assume that there exists a functional relation such that:
 
-From this we can conclude that the function \(f\) is not a function by using the definition of a function as this assumed function has two images.
+\(f(x_{n1},\ x_{n2},\ \ldots x_{nk}) = E_n\)\\
+where \(f\) is the functional relation for the dataset.
+
+Our task is to find \(f(x_{i1},\ x_{i2},\ \ldots x_{ik}) = E_i\) and \(f(x_{j1},\ x_{j2},\ \ldots x_{jk}) = E_j\) 
+where \(i \neq j\) and \(E_i \neq E_j\) and \((x_{i1},\ x_{i2},\ \ldots x_{ik}) = (x_{j1},\ x_{j2},\ \ldots x_{jk})\).
+
+If such \(i\) and \(j\) exists. Then, we can conclude that the \(f\) is not a function by using the definition of a function as this assumed function has two images.
 
 Which contradicts from our hypothesis stated above.
 Hence by proof of contradiction we could say that \(f\) is not a function on the dataset.
 
 Restating the above we can say dataset does not contain a functional relation.
 
-\newpage
-
-Second proof:
-
 \textbf{Prove:} Assuming that the dataset given has linear relationship and if we are able to find the constant for any one of the events. And if it does not apply to the other tuples of data that means linear relationship doesnot exist between the dataset.
 
-\textbf{Proof:}\\Lets first visualize and assume our dataset:
-Let \(k\) be the number of parameters for the energy and \(n\) be the number of tuples in the dataset
-
-\(E_1,x_{11}, x_{12}, \ldots x_{1k}\)\\
-\ldots\\
-\(E_n,x_{n1}, x_{n2}, \ldots x_{nk}\)\\
-where \(E_n\) is the dynamic energy for the nth tuple and \(x_{nk}\) corresponds to the \(k\)th performance event for \(n\)th tuple.
-
+\textbf{Proof:}\\
 Let us assume that the energy consumption is a linear combination of the performance events.
-\(f(x_{i1}, x_{i2}, \ldots x_{ik}) = E_i\)\\
-\(f(x_{i1}, x_{i2}, \ldots x_{ik}) = \alpha _1\times x_{i1} + \alpha_2\times x_{i2} + \cdots + \alpha_k\times x_{ik} + \alpha_{k+1}\)\\
+
+\(f(x_{i1},\ x_{i2},\ \ldots x_{ik}) = E_i\)\\
+\(f(x_{i1},\ x_{i2},\ \ldots x_{ik}) = (\alpha _1\times x_{i1}) + (\alpha_2\times x_{i2}) + \cdots + (\alpha_k\times x_{ik}) + \alpha_{k+1}\)\\
 where \(\alpha_i\) are the constants in the linear combination of performance events and \(i\in[1\ldots k+1]\)
 
 Lets find \(\alpha_i\) where \(i\in[1\ldots k+1]\)\\
-To find this we will have to find atleast 3 records which have their parameter events equal \(x_{1}, x_{2}, \ldots x_{k}\) except \(x_{i}\) where this \(x\) values are value belonging to a row in the dataset.
+To find this we will have to find atleast 3 records which have their parameter events equal \(x_{1},\ x_{2},\ \ldots x_{k}\) except \(x_{i}\) where this \(x\) values are value belonging to a row in the dataset.
 
-Suppose we found three records:\\
-\(E_m,x_{m1}, x_{m2}, \ldots x_{mk}\)\\
-\(E_n,x_{n1}, x_{n2}, \ldots x_{nk}\)\\
-\(E_o,x_{o1}, x_{o2}, \ldots x_{ok}\)\\
-where the tuples (\(x_{m1}, x_{m2}, \ldots x_{mk}\)), (\(x_{n1}, x_{n2}, \ldots x_{nk}\)) and (\(x_{o1}, x_{o2}, \ldots x_{ok}\)) are equal to (\(x_{1}, x_{2}, \ldots x_{k}\)) except \(x_{i}\) for some \(i\in[1\ldots k+1]\) where \(m, n, o \in [1, n]\) and \(m, n, o\) are not equal to each other.
+If we found three records such as:
 
-Then\\
-\(E_m - E_n\)\\
-\(= f(x_{m1}, x_{m2}, \ldots x_{mk}) - f(x_{n1}, x_{n2}, \ldots x_{nk})\)\\
+\(E_a,\ x_{a1},\ x_{a2}, \ldots x_{ak}\)\\
+\(E_b,\ x_{b1},\ x_{b2}, \ldots x_{bk}\)\\
+\(E_c,\ x_{c1},\ x_{c2}, \ldots x_{ck}\)\\
+where the tuples \\
+\((x_{a1}\ldots \ x_{a(i-1)},\ x_{a(i+1)}\ \ldots x_{ak})\), \((x_{b1}\ldots \ x_{b(i-1)},\ x_{b(i+1)}\ \ldots x_{bk})\) and \((x_{c1}\ldots \ x_{c(i-1)},\ x_{c(i+1)}\ \ldots x_{ck})\) are equal to each other, except \(x_{i}\) for some \(i\in[1\ldots k+1]\) where \(a, b, c \in [1, n]\) and \(a, b, c\) are not equal to each other.
+
+Then
+
+\(E_a - E_b\)\\
+\(= f(x_{a1},\ x_{a2},\ \ldots x_{ak}) - f(x_{b1},\ x_{b2},\ \ldots x_{bk})\)\\
 {\footnotesize \{ By our assumption that \(E\) is a linear combination of its parameters \} }\\
-\(= (\alpha _1\times x_{m1} + \alpha_2\times x_{m2} + \cdots + \alpha_k\times x_{mk} + \alpha_{k+1}) - (\alpha _1\times x_{n1} + \alpha_2\times x_{n2} + \cdots + \alpha_k\times x_{nk} + \alpha_{k+1})\)\\
+\(= ((\alpha _1\times x_{a1}) + \cdots + (\alpha_{k}\times x_{ak}) + \alpha_{k+1}) - ((\alpha _1\times x_{b1}) + \cdots + (\alpha_k\times x_{bk}) + \alpha_{k+1})\)\\
 {\footnotesize \{ Gathering terms \}}\\
-\(= \alpha_1 \times (x_{m1} - x_{n1}) + \ldots + \alpha_k \times (x_{mk} - x_{nk}) + (\alpha_{k+1} - \alpha_{k+1})\)\\
+\(= \alpha_1 \times (x_{a1} - x_{b1}) + \ldots + \alpha_k \times (x_{ak} - x_{bk}) + (\alpha_{k+1} - \alpha_{k+1})\)\\
 {\footnotesize \{ Since we know except \(x_{mi}\) and \(x_{ni}\) all are equal \}}\\
-\(= \alpha_i \times (x_{mi} - x_{ni})\)
+\(= \alpha_i \times (x_{ai} - x_{bi})\)
 
-From the above we get:\\
-\(\alpha_i = (E_m - E_n)/(x_{mi} - x_{ni})\)\\
-where \((x_{mi} - x_{ni}) \neq 0\) as \(x_{mi} \neq x_{ni}\) by above during our finding phase.
+From the above we get:
 
-Then we know that using the \(\alpha_i\) and applying to result to this equation \(E_m - E_o = \alpha_i \times (x_{mi} - x_{oi})\) must be true as well.
+\(\alpha_i = (E_a - E_b)/(x_{ai} - x_{bi})\)\\
+where \((x_{ai} - x_{bi}) \neq 0\) as \(x_{ai} \neq x_{bi}\) by above during our finding phase.
+
+Then we know that using the \(\alpha_i\) and applying to result to this equation \(E_a - E_c = \alpha_i \times (x_{ai} - x_{ci})\) must be true as well.
 
 If this is false then \(\alpha_i\) is not a constant which contradicts our assumption that our \(E\) is linear combination of its parameter is false.
 
 Hence using proof by contradiction we can say that the dataset is not linear combination of its parameters.
 
-\newpage
+\textbf{Prove:} Keeping our assumption that the dataset is additive. Creating Pseudo records by simple addition with other records if results into a record whose energy consumption lies in the dataset but with different performance events shows that the dataset is not linear.
 
-Third proof:
+\textbf{Proof:}\\
+Let us assume that there exists a linear function \(f\) such that:
 
-\textbf{Prove:} Keeping our assumption that the dataset is linear. Creating Pseudo records by simple addition or subtraction with other records if results into a record whose energy consumption lies in the dataset but with different performance events shows that the dataset is not linear.
-
-\textbf{Proof:}\\Let us assume that the energy consumption is a linear combination of the performance events.
-
-\(f(x_{i1}, x_{i2}, \ldots x_{ik}) = E_i\)\\
-\(f(x_{i1}, x_{i2}, \ldots x_{ik}) = \alpha _1\times x_{i1} + \alpha_2\times x_{i2} + \cdots + \alpha_k\times x_{ik} + \alpha_{k+1}\)\\
+\(f(x_{i1} + x_{j1},\ x_{i2}+ x_{j2},\ \ldots x_{ik} + x_{jk}) = E_i + E_j\)\\ and 
+\(f(x_{i1},\ x_{i2},\ \ldots x_{ik}) + f(x_{j1},\ x_{j2},\ \ldots x_{jk}) = E_i + E_j\)\\
 where \(\alpha_i\) are the constants in the linear combination of performance events and \(i\in[1\ldots k+1]\)
 
-We know that if \(f\) is linear combination of its parameters they can be added and subtracted with each other to generate other data points.\\
-\(f(x_{i1}, x_{i2}, \ldots x_{ik}) = E_i\)\\
-\(f(x_{j1}, x_{j2}, \ldots x_{jk}) = E_j\)
+We know that if \(f\) is additive, hence new records can be generated via addition of records in the dataset.
 
-Adding above to equations we get:\\
-\(f(x_{i1} + x_{j1},x_{i2} + x_{j2}, \ldots x_{ik} + x_{jk}) = E_j + E_i\)
+Let \(V\) be the set of all dataset rows and dataset rows possible by combining various records in the dataset and pseudo records.
 
-we will not prove this as it is a know property of linear function \(f\).
-Lets rename it as:\\
-\(f(x_{1}, x_{2}, \ldots x_{k}) = E\)
+Now if we are able to find data record with \((x_{i1},\ x_{i2},\ \ldots x_{ik}) = (x_{j1},\ x_{j2},\ \ldots x_{jk})\) where \(i \neq j\) and \(E_i \neq E_j\) , where both records belong to the set \(V\).
 
-Now if we are able to find data record with \(E = E_m\) where \(m \in [1, n]\) in the dataset provided.
+Then, by the first proof, \(f\) is not an linear function. Which contradicts our assumption.
 
-Then if after comparing the parameters we find that \((x_{1}, x_{2}, \ldots x_{k})\neq(x_{m1}, x_{m2}, \ldots x_{mk})\).
+Hence using proof by contradiction we can say that the dataset does not contain a linear function.
 
-Then by the proof provided above, \(f\) has two images. So, above dataset is not linear combination.
+\section{Applications}
+
+As you can see from the proofs above, if any of the conditions above is satisfied then we are able to show that there doesnot exist any functional relationship between the events and the power consumption. If none of the conditions are satisfied then that shows that there might be an existence of a functional relation. However, it doesnot guarantee the existence of any form. Non-existence of a function and linear functions are validated. The reason for making a software like this verifies and gives the user the confidence.

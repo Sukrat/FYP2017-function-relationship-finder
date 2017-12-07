@@ -1,6 +1,8 @@
 \documentclass[]{UCD_CS_FYP_Report}
 	\usepackage{graphicx}
 	\usepackage{hyperref}
+	\usepackage{cite}
+	\usepackage{float}
 	
 	%%%%%%%%%%%%%%%%%%%%%%
 	%%% Input project details
@@ -51,21 +53,15 @@
 \input{05_background_research}
 
 %%%%%%%%%%%%%%%%%%%%%%
-%%% Work done
+%%% Work done / Work plan
 
-\chapter{Work Done}
-\input{06_work_done}
-
-%%%%%%%%%%%%%%%%%%%%%%
-%%% Work plan
-
-\chapter{Work plan}
-\input{07_work_plan}
+\chapter{Work done / Work plan}
+\input{06_work}
 
 %%%% ADD YOUR BIBLIOGRAPHY HERE
 \newpage
-\begin{thebibliography}{99}
-	\bibitem{testExistence1993}Robert Zembowicz and Jan M. Zytkov. \emph{Testing the existence of functional relationship in data.} In Proceedings of the AAAI-93 Workshop on Knowledge Discovery in Databases, 1993.
-\end{thebibliography}\label{endpage}
+
+\bibliography{references}
+\bibliographystyle{plain}\label{endpage}
 
 \end{document}

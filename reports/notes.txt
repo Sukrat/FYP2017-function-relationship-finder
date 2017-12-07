@@ -1,0 +1,9 @@
+Supervisor: 	Ravindranath Reddy Manumachu
+				ravi.manumachu@ucd.ie
+				raw
+Mentor: 		Alexey Lastovetsky
+				alexey.lastovetsky@ucd.ie
+
+
+Porject Id:		39351				
+Project Name: 	Automated Software to Understand Functional Relationship Between Dynamic Energy and Performance Events
