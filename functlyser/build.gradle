@@ -34,5 +34,7 @@ idea {
 dependencies {
     compile("org.springframework.boot:spring-boot-starter-web")
     compile("org.springframework.boot:spring-boot-devtools")
+    compile("org.springframework.boot:spring-boot-starter-data-mongodb")
     testCompile("junit:junit")
+    testCompile('org.springframework.boot:spring-boot-starter-test')
 }
