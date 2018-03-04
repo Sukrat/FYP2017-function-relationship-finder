@@ -93,6 +93,31 @@ public class ProfileServiceTest extends BaseServiceTest {
         assertThat(result.getContent().size(), is(pageSize));
     }
 
+    @Test(expected = ApiException.class)
+    public void testList_ShouldThrowError_whenPageNumLessThan0() {
+        long totalElements = 20;
+        int pageSize = 5;
+        for (int i = 0; i < totalElements; i++) {
+            Profile profile = new Profile();
+            profile.setName(Faker.nextString(30) + i);
+            mongoOperations.save(profile);
+        }
+
+        Page<Profile> result = sut.list(-1, pageSize);
+    }
+
+    @Test(expected = ApiException.class)
+    public void testList_ShouldThrowError_whenPageSizeLessThan1() {
+        long totalElements = 20;
+        int pageSize = 5;
+        for (int i = 0; i < totalElements; i++) {
+            Profile profile = new Profile();
+            profile.setName(Faker.nextString(30) + i);
+            mongoOperations.save(profile);
+        }
+
+        Page<Profile> result = sut.list(0, 0);
+    }
 
     private Profile getPerfectProfile() {
         Profile profile = new Profile();

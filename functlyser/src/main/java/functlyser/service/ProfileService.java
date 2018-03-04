@@ -40,6 +40,12 @@ public class ProfileService extends Service {
     }
 
     public Page<Profile> list(int pageNum, int pageSize) {
+        if (pageNum < 0) {
+            throw new ApiException("Page number cannot be less than zero!");
+        }
+        if (pageSize < 1) {
+            throw new ApiException("Page size cannot be less than 1!");
+        }
         Pageable pageable = new PageRequest(pageNum, pageSize);
         return profileRepository.findAll(pageable);
     }

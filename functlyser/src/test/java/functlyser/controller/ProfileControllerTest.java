@@ -85,6 +85,24 @@ public class ProfileControllerTest extends BaseControllerTest {
                 .andExpect(jsonPath("numberOfElements", is(20)));
     }
 
+    @Test
+    public void testListApi_ShouldReturnPage_UsingWrongPageNumValues() throws Exception {
+        ResultActions result = mvcGet("/profile/list?pageNum=-2");
+
+        result.andExpect(status().isBadRequest())
+                .andExpect(jsonPath("type", is("ApiException")))
+                .andExpect(jsonPath("messages", not(isEmptyOrNullString())));
+    }
+
+    @Test
+    public void testListApi_ShouldReturnPage_UsingWrongPageSizeValues() throws Exception {
+        ResultActions result = mvcGet("/profile/list?pageNum=-1");
+
+        result.andExpect(status().isBadRequest())
+                .andExpect(jsonPath("type", is("ApiException")))
+                .andExpect(jsonPath("messages", not(isEmptyOrNullString())));
+    }
+
     private Profile getPerfectProfile() {
         Profile profile = new Profile();
         profile.setName("test");
