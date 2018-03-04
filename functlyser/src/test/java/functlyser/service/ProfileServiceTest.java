@@ -1,23 +1,22 @@
 package functlyser.service;
 
+import functlyser.Faker;
 import functlyser.exception.ApiException;
 import functlyser.exception.ValidationException;
 import functlyser.model.Profile;
-import functlyser.model.ProfileInfo;
 import functlyser.model.validator.ProfileValidator;
 import functlyser.model.validator.ValidatorRunner;
 import functlyser.repository.ProfileRepository;
-import org.assertj.core.api.StringAssert;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
-import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
 import org.springframework.validation.Errors;
 
-import java.util.HashMap;
+import java.util.List;
 
 import static org.hamcrest.Matchers.*;
 import static org.junit.Assert.*;
@@ -75,6 +74,23 @@ public class ProfileServiceTest extends BaseServiceTest {
         Mockito.when(errors.hasErrors()).thenReturn(true);
 
         Profile result = sut.create(profile);
+    }
+
+    @Test
+    public void testList_ShouldReturnPageProfile() {
+        long totalElements = 20;
+        int pageSize = 5;
+        for (int i = 0; i < totalElements; i++) {
+            Profile profile = new Profile();
+            profile.setName(Faker.nextString(30) + i);
+            mongoOperations.save(profile);
+        }
+
+        Page<Profile> result = sut.list(3, pageSize);
+
+        assertThat(result.getTotalElements(), is(totalElements));
+        assertThat(result.getTotalPages(), is(4));
+        assertThat(result.getContent().size(), is(pageSize));
     }
 
 

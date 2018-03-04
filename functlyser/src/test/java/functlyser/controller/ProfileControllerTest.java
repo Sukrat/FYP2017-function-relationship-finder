@@ -1,6 +1,7 @@
 package functlyser.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import functlyser.Faker;
 import functlyser.model.Profile;
 import functlyser.model.ProfileInfo;
 import org.junit.After;
@@ -46,6 +47,42 @@ public class ProfileControllerTest extends BaseControllerTest {
         result.andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.type", is("ValidationException")))
                 .andExpect(jsonPath("$.messages", not(isEmptyOrNullString())));
+    }
+
+    @Test
+    public void testListApi_ShouldReturnPage() throws Exception {
+        long totalElements = 20;
+        int pageSize = 5;
+        for (int i = 0; i < totalElements; i++) {
+            Profile profile = getPerfectProfile();
+            profile.setName(Faker.nextString(30) + i);
+            mongoOperations.save(profile);
+        }
+
+        ResultActions result = mvcGet("/profile/list?pageNum=3&pageSize=5");
+
+        result.andExpect(status().isOk())
+                .andExpect(jsonPath("totalPages", is(4)))
+                .andExpect(jsonPath("totalElements", is(20)))
+                .andExpect(jsonPath("numberOfElements", is(5)));
+    }
+
+    @Test
+    public void testListApi_ShouldReturnPage_UsingDefaultValues() throws Exception {
+        long totalElements = 20;
+        int pageSize = 5;
+        for (int i = 0; i < totalElements; i++) {
+            Profile profile = getPerfectProfile();
+            profile.setName(Faker.nextString(30) + i);
+            mongoOperations.save(profile);
+        }
+
+        ResultActions result = mvcGet("/profile/list");
+
+        result.andExpect(status().isOk())
+                .andExpect(jsonPath("totalPages", is(1)))
+                .andExpect(jsonPath("totalElements", is(20)))
+                .andExpect(jsonPath("numberOfElements", is(20)));
     }
 
     private Profile getPerfectProfile() {

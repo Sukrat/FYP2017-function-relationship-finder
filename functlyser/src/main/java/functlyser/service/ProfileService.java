@@ -7,6 +7,9 @@ import functlyser.model.validator.ValidatorRunner;
 import functlyser.repository.ProfileRepository;
 import functlyser.model.validator.ProfileValidator;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Component;
 import org.springframework.validation.Errors;
 
@@ -34,5 +37,10 @@ public class ProfileService extends Service {
         }
         Profile insert = profileRepository.insert(profile);
         return insert;
+    }
+
+    public Page<Profile> list(int pageNum, int pageSize) {
+        Pageable pageable = new PageRequest(pageNum, pageSize);
+        return profileRepository.findAll(pageable);
     }
 }

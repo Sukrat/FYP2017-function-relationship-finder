@@ -14,6 +14,7 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 
 @SpringBootTest
 @RunWith(SpringRunner.class)
@@ -37,6 +38,14 @@ public abstract class BaseControllerTest {
             return mockMvc.perform(post(url)
                     .contentType(contentType)
                     .content(objectMapper.writeValueAsString(body)));
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    public ResultActions mvcGet(String url) {
+        try {
+            return mockMvc.perform(get(url));
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
