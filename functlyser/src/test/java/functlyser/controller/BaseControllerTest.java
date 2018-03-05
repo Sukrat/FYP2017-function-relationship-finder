@@ -2,6 +2,7 @@ package functlyser.controller;
 
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import functlyser.BaseSpringTest;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.runner.RunWith;
@@ -20,14 +21,8 @@ import java.util.Set;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 
-@SpringBootTest
-@RunWith(SpringRunner.class)
 @AutoConfigureMockMvc
-@ActiveProfiles("test")
-public abstract class BaseControllerTest {
-
-    @Autowired
-    protected MongoOperations mongoOperations;
+public abstract class BaseControllerTest extends BaseSpringTest {
 
     @Autowired
     protected MockMvc mockMvc;
@@ -36,28 +31,6 @@ public abstract class BaseControllerTest {
     ObjectMapper objectMapper;
 
     protected MediaType contentType = MediaType.APPLICATION_JSON;
-
-
-    @Before
-    public void before() {
-        Set<String> collectionNames = mongoOperations.getCollectionNames();
-        for (String collectionName :
-                collectionNames) {
-            if (mongoOperations.collectionExists(collectionName)) {
-                mongoOperations.dropCollection(collectionName);
-            }
-            mongoOperations.createCollection(collectionName);
-        }
-    }
-
-    @After
-    public void after() {
-        Set<String> collectionNames = mongoOperations.getCollectionNames();
-        for (String collectionName :
-                collectionNames) {
-            mongoOperations.dropCollection(collectionName);
-        }
-    }
 
     public ResultActions mvcPost(String url, Object body) {
         try {

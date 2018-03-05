@@ -18,6 +18,8 @@ public class Data {
 
     private Map<String, Double> columns;
 
+    private Map<String, Long> gridIndexes;
+
     public String getId() {
         return id;
     }
@@ -44,5 +46,13 @@ public class Data {
 
     public void setColumns(Map<String, Double> columns) {
         this.columns = columns;
+    }
+
+    public Map<String, Long> getGridIndexes() {
+        return gridIndexes;
+    }
+
+    public void setGridIndexes(Map<String, Long> gridIndexes) {
+        this.gridIndexes = gridIndexes;
     }
 }

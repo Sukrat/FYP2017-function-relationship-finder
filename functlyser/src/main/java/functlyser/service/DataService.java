@@ -107,7 +107,7 @@ public class DataService extends Service {
         eg.setFileName(filename);
 
         List<Data> datas = dataRepository.findAll(Example.of(eg));
-        if (datas.isEmpty()) {
+        if (datas == null || datas.isEmpty()) {
             throw new ApiException(format("Data for file '%s' not found!", filename));
         }
 

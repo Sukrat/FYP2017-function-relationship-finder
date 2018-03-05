@@ -1,5 +1,6 @@
 package functlyser.service;
 
+import functlyser.BaseSpringTest;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.runner.RunWith;
@@ -12,33 +13,6 @@ import org.springframework.test.context.junit4.SpringRunner;
 import java.util.Set;
 
 
-@SpringBootTest
-@RunWith(SpringRunner.class)
-@ActiveProfiles("test")
-public abstract class BaseServiceTest {
-
-    @Autowired
-    protected MongoOperations mongoOperations;
-
-    @Before
-    public void before() {
-        Set<String> collectionNames = mongoOperations.getCollectionNames();
-        for (String collectionName :
-                collectionNames) {
-            if (mongoOperations.collectionExists(collectionName)) {
-                mongoOperations.dropCollection(collectionName);
-            }
-            mongoOperations.createCollection(collectionName);
-        }
-    }
-
-    @After
-    public void after() {
-        Set<String> collectionNames = mongoOperations.getCollectionNames();
-        for (String collectionName :
-                collectionNames) {
-            mongoOperations.dropCollection(collectionName);
-        }
-    }
+public abstract class BaseServiceTest extends BaseSpringTest {
 
 }
