@@ -171,7 +171,7 @@ public class DataServiceTest extends BaseServiceTest {
         profile.getColumns().put("col3", new ProfileInfo());
         profile.getColumns().get("col3").setIndex(2);
         mongoOperations.save(profile);
-        List<Data> datas = getDataFor(profile.getId(), 20);
+        List<Data> datas = getDataFor(profile.getId(), 20, "test.csv");
         mongoOperations.insert(datas, Data.class);
 
         Resource multi = sut.downloadCsv(profile.getId(), "test.csv");
@@ -195,6 +195,48 @@ public class DataServiceTest extends BaseServiceTest {
         Resource multi = sut.downloadCsv(profile.getId(), "test.csv");
     }
 
+    @Test
+    public void testDelete() throws IOException {
+        Profile profile = new Profile();
+        profile.setName("sukrat-test");
+        profile.setColumns(new HashMap<>());
+        profile.getColumns().put("col1", new ProfileInfo());
+        profile.getColumns().put("col2", new ProfileInfo());
+        profile.getColumns().get("col2").setIndex(1);
+        profile.getColumns().put("col3", new ProfileInfo());
+        profile.getColumns().get("col3").setIndex(2);
+        mongoOperations.save(profile);
+        List<Data> datas = getDataFor(profile.getId(), 20, "test.csv");
+        mongoOperations.insert(datas, Data.class);
+        datas = getDataFor(profile.getId(), 20, "sukhi.csv");
+        mongoOperations.insert(datas, Data.class);
+
+        long result = sut.delete(profile.getId(), "test.csv");
+
+        assertThat(result, is(20L));
+        assertThat(mongoOperations.findAll(Data.class).size(), is(20));
+    }
+
+    @Test(expected = ApiException.class)
+    public void testDelete_whenProfileIdIsWrong() throws IOException {
+        long result = sut.delete("5a9c2061c529401e74584c5f", "test.csv");
+    }
+
+    @Test(expected = ApiException.class)
+    public void testDelete_whenFilenameNotPresent() throws IOException {
+        Profile profile = new Profile();
+        profile.setName("sukrat-test");
+        profile.setColumns(new HashMap<>());
+        profile.getColumns().put("col1", new ProfileInfo());
+        profile.getColumns().put("col2", new ProfileInfo());
+        profile.getColumns().get("col2").setIndex(1);
+        profile.getColumns().put("col3", new ProfileInfo());
+        profile.getColumns().get("col3").setIndex(2);
+        mongoOperations.save(profile);
+
+        long result = sut.delete(profile.getId(), "test.csv");
+    }
+
     private List<Data> getPerfectData(int num) {
         List<Data> list = new ArrayList<>();
         for (int i = 0; i < num; i++) {
@@ -209,12 +251,12 @@ public class DataServiceTest extends BaseServiceTest {
         return list;
     }
 
-    private List<Data> getDataFor(String profileId, int num) {
+    private List<Data> getDataFor(String profileId, int num, String filename) {
         List<Data> list = new ArrayList<>();
         for (int i = 0; i < num; i++) {
             Data data = new Data();
             data.setProfileId(new ObjectId(profileId));
-            data.setFileName("test.csv");
+            data.setFileName(filename);
             data.setColumns(new HashMap<>());
             data.getColumns().put("col1", Faker.nextDouble());
             data.getColumns().put("col2", Faker.nextDouble());

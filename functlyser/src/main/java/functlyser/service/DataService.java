@@ -130,6 +130,23 @@ public class DataService extends Service {
         return new ByteArrayResource(byteArrayOutputStream.toByteArray());
     }
 
+    public long delete(String profileId, String filename) {
+        Profile profile = profileRepository.findOne(profileId);
+        if (profile == null) {
+            throw new ApiException(format("Profile with id:'%s' not found!", profileId));
+        }
+
+        Data eg = new Data();
+        eg.setProfileId(new ObjectId(profile.getId()));
+        eg.setFileName(filename);
+        long count = dataRepository.count(Example.of(eg));
+        if (count == 0) {
+            throw new ApiException(format("Data for file '%s' not found!", filename));
+        }
+        dataRepository.deleteAllByProfileIdAndFileName(new ObjectId(profile.getId()), filename);
+        return count;
+    }
+
     private String[] orderedHeaders(Profile profile) {
         return profile.getColumns().entrySet()
                 .stream()

@@ -18,9 +18,7 @@ import org.springframework.test.web.servlet.ResultActions;
 
 import java.util.Set;
 
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.fileUpload;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 
 @SpringBootTest
 @RunWith(SpringRunner.class)
@@ -82,6 +80,14 @@ public abstract class BaseControllerTest {
     public ResultActions mvcUpload(String url, MockMultipartFile file) {
         try {
             return mockMvc.perform(fileUpload(url).file(file));
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    public ResultActions mvcDelete(String url) {
+        try {
+            return mockMvc.perform(delete(url));
         } catch (Exception e) {
             throw new RuntimeException(e);
         }

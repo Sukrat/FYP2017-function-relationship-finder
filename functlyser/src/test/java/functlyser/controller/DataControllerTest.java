@@ -85,6 +85,34 @@ public class DataControllerTest extends BaseControllerTest {
                 .andExpect(jsonPath("$.messages", not(isEmptyOrNullString())));
     }
 
+    @Test
+    public void testDelete() throws Exception {
+        Profile profile = new Profile();
+        profile.setName("sukrat-test");
+        profile.setColumns(new HashMap<>());
+        profile.getColumns().put("col1", new ProfileInfo());
+        profile.getColumns().put("col2", new ProfileInfo());
+        profile.getColumns().get("col2").setIndex(1);
+        profile.getColumns().put("col3", new ProfileInfo());
+        profile.getColumns().get("col3").setIndex(2);
+        mongoOperations.save(profile);
+        List<Data> datas = getDataFor(profile.getId(), 10);
+        mongoOperations.insert(datas, Data.class);
+
+        ResultActions result = mvcDelete("/data/delete?filename=test.csv&profileId=" + profile.getId());
+
+        result.andExpect(status().isOk())
+                .andExpect(jsonPath("$.messages", not(isEmptyOrNullString())));
+    }
+
+    @Test
+    public void testDelete_whenProfileIdIsWrong() throws Exception {
+        ResultActions result = mvcDelete("/data/delete?filename=test.csv&profileId=5a9c8defc52940747cb92205");
+
+        result.andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.messages", not(isEmptyOrNullString())));
+    }
+
     private String testData() {
         return "69.53716376,43.85339759,27.0789345\n" +
                 "28.60979912,64.06039564,33.7528938\n" +
