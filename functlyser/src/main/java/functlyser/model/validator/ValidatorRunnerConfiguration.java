@@ -10,4 +10,9 @@ public class ValidatorRunnerConfiguration {
     public ValidatorRunner<ProfileValidator> profileValidator() {
         return new ValidatorRunner<>(new ProfileValidator());
     }
+
+    @Bean
+    public ValidatorRunner<DataValidator> dataValidator() {
+        return new ValidatorRunner<>(new DataValidator());
+    }
 }

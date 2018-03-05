@@ -7,7 +7,6 @@ import functlyser.model.Profile;
 import functlyser.model.validator.ProfileValidator;
 import functlyser.model.validator.ValidatorRunner;
 import functlyser.repository.ProfileRepository;
-import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
@@ -36,12 +35,8 @@ public class ProfileServiceTest extends BaseServiceTest {
 
     @Before
     public void before() {
+        super.before();
         sut = new ProfileService(profileRepository, profileValidator);
-    }
-
-    @After
-    public void after() {
-        mongoOperations.dropCollection(Profile.class);
     }
 
     @Test

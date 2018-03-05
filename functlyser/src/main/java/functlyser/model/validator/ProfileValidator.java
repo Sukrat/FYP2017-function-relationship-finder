@@ -8,8 +8,8 @@ import org.springframework.validation.Validator;
 import java.util.Arrays;
 import java.util.stream.IntStream;
 
-import static functlyser.Common.isNullOrEmpty;
 import static java.lang.String.format;
+import static org.hibernate.validator.internal.util.StringHelper.isNullOrEmptyString;
 
 public class ProfileValidator implements Validator {
 
@@ -22,9 +22,7 @@ public class ProfileValidator implements Validator {
     public void validate(Object target, Errors errors) {
         Profile profile = (Profile) target;
 
-        ValidationUtils.rejectIfEmptyOrWhitespace(errors, "name", "field.required",
-                "Profile name cannot be empty!");
-        if (isNullOrEmpty(profile.getName())) {
+        if (isNullOrEmptyString(profile.getName())) {
             errors.rejectValue("name", "field.required",
                     "Profile name cannot be empty!");
         } else if (profile.getName().length() > 60) {
@@ -60,7 +58,7 @@ public class ProfileValidator implements Validator {
     private boolean isKeyNullOrEmpty(Profile profile) {
         return profile.getColumns().keySet()
                 .stream()
-                .anyMatch((key) -> isNullOrEmpty(key));
+                .anyMatch((key) -> isNullOrEmptyString(key));
     }
 }
 

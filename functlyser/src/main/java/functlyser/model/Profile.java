@@ -27,13 +27,6 @@ public class Profile {
 
     private String outputColumn;
 
-    public Profile() {
-    }
-
-    public Profile(String id) {
-        this.id = id;
-    }
-
     public String getId() {
         return id;
     }

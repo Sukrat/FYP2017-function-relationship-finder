@@ -22,11 +22,6 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 public class ProfileControllerTest extends BaseControllerTest {
 
-    @After
-    public void after() {
-        mongoOperations.dropCollection(Profile.class);
-    }
-
     @Test
     public void testCreateApi_ShouldReturnProfile() throws Exception {
         Profile profile = getPerfectProfile();
