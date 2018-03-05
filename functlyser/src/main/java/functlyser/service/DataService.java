@@ -10,6 +10,9 @@ import functlyser.repository.DataRepository;
 import functlyser.repository.ProfileRepository;
 import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.ByteArrayResource;
+import org.springframework.core.io.Resource;
+import org.springframework.data.domain.Example;
 import org.springframework.stereotype.Component;
 import org.springframework.validation.Errors;
 import org.springframework.web.multipart.MultipartFile;
@@ -19,12 +22,12 @@ import org.supercsv.cellprocessor.ift.CellProcessor;
 import org.supercsv.exception.SuperCsvConstraintViolationException;
 import org.supercsv.exception.SuperCsvException;
 import org.supercsv.io.CsvMapReader;
+import org.supercsv.io.CsvMapWriter;
 import org.supercsv.io.ICsvMapReader;
+import org.supercsv.io.ICsvMapWriter;
 import org.supercsv.prefs.CsvPreference;
 
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.Reader;
+import java.io.*;
 import java.util.*;
 
 import static java.lang.String.format;
@@ -92,6 +95,39 @@ public class DataService extends Service {
             throw new ApiException(e.getMessage());
         }
         return multiSave(list);
+    }
+
+    public Resource downloadCsv(String profileId, String filename) {
+        Profile profile = profileRepository.findOne(profileId);
+        if (profile == null) {
+            throw new ApiException(format("Profile with id:'%s' not found!", profileId));
+        }
+        Data eg = new Data();
+        eg.setProfileId(new ObjectId(profile.getId()));
+        eg.setFileName(filename);
+
+        List<Data> datas = dataRepository.findAll(Example.of(eg));
+        if (datas.isEmpty()) {
+            throw new ApiException(format("Data for file '%s' not found!", filename));
+        }
+
+        ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+        Writer writer = new OutputStreamWriter(byteArrayOutputStream);
+        ICsvMapWriter mapWriter = new CsvMapWriter(writer, CsvPreference.STANDARD_PREFERENCE);
+
+        String[] headers = orderedHeaders(profile);
+        CellProcessor[] processors = new CellProcessor[headers.length];
+        Arrays.fill(processors, new NotNull(new ParseDouble()));
+
+        try {
+            for (Data data : datas) {
+                mapWriter.write(data.getColumns(), headers, processors);
+            }
+            mapWriter.close();
+        } catch (IOException e) {
+            throw new ApiException(e.getMessage());
+        }
+        return new ByteArrayResource(byteArrayOutputStream.toByteArray());
     }
 
     private String[] orderedHeaders(Profile profile) {

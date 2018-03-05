@@ -16,10 +16,12 @@ import org.junit.Test;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.Resource;
 import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.validation.Errors;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -158,6 +160,41 @@ public class DataServiceTest extends BaseServiceTest {
         List<Data> multi = sut.uploadCsv(profile.getId(), file);
     }
 
+    @Test
+    public void testDownloadCsv() throws IOException {
+        Profile profile = new Profile();
+        profile.setName("sukrat-test");
+        profile.setColumns(new HashMap<>());
+        profile.getColumns().put("col1", new ProfileInfo());
+        profile.getColumns().put("col2", new ProfileInfo());
+        profile.getColumns().get("col2").setIndex(1);
+        profile.getColumns().put("col3", new ProfileInfo());
+        profile.getColumns().get("col3").setIndex(2);
+        mongoOperations.save(profile);
+        List<Data> datas = getDataFor(profile.getId(), 20);
+        mongoOperations.insert(datas, Data.class);
+
+        Resource multi = sut.downloadCsv(profile.getId(), "test.csv");
+        assertThat(multi.contentLength(), greaterThan(0L));
+    }
+
+    @Test(expected = ApiException.class)
+    public void testDownloadCsv_whenProfileIdIsNotPresent() throws IOException {
+        Resource multi = sut.downloadCsv("5a9c2061c529401e74584c5f", "test.csv");
+    }
+
+    @Test(expected = ApiException.class)
+    public void testDownloadCsv_whenFileNameIsNotPresent() throws IOException {
+        Profile profile = new Profile();
+        profile.setName("sukrat-test");
+        profile.setColumns(new HashMap<>());
+        profile.getColumns().put("col1", new ProfileInfo());
+        profile.getColumns().put("col2", new ProfileInfo());
+        profile.getColumns().get("col2").setIndex(1);
+        mongoOperations.save(profile);
+        Resource multi = sut.downloadCsv(profile.getId(), "test.csv");
+    }
+
     private List<Data> getPerfectData(int num) {
         List<Data> list = new ArrayList<>();
         for (int i = 0; i < num; i++) {
@@ -167,6 +204,21 @@ public class DataServiceTest extends BaseServiceTest {
             data.setColumns(new HashMap<>());
             data.getColumns().put("col1", Faker.nextDouble());
             data.getColumns().put("col2", Faker.nextDouble());
+            list.add(data);
+        }
+        return list;
+    }
+
+    private List<Data> getDataFor(String profileId, int num) {
+        List<Data> list = new ArrayList<>();
+        for (int i = 0; i < num; i++) {
+            Data data = new Data();
+            data.setProfileId(new ObjectId(profileId));
+            data.setFileName("test.csv");
+            data.setColumns(new HashMap<>());
+            data.getColumns().put("col1", Faker.nextDouble());
+            data.getColumns().put("col2", Faker.nextDouble());
+            data.getColumns().put("col3", Faker.nextDouble());
             list.add(data);
         }
         return list;
