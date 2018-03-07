@@ -4,12 +4,9 @@ import functlyser.Faker;
 import functlyser.exception.ApiException;
 import functlyser.exception.ValidationException;
 import functlyser.model.Data;
-import functlyser.model.Profile;
-import functlyser.model.ProfileInfo;
 import functlyser.model.validator.DataValidator;
 import functlyser.model.validator.ValidatorRunner;
-import functlyser.repository.DataRepository;
-import functlyser.repository.ProfileRepository;
+import functlyser.repository.ArangoOperation;
 import org.bson.types.ObjectId;
 import org.junit.Before;
 import org.junit.Test;
@@ -22,9 +19,7 @@ import org.springframework.validation.Errors;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
+import java.util.*;
 
 import static org.hamcrest.Matchers.*;
 import static org.junit.Assert.*;
@@ -33,14 +28,8 @@ import static org.mockito.Matchers.anyObject;
 
 public class DataServiceTest extends BaseServiceTest {
 
-    @Autowired
-    private DataRepository dataRepository;
-
     @Mock
     private ValidatorRunner<DataValidator> dataValidator;
-
-    @Autowired
-    private ProfileRepository profileRepository;
 
     @Mock
     private Errors errors;
@@ -50,74 +39,57 @@ public class DataServiceTest extends BaseServiceTest {
     @Before
     public void before() {
         super.before();
-        sut = new DataService(dataRepository, dataValidator, profileRepository);
+        sut = new DataService(arangoOperation, dataValidator);
     }
 
     @Test
     public void testCreateMulti() {
         int num = 10;
-        List<Data> dataList = getPerfectData(num);
+        List<Data> dataList = getPerfectDataFor(num, "test.csv");
         Mockito.when(dataValidator.validate(anyObject())).thenReturn(errors);
         Mockito.when(errors.hasErrors()).thenReturn(false);
 
-        List<Data> multi = sut.createMulti(dataList);
+        Collection<Data> multi = sut.createMulti(dataList);
 
         assertTrue(multi.stream()
                 .allMatch(m -> !isNullOrEmptyString(m.getId())));
-        assertThat(mongoOperations.findAll(Data.class).size(), equalTo(num));
+        assertThat(arangoOperation.findAll(Data.class).asListRemaining().size(), equalTo(num));
     }
 
     @Test(expected = ValidationException.class)
     public void testCreateMulti_WhenDataIsNotValid() {
         int num = 10;
-        List<Data> dataList = getPerfectData(num);
+        List<Data> dataList = getPerfectDataFor(num, "test.csv");
         Mockito.when(dataValidator.validate(anyObject())).thenReturn(errors);
         Mockito.when(errors.hasErrors()).thenReturn(true);
 
-        List<Data> multi = sut.createMulti(dataList);
+        Collection<Data> multi = sut.createMulti(dataList);
     }
 
     @Test(expected = ApiException.class)
     public void testCreateMulti_WhenDataIsNull() {
         List<Data> dataList = null;
 
-        List<Data> multi = sut.createMulti(dataList);
+        Collection<Data> multi = sut.createMulti(dataList);
     }
 
     @Test(expected = ApiException.class)
     public void testCreateMulti_WhenDataIsEmpty() {
         List<Data> dataList = new ArrayList<>();
 
-        List<Data> multi = sut.createMulti(dataList);
+        Collection<Data> multi = sut.createMulti(dataList);
     }
 
     @Test
     public void testUploadCsv() {
-        Profile profile = new Profile();
-        profile.setName("sukrat-test");
-        profile.setColumns(new HashMap<>());
-        profile.getColumns().put("col1", new ProfileInfo());
-        profile.getColumns().put("col2", new ProfileInfo());
-        profile.getColumns().get("col2").setIndex(1);
-        profile.getColumns().put("col3", new ProfileInfo());
-        profile.getColumns().get("col3").setIndex(2);
-        mongoOperations.save(profile);
         MultipartFile file = new MockMultipartFile("test.csv", testData().getBytes());
         Mockito.when(dataValidator.validate(anyObject())).thenReturn(errors);
         Mockito.when(errors.hasErrors()).thenReturn(false);
 
-        List<Data> multi = sut.uploadCsv(profile.getId(), file);
+        Collection<Data> multi = sut.uploadCsv(file);
 
         assertThat(multi.size(), is(10));
         assertTrue(multi.stream().allMatch(m -> !isNullOrEmptyString(m.getId())));
-    }
-
-    @Test(expected = ApiException.class)
-    public void testUploadCsv_whenProfileIdIsNotPresent() {
-        String profileId = (new ObjectId()).toHexString();
-        MultipartFile file = new MockMultipartFile("test.csv", testData().getBytes());
-
-        List<Data> multi = sut.uploadCsv(profileId, file);
     }
 
     @Test(expected = ApiException.class)
@@ -125,142 +97,79 @@ public class DataServiceTest extends BaseServiceTest {
         String profileId = (new ObjectId()).toHexString();
         MultipartFile file = new MockMultipartFile("test.csv", "".getBytes());
 
-        List<Data> multi = sut.uploadCsv(profileId, file);
+        Collection<Data> multi = sut.uploadCsv(file);
     }
 
     @Test(expected = ApiException.class)
     public void testUploadCsv_whenLessColumnThanExpected() {
-        Profile profile = new Profile();
-        profile.setName("sukrat-test");
-        profile.setColumns(new HashMap<>());
-        profile.getColumns().put("col1", new ProfileInfo());
-        profile.getColumns().put("col2", new ProfileInfo());
-        profile.getColumns().get("col2").setIndex(1);
-        mongoOperations.save(profile);
+        arangoOperation.insert(getPerfectDataFor(10, "test.csv", 5),
+                Data.class);
         MultipartFile file = new MockMultipartFile("test.csv", testData().getBytes());
 
-        List<Data> multi = sut.uploadCsv(profile.getId(), file);
+        Collection<Data> multi = sut.uploadCsv(file);
     }
 
     @Test(expected = ApiException.class)
     public void testUploadCsv_whenMoreColumnThanExpected() {
-        Profile profile = new Profile();
-        profile.setName("sukrat-test");
-        profile.setColumns(new HashMap<>());
-        profile.getColumns().put("col1", new ProfileInfo());
-        profile.getColumns().put("col2", new ProfileInfo());
-        profile.getColumns().get("col2").setIndex(1);
-        profile.getColumns().put("col3", new ProfileInfo());
-        profile.getColumns().get("col3").setIndex(2);
-        profile.getColumns().put("col4", new ProfileInfo());
-        profile.getColumns().get("col4").setIndex(3);
-        mongoOperations.save(profile);
+        arangoOperation.insert(getPerfectDataFor(10, "test.csv", 2),
+                Data.class);
         MultipartFile file = new MockMultipartFile("test.csv", testData().getBytes());
 
-        List<Data> multi = sut.uploadCsv(profile.getId(), file);
+        Collection<Data> multi = sut.uploadCsv(file);
     }
 
     @Test
     public void testDownloadCsv() throws IOException {
-        Profile profile = new Profile();
-        profile.setName("sukrat-test");
-        profile.setColumns(new HashMap<>());
-        profile.getColumns().put("col1", new ProfileInfo());
-        profile.getColumns().put("col2", new ProfileInfo());
-        profile.getColumns().get("col2").setIndex(1);
-        profile.getColumns().put("col3", new ProfileInfo());
-        profile.getColumns().get("col3").setIndex(2);
-        mongoOperations.save(profile);
-        List<Data> datas = getDataFor(profile.getId(), 20, "test.csv");
-        mongoOperations.insert(datas, Data.class);
+        arangoOperation.insert(getPerfectDataFor(10, "test.csv"),
+                Data.class);
+        arangoOperation.insert(getPerfectDataFor(10, "black.csv"),
+                Data.class);
 
-        Resource multi = sut.downloadCsv(profile.getId(), "test.csv");
+        Resource multi = sut.downloadCsv("test.csv");
         assertThat(multi.contentLength(), greaterThan(0L));
     }
 
-    @Test(expected = ApiException.class)
-    public void testDownloadCsv_whenProfileIdIsNotPresent() throws IOException {
-        Resource multi = sut.downloadCsv("5a9c2061c529401e74584c5f", "test.csv");
-    }
-
-    @Test(expected = ApiException.class)
+    @Test
     public void testDownloadCsv_whenFileNameIsNotPresent() throws IOException {
-        Profile profile = new Profile();
-        profile.setName("sukrat-test");
-        profile.setColumns(new HashMap<>());
-        profile.getColumns().put("col1", new ProfileInfo());
-        profile.getColumns().put("col2", new ProfileInfo());
-        profile.getColumns().get("col2").setIndex(1);
-        mongoOperations.save(profile);
-        Resource multi = sut.downloadCsv(profile.getId(), "test.csv");
+        Resource multi = sut.downloadCsv("test.csv");
+
+        assertThat(multi.contentLength(), is(0L));
     }
 
     @Test
     public void testDelete() throws IOException {
-        Profile profile = new Profile();
-        profile.setName("sukrat-test");
-        profile.setColumns(new HashMap<>());
-        profile.getColumns().put("col1", new ProfileInfo());
-        profile.getColumns().put("col2", new ProfileInfo());
-        profile.getColumns().get("col2").setIndex(1);
-        profile.getColumns().put("col3", new ProfileInfo());
-        profile.getColumns().get("col3").setIndex(2);
-        mongoOperations.save(profile);
-        List<Data> datas = getDataFor(profile.getId(), 20, "test.csv");
-        mongoOperations.insert(datas, Data.class);
-        datas = getDataFor(profile.getId(), 20, "sukhi.csv");
-        mongoOperations.insert(datas, Data.class);
+        arangoOperation.insert(getPerfectDataFor(10, "test.csv"),
+                Data.class);
+        arangoOperation.insert(getPerfectDataFor(10, "black.csv"),
+                Data.class);
 
-        long result = sut.delete(profile.getId(), "test.csv");
 
-        assertThat(result, is(20L));
-        assertThat(mongoOperations.findAll(Data.class).size(), is(20));
+        long result = sut.delete("test.csv");
+
+        assertThat(result, is(10L));
+        assertThat(arangoOperation.findAll(Data.class).asListRemaining().size(), is(10));
     }
 
-    @Test(expected = ApiException.class)
-    public void testDelete_whenProfileIdIsWrong() throws IOException {
-        long result = sut.delete("5a9c2061c529401e74584c5f", "test.csv");
-    }
-
-    @Test(expected = ApiException.class)
+    @Test
     public void testDelete_whenFilenameNotPresent() throws IOException {
-        Profile profile = new Profile();
-        profile.setName("sukrat-test");
-        profile.setColumns(new HashMap<>());
-        profile.getColumns().put("col1", new ProfileInfo());
-        profile.getColumns().put("col2", new ProfileInfo());
-        profile.getColumns().get("col2").setIndex(1);
-        profile.getColumns().put("col3", new ProfileInfo());
-        profile.getColumns().get("col3").setIndex(2);
-        mongoOperations.save(profile);
+        long result = sut.delete("test.csv");
 
-        long result = sut.delete(profile.getId(), "test.csv");
+        assertThat(result, is(0L));
     }
 
-    private List<Data> getPerfectData(int num) {
+    private List<Data> getPerfectDataFor(int num, String filename) {
+        return getPerfectDataFor(num, filename, 3);
+    }
+
+    private List<Data> getPerfectDataFor(int num, String filename, int numColumn) {
         List<Data> list = new ArrayList<>();
         for (int i = 0; i < num; i++) {
             Data data = new Data();
-            data.setProfileId(new ObjectId("5a9c2061c529401e74584c5f"));
-            data.setFileName("sukhi.csv");
-            data.setColumns(new HashMap<>());
-            data.getColumns().put("col1", Faker.nextDouble());
-            data.getColumns().put("col2", Faker.nextDouble());
-            list.add(data);
-        }
-        return list;
-    }
-
-    private List<Data> getDataFor(String profileId, int num, String filename) {
-        List<Data> list = new ArrayList<>();
-        for (int i = 0; i < num; i++) {
-            Data data = new Data();
-            data.setProfileId(new ObjectId(profileId));
             data.setFileName(filename);
-            data.setColumns(new HashMap<>());
-            data.getColumns().put("col1", Faker.nextDouble());
-            data.getColumns().put("col2", Faker.nextDouble());
-            data.getColumns().put("col3", Faker.nextDouble());
+            data.setColumns(new ArrayList<>());
+            for (int j = 0; j < numColumn; j++) {
+                data.getColumns().add(j + Faker.nextDouble());
+            }
             list.add(data);
         }
         return list;

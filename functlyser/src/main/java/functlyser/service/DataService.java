@@ -1,18 +1,15 @@
 package functlyser.service;
 
+import com.arangodb.ArangoCursor;
 import functlyser.exception.ApiException;
 import functlyser.exception.ValidationException;
 import functlyser.model.Data;
-import functlyser.model.Profile;
 import functlyser.model.validator.DataValidator;
 import functlyser.model.validator.ValidatorRunner;
-import functlyser.repository.DataRepository;
-import functlyser.repository.ProfileRepository;
-import org.bson.types.ObjectId;
+import functlyser.repository.ArangoOperation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.ByteArrayResource;
 import org.springframework.core.io.Resource;
-import org.springframework.data.domain.Example;
 import org.springframework.stereotype.Component;
 import org.springframework.validation.Errors;
 import org.springframework.web.multipart.MultipartFile;
@@ -21,10 +18,7 @@ import org.supercsv.cellprocessor.constraint.NotNull;
 import org.supercsv.cellprocessor.ift.CellProcessor;
 import org.supercsv.exception.SuperCsvConstraintViolationException;
 import org.supercsv.exception.SuperCsvException;
-import org.supercsv.io.CsvMapReader;
-import org.supercsv.io.CsvMapWriter;
-import org.supercsv.io.ICsvMapReader;
-import org.supercsv.io.ICsvMapWriter;
+import org.supercsv.io.*;
 import org.supercsv.prefs.CsvPreference;
 
 import java.io.*;
@@ -35,56 +29,66 @@ import static java.lang.String.format;
 @Component
 public class DataService extends Service {
 
-    private DataRepository dataRepository;
-
-    private ProfileRepository profileRepository;
+    private ArangoOperation arangoOperation;
 
     private ValidatorRunner<DataValidator> dataValidator;
 
     @Autowired
-    public DataService(DataRepository dataRepository,
-                       ValidatorRunner<DataValidator> dataValidator,
-                       ProfileRepository profileRepository) {
-        this.dataRepository = dataRepository;
+    public DataService(ArangoOperation arangoOperation,
+                       ValidatorRunner<DataValidator> dataValidator) {
+        this.arangoOperation = arangoOperation;
         this.dataValidator = dataValidator;
-        this.profileRepository = profileRepository;
     }
 
 
-    public List<Data> createMulti(List<Data> data) {
+    public Collection<Data> createMulti(Collection<Data> data) {
         return multiSave(data);
     }
 
-    public List<Data> uploadCsv(String profileId, MultipartFile file) {
-        Profile profile = profileRepository.findOne(profileId);
-        if (profile == null) {
-            throw new ApiException(format("Profile with id:'%s' not found!", profileId));
-        }
+    public Collection<Data> uploadCsv(MultipartFile file) {
+        Data sampleData = arangoOperation.findAny(Data.class);
 
         List<Data> list = new ArrayList<>();
         try {
             Reader reader = new InputStreamReader(file.getInputStream());
-            ICsvMapReader mapReader = new CsvMapReader(reader, CsvPreference.STANDARD_PREFERENCE);
+            ICsvListReader mapReader = new CsvListReader(reader, CsvPreference.STANDARD_PREFERENCE);
 
-            String[] headers = orderedHeaders(profile);
-            CellProcessor[] processors = new CellProcessor[headers.length];
+            CellProcessor[] processors = null;
+            String[] header = mapReader.getHeader(true);
+            if (header == null) {
+                throw new ApiException(format("File '%s' is empty! No records found!", file.getOriginalFilename()));
+            }
+
+            if (sampleData != null && sampleData.getColumns().size() != header.length) {
+                throw new ApiException(format("Excel columns dont match with data already present! (Expected: %d and actual: %d)",
+                        sampleData.getColumns().size(), header.length));
+            }
+
+            processors = new CellProcessor[header.length];
             Arrays.fill(processors, new NotNull(new ParseDouble()));
 
-            ObjectId objectId = new ObjectId(profile.getId());
+            if (header != null) {
+                Data data = new Data();
+                data.setFileName(file.getOriginalFilename());
+                Double[] doubles = Arrays.asList(header)
+                        .stream()
+                        .map(m -> Double.parseDouble(m))
+                        .toArray(Double[]::new);
+                data.setColumns(Arrays.asList(doubles));
+                list.add(data);
+            }
             while (true) {
-                Map<String, Object> map = mapReader.read(headers, processors);
-                if (map == null) {
+                List<Object> cols = mapReader.read(processors);
+                if (cols == null) {
                     break;
                 }
 
-                Map<String, Double> temp = new HashMap<>();
-                map.entrySet().stream()
-                        .forEach(m -> temp.put(m.getKey(), (Double) m.getValue()));
-
                 Data data = new Data();
-                data.setProfileId(objectId);
                 data.setFileName(file.getOriginalFilename());
-                data.setColumns(temp);
+                Double[] doubles = cols.stream()
+                        .map(m -> (Double) m)
+                        .toArray(Double[]::new);
+                data.setColumns(Arrays.asList(doubles));
                 list.add(data);
             }
         } catch (IOException e) {
@@ -97,31 +101,20 @@ public class DataService extends Service {
         return multiSave(list);
     }
 
-    public Resource downloadCsv(String profileId, String filename) {
-        Profile profile = profileRepository.findOne(profileId);
-        if (profile == null) {
-            throw new ApiException(format("Profile with id:'%s' not found!", profileId));
-        }
-        Data eg = new Data();
-        eg.setProfileId(new ObjectId(profile.getId()));
-        eg.setFileName(filename);
-
-        List<Data> datas = dataRepository.findAll(Example.of(eg));
-        if (datas == null || datas.isEmpty()) {
-            throw new ApiException(format("Data for file '%s' not found!", filename));
-        }
+    public Resource downloadCsv(String filename) {
+        String query = "FOR r in @@collection FILTER r.fileName == @filename RETURN r";
+        Map<String, Object> bindVar = new HashMap<>();
+        bindVar.put("@collection", arangoOperation.collectionName(Data.class));
+        bindVar.put("filename", filename);
+        ArangoCursor<Data> datas = arangoOperation.query(query, bindVar, Data.class);
 
         ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
         Writer writer = new OutputStreamWriter(byteArrayOutputStream);
-        ICsvMapWriter mapWriter = new CsvMapWriter(writer, CsvPreference.STANDARD_PREFERENCE);
-
-        String[] headers = orderedHeaders(profile);
-        CellProcessor[] processors = new CellProcessor[headers.length];
-        Arrays.fill(processors, new NotNull(new ParseDouble()));
+        CsvListWriter mapWriter = new CsvListWriter(writer, CsvPreference.STANDARD_PREFERENCE);
 
         try {
             for (Data data : datas) {
-                mapWriter.write(data.getColumns(), headers, processors);
+                mapWriter.write(data.getColumns());
             }
             mapWriter.close();
         } catch (IOException e) {
@@ -130,32 +123,16 @@ public class DataService extends Service {
         return new ByteArrayResource(byteArrayOutputStream.toByteArray());
     }
 
-    public long delete(String profileId, String filename) {
-        Profile profile = profileRepository.findOne(profileId);
-        if (profile == null) {
-            throw new ApiException(format("Profile with id:'%s' not found!", profileId));
-        }
-
-        Data eg = new Data();
-        eg.setProfileId(new ObjectId(profile.getId()));
-        eg.setFileName(filename);
-        long count = dataRepository.count(Example.of(eg));
-        if (count == 0) {
-            throw new ApiException(format("Data for file '%s' not found!", filename));
-        }
-        dataRepository.deleteAllByProfileIdAndFileName(new ObjectId(profile.getId()), filename);
-        return count;
+    public long delete(String filename) {
+        String query = "FOR r in @@collection FILTER r.fileName == @filename REMOVE r in @@collection RETURN r";
+        Map<String, Object> bindVar = new HashMap<>();
+        bindVar.put("@collection", arangoOperation.collectionName(Data.class));
+        bindVar.put("filename", filename);
+        ArangoCursor<Data> query1 = arangoOperation.query(query, bindVar, Data.class);
+        return query1.asListRemaining().size();
     }
 
-    private String[] orderedHeaders(Profile profile) {
-        return profile.getColumns().entrySet()
-                .stream()
-                .sorted(Comparator.comparingInt(m -> m.getValue().getIndex()))
-                .map(m -> m.getKey())
-                .toArray(String[]::new);
-    }
-
-    private List<Data> multiSave(List<Data> data) {
+    private Collection<Data> multiSave(Collection<Data> data) {
         if (data == null || data.isEmpty()) {
             throw new ApiException("Data cannot be empty or null");
         }
@@ -165,7 +142,7 @@ public class DataService extends Service {
                 throw new ValidationException(errors);
             }
         }
-        List<Data> save = dataRepository.save(data);
+        Collection<Data> save = arangoOperation.insert(data, Data.class);
         return save;
     }
 }

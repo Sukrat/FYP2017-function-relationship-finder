@@ -1,5 +1,6 @@
 package functlyser.model.validator;
 
+import functlyser.Faker;
 import functlyser.model.Data;
 import org.bson.types.ObjectId;
 import org.junit.Before;
@@ -7,6 +8,8 @@ import org.junit.Test;
 import org.mockito.Mockito;
 import org.springframework.validation.Errors;
 
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 
 import static org.junit.Assert.*;
@@ -40,16 +43,6 @@ public class DataValidatorTest {
     }
 
     @Test
-    public void testValidate_WhenProfileIdIsNull() {
-        Data target = getPerfectData();
-        target.setProfileId(null);
-
-        sut.validate(target, errors);
-
-        Mockito.verify(errors).rejectValue(anyString(), anyString(), anyString());
-    }
-
-    @Test
     public void testValidate_WhenFileNameIsEmpty() {
         Data target = getPerfectData();
         target.setFileName("  ");
@@ -72,17 +65,7 @@ public class DataValidatorTest {
     @Test
     public void testValidate_WhenColumnIsEmpty() {
         Data target = getPerfectData();
-        target.setColumns(new HashMap<>());
-
-        sut.validate(target, errors);
-
-        Mockito.verify(errors).rejectValue(anyString(), anyString(), anyString());
-    }
-
-    @Test
-    public void testValidate_WhenColumnNameIsEmpty() {
-        Data target = getPerfectData();
-        target.getColumns().put(" ", 5.0);
+        target.setColumns(new ArrayList<>());
 
         sut.validate(target, errors);
 
@@ -91,11 +74,8 @@ public class DataValidatorTest {
 
     private Data getPerfectData() {
         Data data = new Data();
-        data.setProfileId(new ObjectId("5a9c2061c529401e74584c5f"));
         data.setFileName("duplex.csv");
-        data.setColumns(new HashMap<>());
-        data.getColumns().put("col1", 100.0);
-        data.getColumns().put("col2", 100.0);
+        data.setColumns(Arrays.asList(Faker.nextDouble(), Faker.nextDouble()));
         return data;
     }
 }

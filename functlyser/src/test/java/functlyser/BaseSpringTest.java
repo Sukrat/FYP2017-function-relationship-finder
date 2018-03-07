@@ -1,5 +1,7 @@
 package functlyser;
 
+import com.arangodb.ArangoDatabase;
+import functlyser.repository.ArangoOperation;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.runner.RunWith;
@@ -19,6 +21,12 @@ public abstract class BaseSpringTest {
     @Autowired
     protected MongoOperations mongoOperations;
 
+    @Autowired
+    private ArangoDatabase database;
+
+    @Autowired
+    protected ArangoOperation arangoOperation;
+
     @Before
     public void before() {
         Set<String> collectionNames = mongoOperations.getCollectionNames();
@@ -29,6 +37,10 @@ public abstract class BaseSpringTest {
             }
             mongoOperations.createCollection(collectionName);
         }
+        database.getCollections()
+                .stream()
+                .filter(m -> !m.getIsSystem())
+                .forEach(m -> database.collection(m.getName()).drop());
     }
 
     @After
@@ -38,5 +50,11 @@ public abstract class BaseSpringTest {
                 collectionNames) {
             mongoOperations.dropCollection(collectionName);
         }
+        database.getCollections()
+                .stream()
+                .filter(m -> !m.getIsSystem())
+                .forEach(m -> database.collection(m.getName()).drop());
     }
+
+
 }

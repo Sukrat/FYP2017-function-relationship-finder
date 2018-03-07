@@ -36,6 +36,12 @@ dependencies {
     compile("org.springframework.boot:spring-boot-devtools")
     compile("org.springframework.boot:spring-boot-starter-data-mongodb")
     compile group: 'net.sf.supercsv', name: 'super-csv', version: '2.4.0'
+    compile group: 'com.arangodb', name: 'arangodb-java-driver', version: '4.3.3'
+
     testCompile("junit:junit")
     testCompile('org.springframework.boot:spring-boot-starter-test')
+
+    compile "org.springframework.boot:spring-boot-configuration-processor"
 }
+
+compileJava.dependsOn(processResources)

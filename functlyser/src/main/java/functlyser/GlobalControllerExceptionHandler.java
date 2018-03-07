@@ -1,6 +1,7 @@
 package functlyser;
 
 
+import functlyser.controller.messages.ErrorMessage;
 import functlyser.exception.ApiException;
 import functlyser.exception.ValidationException;
 import org.springframework.http.ResponseEntity;

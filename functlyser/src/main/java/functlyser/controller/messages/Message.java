@@ -1,4 +1,4 @@
-package functlyser;
+package functlyser.controller.messages;
 
 import java.util.Arrays;
 import java.util.List;

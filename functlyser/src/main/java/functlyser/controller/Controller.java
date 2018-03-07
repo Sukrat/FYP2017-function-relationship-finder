@@ -1,4 +1,4 @@
-package functlyser.Controller;
+package functlyser.controller;
 
 public abstract class Controller {
 }

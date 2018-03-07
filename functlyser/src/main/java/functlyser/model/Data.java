@@ -1,36 +1,15 @@
 package functlyser.model;
 
-import org.bson.types.ObjectId;
-import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
+import java.util.List;
 import java.util.Map;
 
-@Document
-public class Data {
-
-    @Id
-    private String id;
-
-    private ObjectId profileId;
+public class Data extends Entity {
 
     private String fileName;
 
-    private Map<String, Double> columns;
-
-    private Map<String, Long> gridIndexes;
-
-    public String getId() {
-        return id;
-    }
-
-    public ObjectId getProfileId() {
-        return profileId;
-    }
-
-    public void setProfileId(ObjectId profileId) {
-        this.profileId = profileId;
-    }
+    private List<Double> columns;
 
     public String getFileName() {
         return fileName;
@@ -40,19 +19,11 @@ public class Data {
         this.fileName = fileName;
     }
 
-    public Map<String, Double> getColumns() {
+    public List<Double> getColumns() {
         return columns;
     }
 
-    public void setColumns(Map<String, Double> columns) {
+    public void setColumns(List<Double> columns) {
         this.columns = columns;
-    }
-
-    public Map<String, Long> getGridIndexes() {
-        return gridIndexes;
-    }
-
-    public void setGridIndexes(Map<String, Long> gridIndexes) {
-        this.gridIndexes = gridIndexes;
     }
 }
