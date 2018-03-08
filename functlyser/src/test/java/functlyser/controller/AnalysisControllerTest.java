@@ -2,11 +2,13 @@ package functlyser.controller;
 
 import functlyser.Faker;
 import functlyser.model.Data;
+import functlyser.model.GroupedData;
 import org.bson.types.ObjectId;
 import org.junit.Test;
 import org.springframework.test.web.servlet.ResultActions;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 
@@ -18,38 +20,76 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 public class AnalysisControllerTest extends BaseControllerTest {
 
     @Test
-    public void testGrid() throws Exception {
-//        Profile profile = new Profile();
-//        profile.setName("test");
-//        profile.setColumns(new HashMap<>());
-//        profile.getColumns().put("col1", new ProfileInfo());
-//        profile.getColumns().put("col2", new ProfileInfo());
-//        profile.getColumns().get("col2").setIndex(1);
-//        profile.getColumns().put("col3", new ProfileInfo());
-//        profile.getColumns().get("col3").setIndex(2);
-//        mongoOperations.save(profile);
-//        List<Data> datas = getDataFor(profile.getId(), 10, "test.csc");
-//        mongoOperations.insert(datas, Data.class);
-//        datas = getDataFor(profile.getId(), 10, "sukhi.csc");
-//        mongoOperations.insert(datas, Data.class);
-//
-//        ResultActions resultActions = mvcGet("/analysis/grid?profileId=" + profile.getId());
-//
-//        resultActions.andExpect(status().isOk())
-//                .andExpect(jsonPath("$.messages", not(isEmptyOrNullString())));
+    public void testGroup() throws Exception {
+        List<Double> tolerance = Arrays.asList(5.0, 5.0, 5.0, 5.0, 5.0);
+        List<Data> datas = getPerfectDataFor(10, "test.csc", 5);
+        arangoOperation.insert(datas, Data.class);
+        datas = getPerfectDataFor(10, "test.csc", 5);
+        arangoOperation.insert(datas, Data.class);
+
+        ResultActions resultActions = mvcPost("/analysis/grid/group", tolerance);
+
+        resultActions.andExpect(status().isOk())
+                .andExpect(jsonPath("$.messages", not(isEmptyOrNullString())));
     }
 
+    @Test
+    public void testGroup_ShouldGetErrorWhenToleranceColumnMismatch() throws Exception {
+        List<Double> tolerance = Arrays.asList(5.0, 5.0, 5.0, 5.0);
+        List<Data> datas = getPerfectDataFor(10, "test.csc", 5);
+        arangoOperation.insert(datas, Data.class);
+        datas = getPerfectDataFor(10, "test.csc", 5);
+        arangoOperation.insert(datas, Data.class);
 
-//    private List<Data> getDataFor(String profileId, int num, String filename) {
-//        List<Data> list = new ArrayList<>();
-//        for (int i = 0; i < num; i++) {
-//            Data data = new Data();
-//            data.setFileName(filename);
-//            data.getColumns().put("col1", (double) i);
-//            data.getColumns().put("col2", i * Faker.nextDouble());
-//            data.getColumns().put("col3", i * Faker.nextDouble());
-//            list.add(data);
-//        }
-//        return list;
-//    }
+        ResultActions resultActions = mvcPost("/analysis/grid/group", tolerance);
+
+        resultActions.andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.messages", not(isEmptyOrNullString())));
+    }
+
+    @Test
+    public void testIsFunction() throws Exception {
+        List<Data> perfectDataFor = getPerfectDataFor(30, "test.csv", 5);
+        arangoOperation.insert(perfectDataFor, Data.class);
+        GroupedData groupedData = getPerfectGroupedData(Arrays.asList(4l, 5l, 6l));
+        arangoOperation.insert(groupedData);
+        groupedData = getPerfectGroupedData(Arrays.asList(5l, 6l, 7l));
+        arangoOperation.insert(groupedData);
+
+        ResultActions resultActions = mvcPost("/analysis/grid/isfunction", 1);
+
+        resultActions.andExpect(status().isOk());
+    }
+
+    private List<Data> getPerfectDataFor(int num, String filename, int numColumn) {
+        List<Data> list = new ArrayList<>();
+        for (int i = 0; i < num; i++) {
+            Data data = new Data();
+            data.setFileName(filename);
+            data.setColumns(new ArrayList<>());
+            for (int j = 0; j < numColumn; j++) {
+                data.getColumns().add(j + Faker.nextDouble() + i / 5);
+            }
+            list.add(data);
+        }
+        return list;
+    }
+
+    private GroupedData getPerfectGroupedData(List<Long> gridIndex) {
+        GroupedData groupedData = new GroupedData();
+        groupedData.setGridIndex(gridIndex);
+        List<Data> list = new ArrayList<>();
+        for (int i = 0; i < 10; i++) {
+            Data data = new Data();
+            data.setFileName("asdf");
+            data.setColumns(new ArrayList<>());
+            data.getColumns().add(Faker.nextDouble());
+            for (int j = 0; j < gridIndex.size(); j++) {
+                data.getColumns().add(gridIndex.get(j) + Faker.nextDouble());
+            }
+            list.add(data);
+        }
+        groupedData.setDataMembers(list);
+        return groupedData;
+    }
 }

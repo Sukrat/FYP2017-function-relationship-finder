@@ -19,9 +19,6 @@ import java.util.Set;
 public abstract class BaseSpringTest {
 
     @Autowired
-    protected MongoOperations mongoOperations;
-
-    @Autowired
     private ArangoDatabase database;
 
     @Autowired
@@ -29,14 +26,6 @@ public abstract class BaseSpringTest {
 
     @Before
     public void before() {
-        Set<String> collectionNames = mongoOperations.getCollectionNames();
-        for (String collectionName :
-                collectionNames) {
-            if (mongoOperations.collectionExists(collectionName)) {
-                mongoOperations.dropCollection(collectionName);
-            }
-            mongoOperations.createCollection(collectionName);
-        }
         database.getCollections()
                 .stream()
                 .filter(m -> !m.getIsSystem())
@@ -45,11 +34,6 @@ public abstract class BaseSpringTest {
 
     @After
     public void after() {
-        Set<String> collectionNames = mongoOperations.getCollectionNames();
-        for (String collectionName :
-                collectionNames) {
-            mongoOperations.dropCollection(collectionName);
-        }
         database.getCollections()
                 .stream()
                 .filter(m -> !m.getIsSystem())
