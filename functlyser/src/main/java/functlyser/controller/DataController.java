@@ -1,6 +1,7 @@
 package functlyser.controller;
 
 import functlyser.controller.messages.Message;
+import functlyser.exception.ApiException;
 import functlyser.model.Data;
 import functlyser.service.DataService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -49,5 +50,11 @@ public class DataController extends Controller {
         Message message = new Message(Arrays.asList(format("%d records deleted!", deleteCount),
                 format("%s successfully deleted!", filename)));
         return ResponseEntity.ok(message);
+    }
+
+    @RequestMapping(value = "/data/listexcel", method = RequestMethod.GET)
+    public ResponseEntity<List<String>> list() {
+        List<String> excelList = dataService.listExcels();
+        return ResponseEntity.ok(excelList);
     }
 }

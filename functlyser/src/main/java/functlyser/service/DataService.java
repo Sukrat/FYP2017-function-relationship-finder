@@ -46,6 +46,10 @@ public class DataService extends Service {
     }
 
     public Collection<Data> uploadCsv(MultipartFile file) {
+        if (listExcels().contains(file.getOriginalFilename())) {
+            throw new ApiException(format("%s already exists!", file.getOriginalFilename()));
+        }
+
         Data sampleData = arangoOperation.findAny(Data.class);
 
         List<Data> list = new ArrayList<>();
@@ -130,6 +134,14 @@ public class DataService extends Service {
         bindVar.put("filename", filename);
         ArangoCursor<Data> query1 = arangoOperation.query(query, bindVar, Data.class);
         return query1.asListRemaining().size();
+    }
+
+    public List<String> listExcels() {
+        String query = "FOR r in @@collection RETURN DISTINCT r.fileName";
+        Map<String, Object> bindVar = new HashMap<>();
+        bindVar.put("@collection", arangoOperation.collectionName(Data.class));
+        ArangoCursor<String> query1 = arangoOperation.query(query, bindVar, String.class);
+        return query1.asListRemaining();
     }
 
     private Collection<Data> multiSave(Collection<Data> data) {

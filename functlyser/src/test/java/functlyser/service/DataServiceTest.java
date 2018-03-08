@@ -93,6 +93,16 @@ public class DataServiceTest extends BaseServiceTest {
     }
 
     @Test(expected = ApiException.class)
+    public void testUploadCsv_whenFileNameExistsThrowError() {
+        MultipartFile file = new MockMultipartFile("test.csv", testData().getBytes());
+        Mockito.when(dataValidator.validate(anyObject())).thenReturn(errors);
+        Mockito.when(errors.hasErrors()).thenReturn(false);
+
+        Collection<Data> multi = sut.uploadCsv(file);
+        sut.uploadCsv(file);
+    }
+
+    @Test(expected = ApiException.class)
     public void testUploadCsv_whenDataIsEmpty() {
         String profileId = (new ObjectId()).toHexString();
         MultipartFile file = new MockMultipartFile("test.csv", "".getBytes());
@@ -155,6 +165,20 @@ public class DataServiceTest extends BaseServiceTest {
         long result = sut.delete("test.csv");
 
         assertThat(result, is(0L));
+    }
+
+    @Test
+    public void testListExcels() throws IOException {
+        arangoOperation.insert(getPerfectDataFor(10, "test.csv"),
+                Data.class);
+        arangoOperation.insert(getPerfectDataFor(10, "black.csv"),
+                Data.class);
+        arangoOperation.insert(getPerfectDataFor(10, "one.csv"),
+                Data.class);
+        List<String> result = sut.listExcels();
+
+        assertThat(result.size(), is(3));
+        assertThat(result, contains("test.csv", "black.csv", "one.csv"));
     }
 
     private List<Data> getPerfectDataFor(int num, String filename) {
