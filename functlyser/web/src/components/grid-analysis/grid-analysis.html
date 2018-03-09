@@ -1,0 +1,25 @@
+<div class="row">
+    <div class="col">
+        <div class="alert alert-success" role="alert" ng-if="$ctrl.msg.success">
+            <ul>
+                <li ng-repeat="message in $ctrl.msg.success track by $index">{{message}}</li>
+            </ul>
+        </div>
+        <div class="alert alert-danger" role="alert" ng-if="$ctrl.msg.error">
+            <ul>
+                <li ng-repeat="message in $ctrl.msg.error track by $index">{{message}}</li>
+            </ul>
+        </div>
+        <div class="loading" ng-if="$ctrl.loading">Loading</div>
+    </div>
+</div>
+<div class="row">
+    <div class="col">
+        <form>
+            <div class="form-group">
+                <textarea ng-model="$ctrl.tolerances" class="form-control" placeholder="Enter tolerances for the parameters (comma separated)"></textarea>
+            </div>
+            <button class="btn btn-secondary" type="button" ng-click="$ctrl.group($ctrl.tolerances)">Group data by tolerance</button>
+        </form>
+    </div>
+</div>

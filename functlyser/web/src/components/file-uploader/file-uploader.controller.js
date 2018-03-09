@@ -3,11 +3,13 @@ import template from './file-uploader.html';
 class FileUploadController {
 
     constructor(fileUploaderService) {
+        this.fileUploaderService = fileUploaderService;
+
         this.msg = {};
+        this.loading = false;
         this.data = [];
         this.percentage = 0;
-        this.loading = false;
-        this.fileUploaderService = fileUploaderService;
+
         this.loadExcelTable();
     }
 
@@ -41,7 +43,7 @@ class FileUploadController {
         this.loading = true;
         this.fileUploaderService.listExcelFile()
             .then((data) => {
-                this.success();
+                this.loading = false;
                 this.data = data;
             }).catch((error) => {
                 this.error(error);
@@ -68,6 +70,5 @@ class FileUploadController {
 export default {
     template: template,
     controller: ['FileUploaderService',
-        FileUploadController],
-    controllerAs: 'ctrl'
+        FileUploadController]
 };

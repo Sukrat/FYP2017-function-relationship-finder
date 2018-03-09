@@ -1,14 +1,19 @@
+<div class="loading" ng-if="$ctrl.loading">
+    Loading</div>
 <div class="row">
     <div class="col">
         <div class="row">
             <div class="col">
-                <div class="alert alert-success" role="alert" ng-repeat="message in ctrl.msg.success">
-                    {{message}}
+                <div class="alert alert-success" role="alert" ng-if="$ctrl.msg.success">
+                    <ul>
+                        <li ng-repeat="message in $ctrl.msg.success track by $index">{{message}}</li>
+                    </ul>
                 </div>
-                <div class="alert alert-danger" role="alert" ng-repeat="message in ctrl.msg.error">
-                    {{message}}
+                <div class="alert alert-danger" role="alert" ng-if="$ctrl.msg.error">
+                    <ul>
+                        <li ng-repeat="message in $ctrl.msg.error track by $index">{{message}}</li>
+                    </ul>
                 </div>
-                <div class="loading" ng-if="ctrl.loading">Loading</div>
             </div>
         </div>
         <div class="row">
@@ -18,12 +23,12 @@
                         <div class="custom-file">
                             <input type="file" id="fileInput" name="fileInput" />
                         </div>
-                        <div class="progress" ng-show="ctrl.percentage > 0 && ctrl.percentage < 100">
-                            <div class="progress-bar" role="progressbar" ng-style="{width: (ctrl.percentage + '%')}">
+                        <div class="progress" ng-show="$ctrl.percentage > 0 && $ctrl.percentage < 100">
+                            <div class="progress-bar" role="progressbar" ng-style="{width: ($ctrl.percentage + '%')}">
                             </div>
                         </div>
                     </div>
-                    <button class="btn btn-secondary" type="button" ng-click="ctrl.upload()">Upload</button> &nbsp;
+                    <button class="btn btn-secondary" type="button" ng-click="$ctrl.upload()">Upload</button> &nbsp;
                     <button class="btn btn-outline-secondary" type="button" onClick="this.form.reset()">Clear</button>
                 </form>
             </div>
@@ -41,16 +46,16 @@
                             </tr>
                         </thead>
                         <tbody>
-                            <tr ng-repeat="filename in ctrl.data" ng-if="ctrl.data.length > 0">
+                            <tr ng-repeat="filename in $ctrl.data" ng-if="$ctrl.data.length > 0">
                                 <td>
                                     <a ng-href="/data/download?filename={{filename}}">{{$index}}</a>
                                 </td>
                                 <td>{{filename}}</td>
                                 <td>
-                                    <button type="button" class="btn btn-danger btn-sm" ng-click="ctrl.delete(filename)">Delete</button>
+                                    <button type="button" class="btn btn-danger btn-sm" ng-click="$ctrl.delete(filename)">Delete</button>
                                 </td>
                             </tr>
-                            <tr ng-if="ctrl.data.length == 0">
+                            <tr ng-if="$ctrl.data.length == 0">
                                 <td colspan="3">No data</td>
                             </tr>
                         </tbody>

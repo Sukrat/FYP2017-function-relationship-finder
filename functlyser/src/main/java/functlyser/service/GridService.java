@@ -37,7 +37,7 @@ public class GridService extends Service {
         }
         if (any.getColumns().size() != tolerances.size()) {
             throw new ApiException(
-                    format("Number of tolerance must be equal to the data columns. (expected: %d actual: %d",
+                    format("Number of tolerance must be equal to the data columns. (expected: %d actual: %d)",
                             any.getColumns().size(), tolerances.size()));
         }
 
