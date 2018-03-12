@@ -7,16 +7,33 @@ class GridAnalysisController {
 
         this.msg = {};
         this.loading = false;
+
         this.tolerances = "";
+        this.outputTolerance = "";
+        this.columnNo = "";
     }
 
-    group(tolerances) {
+    cluster(tolerances) {
         this.loading = true;
 
-        this.gridAnalysisService.groupByN(tolerances)
+        this.gridAnalysisService.cluster(tolerances)
             .then((data) => {
                 this.success(data.messages);
             }).catch((error) => { this.error(error) })
+    }
+
+    functionCheck(outputTolerance) {
+        this.loading = true;
+        return this.gridAnalysisService.functionCheck(outputTolerance)
+            .then((data) => { this.success(data) })
+            .catch((error) => { this.error(error) })
+    }
+
+    analyseColumn(columnNo) {
+        this.loading = true;
+        return this.gridAnalysisService.analyseColumn(columnNo)
+            .then((response) => { this.success(data) })
+            .catch((error) => { this.error(error) })
     }
 
     error(error) {

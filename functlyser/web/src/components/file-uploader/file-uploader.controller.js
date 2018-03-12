@@ -7,20 +7,25 @@ class FileUploadController {
 
         this.msg = {};
         this.loading = false;
+
         this.data = [];
         this.percentage = 0;
 
-        this.loadExcelTable();
+        this.list();
     }
 
     upload() {
         this.loading = true;
         let file = document.getElementById('fileInput').files[0];
+        if(file == undefined){
+            this.error(['Please select a file to be uploaded!']);
+            return;
+        }
 
         this.fileUploaderService.uploadFile(file)
             .then((data) => {
                 this.success(data.messages);
-                this.loadExcelTable();
+                this.list();
             }, (error) => {
                 this.error(error);
             }, (progressPercentage) => {
@@ -33,15 +38,15 @@ class FileUploadController {
         this.fileUploaderService.deleteFile(filename)
             .then((data) => {
                 this.success(data.messages);
-                this.loadExcelTable();
+                this.list();
             }).catch((error) => {
                 this.error(error);
             })
     }
 
-    loadExcelTable() {
+    list() {
         this.loading = true;
-        this.fileUploaderService.listExcelFile()
+        this.fileUploaderService.getFileNames()
             .then((data) => {
                 this.loading = false;
                 this.data = data;
@@ -63,8 +68,6 @@ class FileUploadController {
             success: success
         }
     }
-
-
 }
 
 export default {

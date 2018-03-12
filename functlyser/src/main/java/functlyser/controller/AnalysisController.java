@@ -29,7 +29,7 @@ public class AnalysisController extends Controller {
     }
 
 
-    @RequestMapping(value = "/analysis/grid/group", method = RequestMethod.POST)
+    @RequestMapping(value = "/analysis/grid/cluster", method = RequestMethod.POST)
     public ResponseEntity<Message> isafunctionByGrid(@RequestBody ArrayList<Double> tolerances) {
         long count = gridService.groupByNdimensionAndInsert(tolerances);
         Message message = new Message(Arrays.asList(format("%d groups created!", count),
@@ -37,7 +37,7 @@ public class AnalysisController extends Controller {
         return ResponseEntity.ok(message);
     }
 
-    @RequestMapping(value = "/analysis/grid/isfunction", method = RequestMethod.POST)
+    @RequestMapping(value = "/analysis/grid/functioncheck", method = RequestMethod.POST)
     public ResponseEntity<List<GroupedData>> isafunctionByGrid(@RequestBody double tolerance) {
         List<GroupedData> result = gridService.getFunctionTerminator(tolerance);
         return ResponseEntity.ok(result);

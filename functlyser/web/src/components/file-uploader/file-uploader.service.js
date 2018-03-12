@@ -8,21 +8,20 @@ export default class FileUploaderService {
     }
 
     uploadFile(file) {
-        var deferred = this.$q.defer();
+        var defer = this.$q.defer();
         this.fileupload.upload({
             url: '/data/upload',
             file: file
         }).then((response) => {
-            console.log(response);
-            deferred.resolve(response.data);
+            defer.resolve(response.data);
         }, (error) => {
             console.log(error);
-            deferred.reject(error.data.messages);
+            defer.reject(error.data.messages);
         }, (evt) => {
             var progressPercentage = parseInt(100.0 * evt.loaded / evt.total);
-            deferred.notify(progressPercentage);
+            defer.notify(progressPercentage);
         });
-        return deferred.promise;        
+        return defer.promise;        
     }
 
     deleteFile(filename) {
@@ -36,7 +35,7 @@ export default class FileUploaderService {
             })
     }
 
-    listExcelFile() {
+    getFileNames() {
         return this.$http.get("/data/listexcel")
             .then((response) => {
                 return response.data;

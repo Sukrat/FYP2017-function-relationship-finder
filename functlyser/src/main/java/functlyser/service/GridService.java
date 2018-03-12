@@ -35,6 +35,12 @@ public class GridService extends Service {
         if (any == null) {
             throw new ApiException("No data found in the database!");
         }
+        if (tolerances.size() == 1) {
+            double tolerance = tolerances.get(0);
+            for (int i = 1; i < any.getColumns().size(); i++) {
+                tolerances.add(tolerance);
+            }
+        }
         if (any.getColumns().size() != tolerances.size()) {
             throw new ApiException(
                     format("Number of tolerance must be equal to the data columns. (expected: %d actual: %d)",
@@ -111,7 +117,7 @@ public class GridService extends Service {
             throw new ApiException("Data has not been grouped!");
         }
         if (column == 0) {
-            throw new ApiException("Choose parameter column to be analyser cannot analyse output!");
+            throw new ApiException("Choose parameter column to be analysed cannot analyse output column!");
         }
         if (column < 0 || column >= any.getColumns().size()) {
             throw new ApiException(format("Column number doesnot exist! (Expected: < %d and > 0 and got: )",

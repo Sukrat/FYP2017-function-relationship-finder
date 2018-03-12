@@ -1,10 +1,12 @@
-<div class="alert alert-success" role="alert" ng-if="msgs.success">
+<div class="loading" ng-if="loading">
+    Loading</div>
+<div class="alert alert-success" role="alert" ng-if="msg.success">
     <ul>
-        <li ng-repeat="message in msgs.success track by $index">{{message}}</li>
+        <li ng-repeat="message in msg.success track by $index">{{message}}</li>
     </ul>
 </div>
-<div class="alert alert-danger" role="alert" ng-if="msgs.error">
+<div class="alert alert-danger" role="alert" ng-if="msg.error">
     <ul>
-        <li ng-repeat="message in msgs.error track by $index">{{message}}</li>
+        <li ng-repeat="message in msg.error track by $index">{{message}}</li>
     </ul>
 </div>

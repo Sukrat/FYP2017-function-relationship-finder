@@ -1,67 +1,52 @@
-<div class="loading" ng-if="$ctrl.loading">
-    Loading</div>
 <div class="row">
     <div class="col">
-        <div class="row">
-            <div class="col">
-                <div class="alert alert-success" role="alert" ng-if="$ctrl.msg.success">
-                    <ul>
-                        <li ng-repeat="message in $ctrl.msg.success track by $index">{{message}}</li>
-                    </ul>
-                </div>
-                <div class="alert alert-danger" role="alert" ng-if="$ctrl.msg.error">
-                    <ul>
-                        <li ng-repeat="message in $ctrl.msg.error track by $index">{{message}}</li>
-                    </ul>
-                </div>
-            </div>
-        </div>
-        <div class="row">
-            <div class="col-7">
-                <form>
-                    <div class="form-group">
-                        <div class="custom-file">
-                            <input type="file" id="fileInput" name="fileInput" />
-                        </div>
-                        <div class="progress" ng-show="$ctrl.percentage > 0 && $ctrl.percentage < 100">
-                            <div class="progress-bar" role="progressbar" ng-style="{width: ($ctrl.percentage + '%')}">
-                            </div>
-                        </div>
+        <msg loading="$ctrl.loading" msg="$ctrl.msg"></msg>
+    </div>
+</div>
+<div class="row">
+    <div class="col">
+        <form>
+            <div class="form-group">
+                <input type="file" id="fileInput" name="fileInput" class="form-control-file" />
+                <div class="progress" ng-show="$ctrl.percentage > 0 && $ctrl.percentage < 100">
+                    <div class="progress-bar" role="progressbar" ng-style="{width: ($ctrl.percentage + '%')}">
                     </div>
-                    <button class="btn btn-secondary" type="button" ng-click="$ctrl.upload()">Upload</button> &nbsp;
-                    <button class="btn btn-outline-secondary" type="button" onClick="this.form.reset()">Clear</button>
-                </form>
-            </div>
-        </div>
-        <br />
-        <div class="row">
-            <div class="col">
-                <div class="table-responsive">
-                    <table class="table table-hover table-bordered">
-                        <thead>
-                            <tr>
-                                <th scope="col">#</th>
-                                <th scope="col">Name</th>
-                                <th scope="col">Delete</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <tr ng-repeat="filename in $ctrl.data" ng-if="$ctrl.data.length > 0">
-                                <td>
-                                    <a ng-href="/data/download?filename={{filename}}">{{$index}}</a>
-                                </td>
-                                <td>{{filename}}</td>
-                                <td>
-                                    <button type="button" class="btn btn-danger btn-sm" ng-click="$ctrl.delete(filename)">Delete</button>
-                                </td>
-                            </tr>
-                            <tr ng-if="$ctrl.data.length == 0">
-                                <td colspan="3">No data</td>
-                            </tr>
-                        </tbody>
-                    </table>
                 </div>
             </div>
+            <button class="btn btn-secondary" type="button" ng-click="$ctrl.upload()">Upload</button> &nbsp;
+            <button class="btn btn-outline-secondary" type="button" onClick="this.form.reset()">Clear</button>
+        </form>
+    </div>
+</div>
+<br/>
+<div class="row">
+    <div class="col">
+        <div class="table-responsive">
+            <table class="table table-hover table-bordered">
+                <thead>
+                    <tr>
+                        <th scope="col">#</th>
+                        <th scope="col">Name</th>
+                        <th scope="col">Delete</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr ng-repeat="filename in $ctrl.data" ng-if="$ctrl.data.length > 0">
+                        <td>
+                            <a ng-href="/data/download?filename={{filename}}">{{$index}}</a>
+                        </td>
+                        <td>{{filename}}</td>
+                        <td>
+                            <button type="button" class="btn btn-danger btn-sm" ng-click="$ctrl.delete(filename)">
+                                Delete
+                            </button>
+                        </td>
+                    </tr>
+                    <tr ng-if="$ctrl.data.length == 0">
+                        <td colspan="3">No data</td>
+                    </tr>
+                </tbody>
+            </table>
         </div>
     </div>
 </div>
