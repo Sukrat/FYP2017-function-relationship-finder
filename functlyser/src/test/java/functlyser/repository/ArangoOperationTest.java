@@ -4,6 +4,9 @@ package functlyser.repository;
 import com.arangodb.ArangoCollection;
 import com.arangodb.ArangoCursor;
 import com.arangodb.ArangoDatabase;
+import com.arangodb.entity.CollectionEntity;
+import com.arangodb.entity.IndexEntity;
+import org.hamcrest.core.IsNull;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -17,6 +20,7 @@ import java.util.*;
 
 import static org.hamcrest.MatcherAssert.*;
 import static org.hamcrest.Matchers.*;
+import static org.hibernate.validator.internal.util.StringHelper.isNullOrEmptyString;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
@@ -49,7 +53,7 @@ public class ArangoOperationTest {
     }
 
     @Test
-    public void collection_WithTypeParam() {
+    public void collection_withTypeParam() {
         Class<Test> type = Test.class;
 
         ArangoCollection result = sut.collection(type);
@@ -60,14 +64,14 @@ public class ArangoOperationTest {
     }
 
     @Test(expected = IllegalArgumentException.class)
-    public void collection_WithNullTypeParam() {
+    public void collection_withNullTypeParam() {
         Class<Test> type = null;
 
         ArangoCollection result = sut.collection(type);
     }
 
     @Test
-    public void collection_mustCreateIfNotPresent() {
+    public void collection_withNameParam() {
         String collectionName = "sukrat";
 
         ArangoCollection result = sut.collection(collectionName);
@@ -78,18 +82,10 @@ public class ArangoOperationTest {
         assertTrue(database.collection(collectionName).exists());
     }
 
-//    @Test
-//    public void collection_ifAlreadyCreatedShouldGiveCacheValue() {
-//        ArangoCollection resultX = sut.collection("sukrat");
-//        ArangoCollection resultY = sut.collection("sukrat");
-//
-//        assertThat(resultX, is(resultY));
-//    }
-
-
     @Test(expected = IllegalArgumentException.class)
     public void collection_withEmptyCollectionName() {
-        ArangoCollection result = sut.collection("");
+
+        ArangoCollection result = sut.collection(" ");
     }
 
     @Test
@@ -99,11 +95,12 @@ public class ArangoOperationTest {
 
         Set<String> result = sut.getCollectionNames();
 
+        assertThat(result.size(), is(2));
         assertThat(result, contains("t1", "t2"));
     }
 
     @Test
-    public void collectionExists_WithTypeWhenTrue() {
+    public void collectionExists_withTypeWhenTrue() {
         Class<Test> type = Test.class;
         database.createCollection("test");
 
@@ -113,7 +110,7 @@ public class ArangoOperationTest {
     }
 
     @Test
-    public void collectionExists_WithTypeWhenFalse() {
+    public void collectionExists_withTypeWhenFalse() {
         Class<Test> type = Test.class;
 
         boolean result = sut.collectionExists(type);
@@ -122,14 +119,14 @@ public class ArangoOperationTest {
     }
 
     @Test(expected = IllegalArgumentException.class)
-    public void collectionExists_WithNullTypeShouldThrow() {
+    public void collectionExists_withNullTypeShouldThrow() {
         Class<Test> type = null;
 
         boolean result = sut.collectionExists(type);
     }
 
     @Test
-    public void collectionExists_IfPresentReturnTrue() {
+    public void collectionExists_withNameIfPresentReturnTrue() {
         String collectionName = "sukrat";
         database.createCollection(collectionName);
 
@@ -139,7 +136,7 @@ public class ArangoOperationTest {
     }
 
     @Test
-    public void collectionExists_IfNotPresentReturnFalse() {
+    public void collectionExists_withNameIfNotPresentReturnFalse() {
         String collectionName = "sukrat";
 
         boolean result = sut.collectionExists(collectionName);
@@ -148,16 +145,26 @@ public class ArangoOperationTest {
     }
 
     @Test(expected = IllegalArgumentException.class)
-    public void collectionExists_IfEmptyShouldThrow() {
+    public void collectionExists_ifEmptyShouldThrow() {
         String collectionName = "";
 
         boolean result = sut.collectionExists(collectionName);
     }
 
     @Test
-    public void dropCollection_WithType() {
+    public void dropCollection_withType() {
         Class<Test> type = Test.class;
         database.createCollection("test");
+
+        sut.dropCollection(type);
+
+        assertFalse(database.getCollections().stream()
+                .anyMatch(m -> m.getName().equals("test")));
+    }
+
+    @Test
+    public void dropCollection_shouldWorkWhenCollectionDoesntExist() {
+        Class<Test> type = Test.class;
 
         sut.dropCollection(type);
 
@@ -173,7 +180,7 @@ public class ArangoOperationTest {
     }
 
     @Test
-    public void dropCollection() {
+    public void dropCollection_withName() {
         String collectionName = "sukrat";
         database.createCollection(collectionName);
 
@@ -201,14 +208,29 @@ public class ArangoOperationTest {
     }
 
     @Test
-    public void findAny() {
+    public void findAny_mustReturnElement() {
+        TestData data = new TestData("sukrat", 35, 6.2);
         Class<TestData> type = TestData.class;
         database.createCollection("testdata");
-        database.collection("testdata").insertDocument(new TestData("sukrat", 35, 6.2));
+        database.collection("testdata")
+                .insertDocument(data);
 
         TestData all = sut.findAny(TestData.class);
 
         assertThat(all.getKey(), not(isEmptyOrNullString()));
+        assertThat(all.getName(), is(data.getName()));
+        assertThat(all.getAge(), is(data.getAge()));
+        assertThat(all.getMoney(), is(data.getMoney()));
+        assertThat(all.getCreatedOn(), is(data.getCreatedOn()));
+    }
+
+    @Test
+    public void findAny_mustReturnNullIfNotPresent() {
+        TestData data = new TestData("sukrat", 35, 6.2);
+
+        TestData all = sut.findAny(TestData.class);
+
+        assertThat(all, is(nullValue()));
     }
 
 
@@ -222,11 +244,16 @@ public class ArangoOperationTest {
 
         ArangoCursor<TestData> all = sut.findAll(TestData.class);
 
-        assertThat(all.asListRemaining().size(), is(3));
+        List<TestData> result = all.asListRemaining();
+        assertThat(result.size(), is(3));
+        assertFalse(result.stream()
+                .anyMatch(m -> isNullOrEmptyString(m.getKey())));
+        assertFalse(result.stream()
+                .anyMatch(m -> isNullOrEmptyString(m.getId())));
     }
 
     @Test
-    public void findAll_WhenEmpty() {
+    public void findAll_whenEmpty() {
         Class<TestData> type = TestData.class;
         database.createCollection("testdata");
 
@@ -236,7 +263,7 @@ public class ArangoOperationTest {
     }
 
     @Test
-    public void findAll_WhenNoCollection() {
+    public void findAll_whenNoCollection() {
         Class<TestData> type = TestData.class;
 
         ArangoCursor<TestData> all = sut.findAll(TestData.class);
@@ -245,7 +272,7 @@ public class ArangoOperationTest {
     }
 
     @Test
-    public void findAll_WhenString() {
+    public void findAll_whenString() {
         String collectionName = "testdata";
         database.createCollection(collectionName);
         database.collection(collectionName).insertDocument(new TestData("sukrat", 35, 6.2));
@@ -254,16 +281,35 @@ public class ArangoOperationTest {
 
         ArangoCursor<TestData> all = sut.findAll(collectionName, TestData.class);
 
-        assertThat(all.asListRemaining().size(), is(3));
+        List<TestData> result = all.asListRemaining();
+        assertThat(result.size(), is(3));
+        assertFalse(result.stream()
+                .anyMatch(m -> isNullOrEmptyString(m.getKey())));
+        assertFalse(result.stream()
+                .anyMatch(m -> isNullOrEmptyString(m.getId())));
     }
 
     @Test(expected = IllegalArgumentException.class)
-    public void findAll_WhenEmptyString() {
+    public void findAll_whenEmptyString() {
+
         ArangoCursor<TestData> all = sut.findAll("", TestData.class);
     }
 
     @Test
-    public void count() {
+    public void count_withTypeParam() {
+        String collectionName = "testdata";
+        database.createCollection(collectionName);
+        database.collection(collectionName).insertDocument(new TestData("sukrat", 35, 6.2));
+        database.collection(collectionName).insertDocument(new TestData("sukrat2", 35, 6.2));
+        database.collection(collectionName).insertDocument(new TestData("sukrat25", 35, 6.2));
+
+        long result = sut.count(TestData.class);
+
+        assertThat(result, is(3L));
+    }
+
+    @Test
+    public void count_withName() {
         String collectionName = "testdata";
         database.createCollection(collectionName);
         database.collection(collectionName).insertDocument(new TestData("sukrat", 35, 6.2));
@@ -276,7 +322,7 @@ public class ArangoOperationTest {
     }
 
     @Test
-    public void count_IfDocumentDonotExist() {
+    public void count_ifDocumentDonotExist() {
         String collectionName = "testdata";
 
         long result = sut.count(collectionName);
@@ -285,8 +331,7 @@ public class ArangoOperationTest {
     }
 
     @Test
-    public void insert() {
-        String collectionName = "testdata";
+    public void insert_withTypeParam_whenCollectionDoesntExist() {
         TestData testData = new TestData("sukrat", 35, 6.2);
 
         TestData result = sut.insert(testData);
@@ -295,7 +340,24 @@ public class ArangoOperationTest {
     }
 
     @Test
-    public void insert_WithCollectionName() {
+    public void insert_withTypeParam_whenCollectionDoesExist() {
+        database.createCollection("testdata");
+        TestData testData = new TestData("sukrat", 35, 6.2);
+
+        TestData result = sut.insert(testData);
+
+        assertThat(result.getKey(), not(isEmptyOrNullString()));
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void insert_withNullTypeParam_shouldThrow() {
+        TestData testData = new TestData("sukrat", 35, 6.2);
+
+        TestData result = sut.insert(null);
+    }
+
+    @Test
+    public void insert_withCollectionName() {
         String collectionName = "testdatas";
         TestData testData = new TestData("sukrat", 35, 6.2);
 
@@ -304,9 +366,16 @@ public class ArangoOperationTest {
         assertThat(result.getKey(), not(isEmptyOrNullString()));
     }
 
+    @Test(expected = IllegalArgumentException.class)
+    public void insert_withEmptyCollectionName_shouldThrow() {
+        String collectionName = "testdatas";
+        TestData testData = new TestData("sukrat", 35, 6.2);
+
+        TestData result = sut.insert(testData, "");
+    }
+
     @Test
-    public void insert_Bulk() {
-        String collectionName = "testdata";
+    public void insert_Bulk_withTypeParam() {
         TestData testData = new TestData("sukrat", 35, 6.2);
         TestData testData2 = new TestData("sukrat2", 35, 6.2);
         TestData testData3 = new TestData("sukrat3", 35, 6.2);
@@ -316,5 +385,96 @@ public class ArangoOperationTest {
 
         assertThat(result.size(), is(3));
         assertTrue(result.stream().allMatch(m -> not(isEmptyOrNullString()).matches(m.getKey())));
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void insert_Bulk_withNullData() {
+        Collection<TestData> result = sut.insert(null, TestData.class);
+
+        assertThat(result.size(), is(3));
+        assertTrue(result.stream().allMatch(m -> not(isEmptyOrNullString()).matches(m.getKey())));
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void insert_Bulk_withNullTypeParam() {
+        Class type = null;
+        TestData testData = new TestData("sukrat", 35, 6.2);
+        TestData testData2 = new TestData("sukrat2", 35, 6.2);
+        TestData testData3 = new TestData("sukrat3", 35, 6.2);
+        Collection<TestData> collection = Arrays.asList(testData, testData2, testData3);
+
+        Collection<TestData> result = sut.insert(collection, type);
+    }
+
+    @Test
+    public void insert_Bulk_withNameParam() {
+        TestData testData = new TestData("sukrat", 35, 6.2);
+        TestData testData2 = new TestData("sukrat2", 35, 6.2);
+        TestData testData3 = new TestData("sukrat3", 35, 6.2);
+        Collection<TestData> collection = Arrays.asList(testData, testData2, testData3);
+
+        Collection<TestData> result = sut.insert(collection, "testdata");
+
+        assertThat(result.size(), is(3));
+        assertTrue(result.stream().allMatch(m -> not(isEmptyOrNullString()).matches(m.getKey())));
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void insert_Bulk_withEmptyNameParam() {
+        TestData testData = new TestData("sukrat", 35, 6.2);
+        TestData testData2 = new TestData("sukrat2", 35, 6.2);
+        TestData testData3 = new TestData("sukrat3", 35, 6.2);
+        Collection<TestData> collection = Arrays.asList(testData, testData2, testData3);
+
+        Collection<TestData> result = sut.insert(collection, "");
+
+        assertThat(result.size(), is(3));
+        assertTrue(result.stream().allMatch(m -> not(isEmptyOrNullString()).matches(m.getKey())));
+    }
+
+    @Test
+    public void ensureSkipListIndex_withTypeParam() {
+        Class<TestData> type = TestData.class;
+        database.createCollection("testdata");
+        database.collection("testdata").insertDocument(new TestData("sukrat", 35, 6.2));
+        database.collection("testdata").insertDocument(new TestData("sukrat2", 35, 6.2));
+        database.collection("testdata").insertDocument(new TestData("sukrat25", 35, 6.2));
+
+        IndexEntity result = sut.ensureSkipListIndex(TestData.class, Arrays.asList("name", "age"));
+
+        assertTrue(result.getDeduplicate());
+        assertFalse(result.getUnique());
+        assertFalse(result.getSparse());
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void ensureSkipListIndex_withNullTypeParam() {
+        Class<TestData> type = null;
+        IndexEntity result = sut.ensureSkipListIndex(type, Arrays.asList("name", "age"));
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void ensureSkipListIndex_withEmptyNameParam() {
+        IndexEntity result = sut.ensureSkipListIndex("", Arrays.asList("name", "age"));
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void ensureSkipListIndex_withEmptyFieldsParam() {
+        IndexEntity result = sut.ensureSkipListIndex("testdata", Arrays.asList());
+    }
+
+    @Test
+    public void ensureSkipListIndexMulti_withTypeParam() {
+        Class<TestData> type = TestData.class;
+        database.createCollection("testdata");
+        database.collection("testdata").insertDocument(new TestData("sukrat", 35, 6.2));
+        database.collection("testdata").insertDocument(new TestData("sukrat2", 35, 6.2));
+        database.collection("testdata").insertDocument(new TestData("sukrat25", 35, 6.2));
+
+        List<IndexEntity> result = sut.ensureSkipListIndexMulti(TestData.class, Arrays.asList("name", "age"));
+
+        assertTrue(result.stream().allMatch(m -> m.getDeduplicate()));
+        assertTrue(result.stream().allMatch(m -> !m.getUnique()));
+        assertTrue(result.stream().allMatch(m -> !m.getSparse()));
     }
 }

@@ -3,6 +3,7 @@ package functlyser.repository;
 import com.arangodb.*;
 import com.arangodb.entity.DocumentCreateEntity;
 import com.arangodb.entity.DocumentEntity;
+import com.arangodb.entity.IndexEntity;
 import com.arangodb.entity.MultiDocumentEntity;
 import functlyser.model.Entity;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -116,7 +117,7 @@ public class ArangoOperation {
     public long count(Class<?> type) {
         Assert.notNull(type, ERROR_TYPE_NULL);
 
-        return count(type.getSimpleName());
+        return count(name(type));
     }
 
     public long count(String collectionName) {
@@ -131,11 +132,12 @@ public class ArangoOperation {
     }
 
     public <T extends Entity> T insert(T objectToSave) {
+        Assert.notNull(objectToSave, "Object about to be saved cannot be null!");
+
         return insert(objectToSave, name(objectToSave.getClass()));
     }
 
     public <T extends Entity> T insert(T objectToSave, String collectionName) {
-        Assert.notNull(objectToSave, "Object about to be saved cannot be null!");
         Assert.hasText(collectionName, ERROR_COLLECTION_STRING_EMPTY);
 
         ArangoCollection collection = collection(collectionName);
@@ -146,6 +148,8 @@ public class ArangoOperation {
     }
 
     public <T extends Entity> Collection<T> insert(Collection<T> batchToSave, Class<T> type) {
+        Assert.notNull(type, ERROR_TYPE_NULL);
+
         return insert(batchToSave, name(type));
     }
 
@@ -185,6 +189,37 @@ public class ArangoOperation {
             final Map<String, Object> bindVars,
             final Class<T> type) throws ArangoDBException {
         return database.query(query, bindVars, null, type);
+    }
+
+    public <T> IndexEntity ensureSkipListIndex(Class<T> type, Collection<String> fields) {
+        Assert.notNull(type, ERROR_TYPE_NULL);
+
+        return ensureSkipListIndex(name(type), fields);
+    }
+
+    public IndexEntity ensureSkipListIndex(String collectionName, Collection<String> fields) {
+        Assert.hasText(collectionName, ERROR_COLLECTION_STRING_EMPTY);
+        Assert.notEmpty(fields, "Fields to be indexed cannot be empty");
+
+        ArangoCollection collection = collection(collectionName);
+        return collection.ensureSkiplistIndex(fields, null);
+    }
+
+    public <T> List<IndexEntity> ensureSkipListIndexMulti(Class<T> type, Collection<String> fields) {
+        Assert.notNull(type, ERROR_TYPE_NULL);
+
+        return ensureSkipListIndexMulti(name(type), fields);
+    }
+
+    public List<IndexEntity> ensureSkipListIndexMulti(String collectionName, Collection<String> fields) {
+        Assert.hasText(collectionName, ERROR_COLLECTION_STRING_EMPTY);
+        Assert.notEmpty(fields, "Fields to be indexed cannot be empty");
+
+        ArangoCollection collection = collection(collectionName);
+        return fields.stream()
+                .map(m -> collection
+                        .ensureSkiplistIndex(Arrays.asList(m), null))
+                .collect(Collectors.toList());
     }
 
     private <T> String name(Class<T> type) {
