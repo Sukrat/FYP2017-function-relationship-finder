@@ -40,7 +40,7 @@ public class Faker {
             data.setFileName(filename);
             data.setColumns(new HashMap<>());
             for (int j = 0; j < col; j++) {
-                data.getColumns().put(Data.colName(i), Faker.nextDouble());
+                data.getColumns().put(Data.colName(j), Faker.nextDouble());
             }
             list.add(data);
         }

@@ -127,7 +127,7 @@ public class DataServiceTest extends BaseServiceTest {
         Collection<Data> multi = sut.insertCsvFile(file);
     }
 
-//    @Test
+    //    @Test
 //    public void downloadCsv() throws IOException {
 //        arangoOperation.insert(getPerfectDataFor(10, "test.csv"),
 //                Data.class);
@@ -166,19 +166,27 @@ public class DataServiceTest extends BaseServiceTest {
 //        assertThat(result, is(0L));
 //    }
 //
-//    @Test
-//    public void listExcels() throws IOException {
-//        arangoOperation.insert(getPerfectDataFor(10, "test.csv"),
-//                Data.class);
-//        arangoOperation.insert(getPerfectDataFor(10, "black.csv"),
-//                Data.class);
-//        arangoOperation.insert(getPerfectDataFor(10, "one.csv"),
-//                Data.class);
-//        List<String> result = sut.listCsvFileNames();
-//
-//        assertThat(result.size(), is(3));
-//        assertThat(result, contains("test.csv", "black.csv", "one.csv"));
-//    }
+    @Test
+    public void listCsvFileNames() throws IOException {
+        arangoOperation.insert(Faker.nextData("testcsv.csv", 10, 3),
+                Data.class);
+        arangoOperation.insert(Faker.nextData("hello.csv", 10, 3),
+                Data.class);
+        arangoOperation.insert(Faker.nextData("asfdsf.csv", 10, 3),
+                Data.class);
+        List<String> result = sut.listCsvFileNames();
+
+        assertThat(result.size(), is(3));
+        assertThat(result, containsInAnyOrder("testcsv.csv", "hello.csv", "asfdsf.csv"));
+    }
+
+    @Test
+    public void listCsvFileNames_whenEmpty() throws IOException {
+        List<String> result = sut.listCsvFileNames();
+
+        assertThat(result.size(), is(0));
+    }
+
 //
 //    private List<Data> getPerfectDataFor(int num, String filename) {
 //        return getPerfectDataFor(num, filename, 3);

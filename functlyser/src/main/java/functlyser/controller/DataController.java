@@ -34,7 +34,7 @@ public class DataController extends Controller {
         return ResponseEntity.ok(message);
     }
 
-//    @RequestMapping(value = "/data/download", method = RequestMethod.GET)
+    //    @RequestMapping(value = "/data/download", method = RequestMethod.GET)
 //    public ResponseEntity<Resource> downloadcsv(@RequestParam("filename") String filename) {
 //
 //        Resource file = dataService.downloadCsv(filename);
@@ -51,9 +51,9 @@ public class DataController extends Controller {
 //        return ResponseEntity.ok(message);
 //    }
 //
-//    @RequestMapping(value = "/data/filenames", method = RequestMethod.GET)
-//    public ResponseEntity<List<String>> list() {
-//        List<String> excelList = dataService.listCsvFileNames();
-//        return ResponseEntity.ok(excelList);
-//    }
+    @RequestMapping(value = "/data/filenames", method = RequestMethod.GET)
+    public ResponseEntity<List<String>> listFileNames() {
+        List<String> excelList = dataService.listCsvFileNames();
+        return ResponseEntity.ok(excelList);
+    }
 }

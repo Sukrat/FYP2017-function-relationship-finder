@@ -127,11 +127,11 @@ public class DataService extends Service {
     }
 
     public List<String> listCsvFileNames() {
-        String query = "FOR r in @@collection RETURN DISTINCT r.fileName";
+        String query = "FOR r IN @@collection RETURN DISTINCT r.fileName";
         Map<String, Object> bindVar = new HashMap<>();
         bindVar.put("@collection", arangoOperation.collectionName(Data.class));
-        ArangoCursor<String> query1 = arangoOperation.query(query, bindVar, String.class);
-        return query1.asListRemaining();
+        ArangoCursor<String> result = arangoOperation.query(query, bindVar, String.class);
+        return result.asListRemaining();
     }
 
     private Collection<Data> multiSave(Collection<Data> data) {

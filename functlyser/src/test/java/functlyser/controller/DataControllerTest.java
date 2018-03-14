@@ -19,15 +19,37 @@ public class DataControllerTest extends BaseControllerTest {
 
     @Test
     public void uploadCsvFile_shouldUpload() throws Exception {
+        String url = "/data/upload";
         MockMultipartFile file = new MockMultipartFile("file", "test.csv",
                 "text/plain", testData().getBytes());
-        String url = "/data/upload";
 
         ResultActions result = mvcUpload(url, file);
 
         result.andExpect(status().isOk())
                 .andExpect(jsonPath("$.messages", not(isEmptyOrNullString())));
         assertThat(arangoOperation.findAll(Data.class).asListRemaining().size(), is(4));
+    }
+
+    @Test
+    public void uploadCsvFile_withEmptyFileShouldThrow() throws Exception {
+        String url = "/data/upload";
+        MockMultipartFile file = new MockMultipartFile("file", "test.csv",
+                "text/plain", "".getBytes());
+
+        ResultActions result = mvcUpload(url, file);
+
+        result.andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.messages", not(isEmptyOrNullString())));
+    }
+
+    @Test
+    public void listFileNames_() throws Exception {
+        String url = "/data/filenames";
+
+        ResultActions result = mvcGet(url);
+
+        result.andExpect(status().isOk())
+                .andExpect(content().string(not(isEmptyOrNullString())));
     }
 
 //    @Test
