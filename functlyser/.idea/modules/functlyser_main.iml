@@ -25,6 +25,15 @@
     <orderEntry type="library" name="Gradle: net.sf.supercsv:super-csv:2.4.0" level="project" />
     <orderEntry type="library" name="Gradle: com.arangodb:arangodb-java-driver:4.3.3" level="project" />
     <orderEntry type="library" name="Gradle: org.springframework.boot:spring-boot-configuration-processor:1.5.10.RELEASE" level="project" />
+    <orderEntry type="library" name="Gradle: org.webjars:webjars-locator:0.33" level="project" />
+    <orderEntry type="library" name="Gradle: org.webjars:bootstrap:4.0.0-2" level="project" />
+    <orderEntry type="library" name="Gradle: org.webjars:jquery:3.3.1-1" level="project" />
+    <orderEntry type="library" name="Gradle: org.webjars:popper.js:1.12.9-1" level="project" />
+    <orderEntry type="library" name="Gradle: org.webjars:rxjs:2.5.3" level="project" />
+    <orderEntry type="library" name="Gradle: org.webjars:lodash:4.17.4" level="project" />
+    <orderEntry type="library" name="Gradle: org.webjars:ng-file-upload:12.0.4" level="project" />
+    <orderEntry type="library" name="Gradle: org.webjars:angularjs:1.6.9" level="project" />
+    <orderEntry type="library" name="Gradle: org.webjars.npm:rx-angular:1.1.3" level="project" />
     <orderEntry type="library" name="Gradle: org.springframework.boot:spring-boot-starter:1.5.10.RELEASE" level="project" />
     <orderEntry type="library" name="Gradle: org.springframework.boot:spring-boot-starter-tomcat:1.5.10.RELEASE" level="project" />
     <orderEntry type="library" name="Gradle: org.hibernate:hibernate-validator:5.3.6.Final" level="project" />
@@ -36,6 +45,7 @@
     <orderEntry type="library" name="Gradle: org.mongodb:mongodb-driver:3.4.3" level="project" />
     <orderEntry type="library" name="Gradle: org.springframework.data:spring-data-mongodb:1.10.10.RELEASE" level="project" />
     <orderEntry type="library" name="Gradle: com.arangodb:velocypack:1.0.14" level="project" />
+    <orderEntry type="library" name="Gradle: org.webjars:webjars-locator-core:0.35" level="project" />
     <orderEntry type="library" name="Gradle: org.springframework.data:spring-data-commons:1.13.10.RELEASE" level="project" />
     <orderEntry type="library" name="Gradle: org.springframework.boot:spring-boot-starter-logging:1.5.10.RELEASE" level="project" />
     <orderEntry type="library" name="Gradle: org.slf4j:jcl-over-slf4j:1.7.25" level="project" />
@@ -43,6 +53,7 @@
     <orderEntry type="library" name="Gradle: org.slf4j:jul-to-slf4j:1.7.25" level="project" />
     <orderEntry type="library" name="Gradle: org.slf4j:log4j-over-slf4j:1.7.25" level="project" />
     <orderEntry type="library" name="Gradle: org.slf4j:slf4j-api:1.7.25" level="project" />
+    <orderEntry type="library" name="Gradle: org.webjars.npm:rx:4.1.0" level="project" />
     <orderEntry type="library" name="Gradle: org.springframework:spring-context:4.3.14.RELEASE" level="project" />
     <orderEntry type="library" name="Gradle: org.springframework:spring-aop:4.3.14.RELEASE" level="project" />
     <orderEntry type="library" name="Gradle: org.springframework:spring-tx:4.3.14.RELEASE" level="project" />
@@ -61,6 +72,8 @@
     <orderEntry type="library" name="Gradle: org.mongodb:mongodb-driver-core:3.4.3" level="project" />
     <orderEntry type="library" name="Gradle: org.mongodb:bson:3.4.3" level="project" />
     <orderEntry type="library" name="Gradle: com.googlecode.json-simple:json-simple:1.1.1" level="project" />
+    <orderEntry type="library" name="Gradle: org.apache.commons:commons-lang3:3.1" level="project" />
+    <orderEntry type="library" name="Gradle: org.apache.commons:commons-compress:1.9" level="project" />
     <orderEntry type="library" name="Gradle: org.apache.tomcat:tomcat-annotations-api:8.5.27" level="project" />
     <orderEntry type="library" name="Gradle: ch.qos.logback:logback-core:1.1.11" level="project" />
   </component>
