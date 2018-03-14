@@ -26,7 +26,7 @@ public class ArangoOperation {
         this.database = arangoDatabase;
     }
 
-    public <T> ArangoCollection collection(Class<T> type) {
+    public <T extends Entity> ArangoCollection collection(Class<T> type) {
         Assert.notNull(type, ERROR_TYPE_NULL);
 
         return collection(name(type));
@@ -42,7 +42,7 @@ public class ArangoOperation {
         return collection;
     }
 
-    public <T> String collectionName(Class<T> type) {
+    public <T extends Entity> String collectionName(Class<T> type) {
         collection(type);
         return name(type);
     }
@@ -54,7 +54,7 @@ public class ArangoOperation {
                 .collect(Collectors.toSet());
     }
 
-    public <T> boolean collectionExists(Class<T> type) {
+    public <T extends Entity> boolean collectionExists(Class<T> type) {
         Assert.notNull(type, ERROR_TYPE_NULL);
 
         return collectionExists(name(type));
@@ -66,7 +66,7 @@ public class ArangoOperation {
         return database.collection(collectionName).exists();
     }
 
-    public <T> void dropCollection(Class<T> type) {
+    public <T extends Entity> void dropCollection(Class<T> type) {
         Assert.notNull(type, ERROR_TYPE_NULL);
 
         dropCollection(name(type));
@@ -81,7 +81,7 @@ public class ArangoOperation {
         }
     }
 
-    public <T> T findAny(Class<T> type) {
+    public <T extends Entity> T findAny(Class<T> type) {
         Assert.notNull(type, ERROR_TYPE_NULL);
 
         collection(name(type));
@@ -97,7 +97,7 @@ public class ArangoOperation {
         return result;
     }
 
-    public <T> ArangoCursor<T> findAll(Class<T> type) {
+    public <T extends Entity> ArangoCursor<T> findAll(Class<T> type) {
         Assert.notNull(type, ERROR_TYPE_NULL);
 
         return findAll(name(type), type);
@@ -114,7 +114,7 @@ public class ArangoOperation {
         return database.query(query, bindVar, null, entityClass);
     }
 
-    public long count(Class<?> type) {
+    public <T extends Entity> long count(Class<T> type) {
         Assert.notNull(type, ERROR_TYPE_NULL);
 
         return count(name(type));
@@ -191,7 +191,7 @@ public class ArangoOperation {
         return database.query(query, bindVars, null, type);
     }
 
-    public <T> IndexEntity ensureSkipListIndex(Class<T> type, Collection<String> fields) {
+    public <T extends Entity> IndexEntity ensureSkipListIndex(Class<T> type, Collection<String> fields) {
         Assert.notNull(type, ERROR_TYPE_NULL);
 
         return ensureSkipListIndex(name(type), fields);
@@ -205,7 +205,7 @@ public class ArangoOperation {
         return collection.ensureSkiplistIndex(fields, null);
     }
 
-    public <T> List<IndexEntity> ensureSkipListIndexMulti(Class<T> type, Collection<String> fields) {
+    public <T extends Entity> List<IndexEntity> ensureSkipListIndexMulti(Class<T> type, Collection<String> fields) {
         Assert.notNull(type, ERROR_TYPE_NULL);
 
         return ensureSkipListIndexMulti(name(type), fields);
@@ -222,7 +222,7 @@ public class ArangoOperation {
                 .collect(Collectors.toList());
     }
 
-    private <T> String name(Class<T> type) {
+    private <T extends Entity> String name(Class<T> type) {
 
         return type.getSimpleName().toString().toLowerCase();
     }

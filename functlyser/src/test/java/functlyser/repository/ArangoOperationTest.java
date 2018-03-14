@@ -54,18 +54,18 @@ public class ArangoOperationTest {
 
     @Test
     public void collection_withTypeParam() {
-        Class<Test> type = Test.class;
+        Class<TestData> type = TestData.class;
 
         ArangoCollection result = sut.collection(type);
 
         assertThat(result, notNullValue());
         assertThat(result.count().getCount(), is(0L));
-        assertThat(result.name(), is("test"));
+        assertThat(result.name(), is("testdata"));
     }
 
     @Test(expected = IllegalArgumentException.class)
     public void collection_withNullTypeParam() {
-        Class<Test> type = null;
+        Class<TestData> type = null;
 
         ArangoCollection result = sut.collection(type);
     }
@@ -101,8 +101,8 @@ public class ArangoOperationTest {
 
     @Test
     public void collectionExists_withTypeWhenTrue() {
-        Class<Test> type = Test.class;
-        database.createCollection("test");
+        Class<TestData> type = TestData.class;
+        database.createCollection("testdata");
 
         boolean result = sut.collectionExists(type);
 
@@ -111,7 +111,7 @@ public class ArangoOperationTest {
 
     @Test
     public void collectionExists_withTypeWhenFalse() {
-        Class<Test> type = Test.class;
+        Class<TestData> type = TestData.class;
 
         boolean result = sut.collectionExists(type);
 
@@ -120,7 +120,7 @@ public class ArangoOperationTest {
 
     @Test(expected = IllegalArgumentException.class)
     public void collectionExists_withNullTypeShouldThrow() {
-        Class<Test> type = null;
+        Class<TestData> type = null;
 
         boolean result = sut.collectionExists(type);
     }
@@ -153,8 +153,8 @@ public class ArangoOperationTest {
 
     @Test
     public void dropCollection_withType() {
-        Class<Test> type = Test.class;
-        database.createCollection("test");
+        Class<TestData> type = TestData.class;
+        database.createCollection("testdata");
 
         sut.dropCollection(type);
 
@@ -164,7 +164,7 @@ public class ArangoOperationTest {
 
     @Test
     public void dropCollection_shouldWorkWhenCollectionDoesntExist() {
-        Class<Test> type = Test.class;
+        Class<TestData> type = TestData.class;
 
         sut.dropCollection(type);
 
@@ -174,7 +174,7 @@ public class ArangoOperationTest {
 
     @Test(expected = IllegalArgumentException.class)
     public void dropCollection_WithNullShouldThrow() {
-        Class<Test> type = null;
+        Class<TestData> type = null;
 
         sut.dropCollection(type);
     }
