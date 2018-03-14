@@ -111,7 +111,7 @@ public class GridServiceTest extends BaseSpringTest {
         List<Data> perfectDataFor = getPerfectDataFor(30, "test.csv", 5);
         arangoOperation.insert(perfectDataFor, Data.class);
         GroupedData groupedData = getPerfectGroupedData(Arrays.asList(4l, 5l, 6l));
-        groupedData.getDataMembers().get(0).getColumns().set(0, 5.0);
+//        groupedData.getDataMembers().get(0).getColumns().set(0, 5.0);
         arangoOperation.insert(groupedData);
         GroupedData groupedData2 = getPerfectGroupedData(Arrays.asList(5l, 6l, 7l));
         arangoOperation.insert(groupedData2);
@@ -198,9 +198,9 @@ public class GridServiceTest extends BaseSpringTest {
         for (int i = 0; i < num; i++) {
             Data data = new Data();
             data.setFileName(filename);
-            data.setColumns(new ArrayList<>());
+//            data.setColumns(new ArrayList<>());
             for (int j = 0; j < numColumn; j++) {
-                data.getColumns().add(j + Faker.nextDouble() + i / 5);
+//                data.getColumns().add(j + Faker.nextDouble() + i / 5);
             }
             list.add(data);
         }
@@ -214,11 +214,11 @@ public class GridServiceTest extends BaseSpringTest {
         for (int i = 0; i < 10; i++) {
             Data data = new Data();
             data.setFileName("asdf");
-            data.setColumns(new ArrayList<>());
-            data.getColumns().add(Faker.nextDouble());
-            for (int j = 0; j < gridIndex.size(); j++) {
-                data.getColumns().add(gridIndex.get(j) + Faker.nextDouble());
-            }
+//            data.setColumns(new ArrayList<>());
+//            data.getColumns().add(Faker.nextDouble());
+//            for (int j = 0; j < gridIndex.size(); j++) {
+//                data.getColumns().add(gridIndex.get(j) + Faker.nextDouble());
+//            }
             list.add(data);
         }
         groupedData.setDataMembers(list);

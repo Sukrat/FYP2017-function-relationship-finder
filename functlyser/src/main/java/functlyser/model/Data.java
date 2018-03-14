@@ -1,12 +1,15 @@
 package functlyser.model;
 
-import java.util.List;
+import java.util.Map;
+
+import static java.lang.String.format;
 
 public class Data extends Entity {
+    public static String prefixColumn = "col";
 
     private String fileName;
 
-    private List<Double> columns;
+    private Map<String, Double> columns;
 
     public String getFileName() {
         return fileName;
@@ -16,11 +19,15 @@ public class Data extends Entity {
         this.fileName = fileName;
     }
 
-    public List<Double> getColumns() {
+    public Map<String, Double> getColumns() {
         return columns;
     }
 
-    public void setColumns(List<Double> columns) {
+    public void setColumns(Map<String, Double> columns) {
         this.columns = columns;
+    }
+
+    public static String colName(int num) {
+        return format("%s%d", prefixColumn, num);
     }
 }

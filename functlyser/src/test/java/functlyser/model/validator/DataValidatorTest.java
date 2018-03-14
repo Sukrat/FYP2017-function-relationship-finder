@@ -9,6 +9,7 @@ import org.springframework.validation.Errors;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 
 import static org.junit.Assert.*;
 import static org.mockito.Matchers.anyString;
@@ -63,7 +64,7 @@ public class DataValidatorTest {
     @Test
     public void testValidate_WhenColumnIsEmpty() {
         Data target = getPerfectData();
-        target.setColumns(new ArrayList<>());
+        target.setColumns(new HashMap<>());
 
         sut.validate(target, errors);
 
@@ -73,7 +74,10 @@ public class DataValidatorTest {
     private Data getPerfectData() {
         Data data = new Data();
         data.setFileName("duplex.csv");
-        data.setColumns(Arrays.asList(Faker.nextDouble(), Faker.nextDouble()));
+        data.setColumns(new HashMap<String, Double>() {{
+            put("col0", Faker.nextDouble());
+            put("col1", Faker.nextDouble());
+        }});
         return data;
     }
 }

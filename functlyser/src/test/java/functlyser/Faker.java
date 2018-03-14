@@ -1,8 +1,12 @@
 package functlyser;
 
+import functlyser.model.Data;
 import org.junit.Assert;
 
 import java.nio.charset.Charset;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
 import java.util.Random;
 
 public class Faker {
@@ -28,4 +32,33 @@ public class Faker {
         random.nextBytes(array);
         return new String(array, Charset.forName("UTF-8"));
     }
+
+    public static List<Data> nextData(String filename, int num, int col) {
+        List<Data> list = new ArrayList<>();
+        for (int i = 0; i < num; i++) {
+            Data data = new Data();
+            data.setFileName(filename);
+            data.setColumns(new HashMap<>());
+            for (int j = 0; j < col; j++) {
+                data.getColumns().put(Data.colName(i), Faker.nextDouble());
+            }
+            list.add(data);
+        }
+        return list;
+    }
+
+    public static List<Data> nextData(int num, int col) {
+        List<Data> list = new ArrayList<>();
+        for (int i = 0; i < num; i++) {
+            Data data = new Data();
+            data.setFileName("testcsv.csv");
+            data.setColumns(new HashMap<>());
+            for (int j = 0; j < col; j++) {
+                data.getColumns().put(Data.colName(i), Faker.nextDouble());
+            }
+            list.add(data);
+        }
+        return list;
+    }
+
 }

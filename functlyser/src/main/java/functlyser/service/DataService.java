@@ -7,6 +7,7 @@ import functlyser.model.Data;
 import functlyser.model.validator.DataValidator;
 import functlyser.model.validator.ValidatorRunner;
 import functlyser.repository.ArangoOperation;
+import javafx.util.Pair;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.ByteArrayResource;
 import org.springframework.core.io.Resource;
@@ -23,6 +24,8 @@ import org.supercsv.prefs.CsvPreference;
 
 import java.io.*;
 import java.util.*;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 import static java.lang.String.format;
 
@@ -33,76 +36,59 @@ public class DataService extends Service {
 
     private ValidatorRunner<DataValidator> dataValidator;
 
+    private CsvService csvService;
+
     @Autowired
     public DataService(ArangoOperation arangoOperation,
-                       ValidatorRunner<DataValidator> dataValidator) {
+                       ValidatorRunner<DataValidator> dataValidator, CsvService csvService) {
         this.arangoOperation = arangoOperation;
         this.dataValidator = dataValidator;
+        this.csvService = csvService;
     }
 
-
-    public Collection<Data> createMulti(Collection<Data> data) {
-        return multiSave(data);
-    }
-
-    public Collection<Data> uploadCsv(MultipartFile file) {
-        if (listExcels().contains(file.getOriginalFilename())) {
-            throw new ApiException(format("%s already exists!", file.getOriginalFilename()));
+    public Collection<Data> insertCsvFile(MultipartFile file) {
+        if (listCsvFileNames().contains(file.getOriginalFilename())) {
+            throw new ApiException(format("'%s' already exists!", file.getOriginalFilename()));
         }
 
         Data sampleData = arangoOperation.findAny(Data.class);
-
-        List<Data> list = new ArrayList<>();
+        List<Data> datas = null;
         try {
-            Reader reader = new InputStreamReader(file.getInputStream());
-            ICsvListReader mapReader = new CsvListReader(reader, CsvPreference.STANDARD_PREFERENCE);
-
-            CellProcessor[] processors = null;
-            String[] header = mapReader.getHeader(true);
-            if (header == null) {
-                throw new ApiException(format("File '%s' is empty! No records found!", file.getOriginalFilename()));
-            }
-
-            if (sampleData != null && sampleData.getColumns().size() != header.length) {
-                throw new ApiException(format("Excel columns dont match with data already present! (Expected: %d and actual: %d)",
-                        sampleData.getColumns().size(), header.length));
-            }
-
-            processors = new CellProcessor[header.length];
-            Arrays.fill(processors, new NotNull(new ParseDouble()));
-
-            if (header != null) {
+            Function<Map<String, Object>, Data> converter = (row) -> {
                 Data data = new Data();
                 data.setFileName(file.getOriginalFilename());
-                Double[] doubles = Arrays.asList(header)
+                Map<String, Double> collect = row.entrySet()
                         .stream()
-                        .map(m -> Double.parseDouble(m))
-                        .toArray(Double[]::new);
-                data.setColumns(Arrays.asList(doubles));
-                list.add(data);
-            }
-            while (true) {
-                List<Object> cols = mapReader.read(processors);
-                if (cols == null) {
-                    break;
-                }
-
-                Data data = new Data();
-                data.setFileName(file.getOriginalFilename());
-                Double[] doubles = cols.stream()
-                        .map(m -> (Double) m)
-                        .toArray(Double[]::new);
-                data.setColumns(Arrays.asList(doubles));
-                list.add(data);
+                        .collect(Collectors
+                                .toMap(m -> m.getKey(), m -> (Double) m.getValue()));
+                data.setColumns(collect);
+                return data;
+            };
+            if (sampleData != null) {
+                datas = csvService.convert(file.getInputStream(), true, header -> {
+                    if (header.length != sampleData.getColumns().size()) {
+                        throw new ApiException(format("Number of columns donot match. (expected: %d, actual: %d)",
+                                sampleData.getColumns().size(), header.length));
+                    }
+                    return getArgumentsForCsv(header.length);
+                }, converter);
+            } else {
+                datas = csvService.convert(file.getInputStream(), true, header -> getArgumentsForCsv(header.length), converter);
             }
         } catch (IOException e) {
-            throw new ApiException("File could not be loaded! " + e.getMessage());
-        } catch (SuperCsvConstraintViolationException e) {
-            throw new ApiException(e.getMessage());
-        } catch (SuperCsvException e) {
-            throw new ApiException(e.getMessage());
+            throw new ApiException(format("File '%s' could not be loaded! %s", file.getOriginalFilename(), e.getMessage()));
         }
-        return multiSave(list);
+        return multiSave(datas);
+    }
+
+    private Pair<String[], CellProcessor[]> getArgumentsForCsv(int size) {
+        CellProcessor[] processors = new CellProcessor[size];
+        String[] headers = new String[size];
+        for (int i = 0; i < size; i++) {
+            headers[i] = format("%s%d", Data.prefixColumn, i);
+            processors[i] = new NotNull(new ParseDouble());
+        }
+        return new Pair<>(headers, processors);
     }
 
     public Resource downloadCsv(String filename) {
@@ -127,6 +113,10 @@ public class DataService extends Service {
         return new ByteArrayResource(byteArrayOutputStream.toByteArray());
     }
 
+    public Collection<Data> createMulti(Collection<Data> data) {
+        return multiSave(data);
+    }
+
     public long delete(String filename) {
         String query = "FOR r in @@collection FILTER r.fileName == @filename REMOVE r in @@collection RETURN r";
         Map<String, Object> bindVar = new HashMap<>();
@@ -136,7 +126,7 @@ public class DataService extends Service {
         return query1.asListRemaining().size();
     }
 
-    public List<String> listExcels() {
+    public List<String> listCsvFileNames() {
         String query = "FOR r in @@collection RETURN DISTINCT r.fileName";
         Map<String, Object> bindVar = new HashMap<>();
         bindVar.put("@collection", arangoOperation.collectionName(Data.class));

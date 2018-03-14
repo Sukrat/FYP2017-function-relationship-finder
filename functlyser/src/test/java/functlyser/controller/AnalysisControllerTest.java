@@ -64,9 +64,9 @@ public class AnalysisControllerTest extends BaseControllerTest {
         for (int i = 0; i < num; i++) {
             Data data = new Data();
             data.setFileName(filename);
-            data.setColumns(new ArrayList<>());
+//            data.setColumns(new ArrayList<>());
             for (int j = 0; j < numColumn; j++) {
-                data.getColumns().add(j + Faker.nextDouble() + i / 5);
+//                data.getColumns().add(j + Faker.nextDouble() + i / 5);
             }
             list.add(data);
         }
@@ -80,10 +80,10 @@ public class AnalysisControllerTest extends BaseControllerTest {
         for (int i = 0; i < 10; i++) {
             Data data = new Data();
             data.setFileName("asdf");
-            data.setColumns(new ArrayList<>());
-            data.getColumns().add(Faker.nextDouble());
+//            data.setColumns(new ArrayList<>());
+//            data.getColumns().add(Faker.nextDouble());
             for (int j = 0; j < gridIndex.size(); j++) {
-                data.getColumns().add(gridIndex.get(j) + Faker.nextDouble());
+//                data.getColumns().add(gridIndex.get(j) + Faker.nextDouble());
             }
             list.add(data);
         }
