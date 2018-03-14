@@ -1,55 +1,74 @@
 (function () {
     var app = angular.module('app');
     app.component('fileUploader', {
-        templateUrl: '/js/file-uploader/file-uploader.html',
-        controller: ['FileUploaderService', function (FileUploaderService) {
-            var vm = this;
-            vm.upload = upload;
-            vm.list = list;
-            vm.deleteFile = deleteFile;
+        templateUrl: './js/file-uploader/file-uploader.html',
+        controller: ['FileUploaderService', 'RootService',
+            function (FileUploaderService, RootService) {
+                var vm = this;
+                vm.upload = upload;
+                vm.deleteFile = deleteFile;
+                vm.list = list;
+                vm.deleteAllFiles = deleteAllFiles;
+                list();
 
-            function upload() {
-                vm.loading = true;
-                var file = document.getElementById('fileInput').files[0];
-                if (file == undefined) {
-                    vm.error(['Please select a file to be uploaded!']);
-                    return;
+                vm.percentage = 0;
+                vm.data = [];
+
+                function upload() {
+                    RootService.loading(true);
+                    var file = document.getElementById('fileInput').files[0];
+                    if (file == undefined) {
+                        RootService.error(['Please select a file to be uploaded!']);
+                        return;
+                    }
+
+                    FileUploaderService.uploadFile(file)
+                        .then((data) => {
+                            RootService.success(data.messages);
+                            list();
+                        }, (error) => {
+                            RootService.error(error);
+                        }, (progressPercentage) => {
+                            vm.percentage = progressPercentage
+                        });
                 }
 
-                FileUploaderService.uploadFile(file)
-                    .then((data) => {
-                        vm.success(data.messages);
-                        vm.list();
-                    }, (error) => {
-                        vm.error(error);
-                    }, (progressPercentage) => {
-                        vm.percentage = progressPercentage
+                function list() {
+                    RootService.loading(true);
+                    FileUploaderService.getFileNames()
+                        .then((data) => {
+                            RootService.loading(false);
+                            vm.data = data;
+                        }).catch((error) => {
+                        RootService.error(error);
                     });
-            }
+                }
 
-            function list() {
-                this.loading = true;
-                FileUploaderService.getFileNames()
-                    .then((data) => {
-                        this.loading = false;
-                        this.data = data;
-                    }).catch((error) => {
-                    vm.error(error);
-                })
-            }
+                function deleteFile(filename) {
+                    RootService.loading(true);
+                    FileUploaderService.deleteFile(filename)
+                        .then((data) => {
+                            RootService.success(data.messages);
+                            list();
+                        }).catch((error) => {
+                        RootService.error(error);
+                    })
+                }
 
-            function deleteFile(filename)
-            {
-                vm.loading = true;
-                FileUploaderService.deleteFile(filename)
-                    .then((data) => {
-                        vm.success(data.messages);
-                        vm.list();
-                    }).catch((error) => {
-                    vm.error(error);
-                })
-            }
-
-        }]
+                function deleteAllFiles() {
+                    if (confirm('Are you sure you want to delete all the data?')) {
+                        RootService.loading(true);
+                        FileUploaderService.deleteAllFiles()
+                            .then((data) => {
+                                RootService.success(data.messages);
+                                list();
+                            }).catch((error) => {
+                            RootService.error(error);
+                        })
+                    } else {
+                        RootService.error(['Delete all files command cancelled.']);
+                    }
+                }
+            }]
     })
 })();

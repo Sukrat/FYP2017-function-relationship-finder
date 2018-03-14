@@ -3,13 +3,11 @@ package functlyser.controller;
 import functlyser.Faker;
 import functlyser.model.Data;
 import functlyser.model.GroupedData;
-import org.bson.types.ObjectId;
 import org.junit.Test;
 import org.springframework.test.web.servlet.ResultActions;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.HashMap;
 import java.util.List;
 
 import static org.hamcrest.Matchers.isEmptyOrNullString;

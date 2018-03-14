@@ -1,7 +1,6 @@
 package functlyser.service;
 
 import com.arangodb.ArangoCursor;
-import com.arangodb.ArangoDatabase;
 import com.arangodb.entity.BaseDocument;
 import functlyser.exception.ApiException;
 import functlyser.model.Data;
@@ -9,11 +8,8 @@ import functlyser.model.GroupedData;
 import functlyser.model.Regression;
 import functlyser.repository.ArangoOperation;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.mongodb.core.MongoOperations;
 import org.springframework.stereotype.Component;
 
-import java.security.acl.Group;
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;

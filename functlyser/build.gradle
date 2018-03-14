@@ -33,7 +33,6 @@ idea {
 dependencies {
     compile group: 'org.springframework.boot', name: 'spring-boot-starter-web', version: '1.5.10.RELEASE'
     compile group: 'org.springframework.boot', name: 'spring-boot-devtools', version: '1.5.10.RELEASE'
-    compile("org.springframework.boot:spring-boot-starter-data-mongodb")
     compile group: 'net.sf.supercsv', name: 'super-csv', version: '2.4.0'
     compile group: 'com.arangodb', name: 'arangodb-java-driver', version: '4.3.3'
     compile group: 'org.springframework.boot', name: 'spring-boot-configuration-processor', version: '1.5.10.RELEASE'

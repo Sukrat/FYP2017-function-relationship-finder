@@ -1,18 +1,17 @@
 package functlyser.service;
 
+import com.sun.corba.se.impl.ior.ObjectIdImpl;
+import com.sun.corba.se.spi.ior.ObjectId;
 import functlyser.Faker;
 import functlyser.exception.ApiException;
 import functlyser.exception.ValidationException;
 import functlyser.model.Data;
 import functlyser.model.validator.DataValidator;
 import functlyser.model.validator.ValidatorRunner;
-import functlyser.repository.ArangoOperation;
-import org.bson.types.ObjectId;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
 import org.mockito.Mockito;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.Resource;
 import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.validation.Errors;
@@ -104,7 +103,6 @@ public class DataServiceTest extends BaseServiceTest {
 
     @Test(expected = ApiException.class)
     public void testUploadCsv_whenDataIsEmpty() {
-        String profileId = (new ObjectId()).toHexString();
         MultipartFile file = new MockMultipartFile("test.csv", "".getBytes());
 
         Collection<Data> multi = sut.uploadCsv(file);

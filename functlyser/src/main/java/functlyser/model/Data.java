@@ -1,9 +1,6 @@
 package functlyser.model;
 
-import org.springframework.data.mongodb.core.mapping.Document;
-
 import java.util.List;
-import java.util.Map;
 
 public class Data extends Entity {
 

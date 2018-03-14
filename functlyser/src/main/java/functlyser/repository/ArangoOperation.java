@@ -1,49 +1,38 @@
 package functlyser.repository;
 
 import com.arangodb.*;
-import com.arangodb.entity.BaseDocument;
 import com.arangodb.entity.DocumentCreateEntity;
 import com.arangodb.entity.DocumentEntity;
 import com.arangodb.entity.MultiDocumentEntity;
-import com.mongodb.*;
 import functlyser.model.Entity;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.mongodb.core.query.Query;
-import org.springframework.data.mongodb.core.query.Update;
 import org.springframework.stereotype.Component;
 import org.springframework.util.Assert;
 
 import java.util.*;
-import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
-
-import static java.lang.String.format;
 
 @Component
 public class ArangoOperation {
 
+    public static final String ERROR_TYPE_NULL = "Type passed must not be null!";
+    public static final String ERROR_COLLECTION_STRING_EMPTY = "Collection name string must not be empty!";
+
     private ArangoDatabase database;
-    private Map<String, ArangoCollection> collectionCache;
 
     @Autowired
     public ArangoOperation(ArangoDatabase arangoDatabase) {
         this.database = arangoDatabase;
-        collectionCache = getCollectionNames()
-                .stream()
-                .collect(Collectors.toConcurrentMap(m -> m, m -> database.collection(m)));
     }
 
-    private static final String TYPE_NULL = "Type passed must not be null!";
-    private static final String COLLECTION_STRING_EMPTY = "Collection name string must not be empty!";
-
     public <T> ArangoCollection collection(Class<T> type) {
-        Assert.notNull(type, TYPE_NULL);
+        Assert.notNull(type, ERROR_TYPE_NULL);
 
         return collection(name(type));
     }
 
     public ArangoCollection collection(String collectionName) {
-        Assert.hasText(collectionName, COLLECTION_STRING_EMPTY);
+        Assert.hasText(collectionName, ERROR_COLLECTION_STRING_EMPTY);
 
         ArangoCollection collection = database.collection(collectionName);
         if (!collection.exists()) {
@@ -65,25 +54,25 @@ public class ArangoOperation {
     }
 
     public <T> boolean collectionExists(Class<T> type) {
-        Assert.notNull(type, TYPE_NULL);
+        Assert.notNull(type, ERROR_TYPE_NULL);
 
         return collectionExists(name(type));
     }
 
     public boolean collectionExists(String collectionName) {
-        Assert.hasText(collectionName, COLLECTION_STRING_EMPTY);
+        Assert.hasText(collectionName, ERROR_COLLECTION_STRING_EMPTY);
 
         return database.collection(collectionName).exists();
     }
 
     public <T> void dropCollection(Class<T> type) {
-        Assert.notNull(type, TYPE_NULL);
+        Assert.notNull(type, ERROR_TYPE_NULL);
 
         dropCollection(name(type));
     }
 
     public void dropCollection(String collectionName) {
-        Assert.hasText(collectionName, COLLECTION_STRING_EMPTY);
+        Assert.hasText(collectionName, ERROR_COLLECTION_STRING_EMPTY);
 
         ArangoCollection collection = database.collection(collectionName);
         if (collection.exists()) {
@@ -92,7 +81,7 @@ public class ArangoOperation {
     }
 
     public <T> T findAny(Class<T> type) {
-        Assert.notNull(type, TYPE_NULL);
+        Assert.notNull(type, ERROR_TYPE_NULL);
 
         collection(name(type));
         String query = "FOR c IN @@collection LIMIT 1 RETURN c";
@@ -108,14 +97,14 @@ public class ArangoOperation {
     }
 
     public <T> ArangoCursor<T> findAll(Class<T> type) {
-        Assert.notNull(type, TYPE_NULL);
+        Assert.notNull(type, ERROR_TYPE_NULL);
 
         return findAll(name(type), type);
     }
 
     public <T> ArangoCursor<T> findAll(String collectionName, Class<T> entityClass) {
-        Assert.hasText(collectionName, COLLECTION_STRING_EMPTY);
-        Assert.notNull(entityClass, TYPE_NULL);
+        Assert.hasText(collectionName, ERROR_COLLECTION_STRING_EMPTY);
+        Assert.notNull(entityClass, ERROR_TYPE_NULL);
 
         collection(collectionName);
         String query = "FOR c IN @@collection RETURN c";
@@ -125,13 +114,13 @@ public class ArangoOperation {
     }
 
     public long count(Class<?> type) {
-        Assert.notNull(type, TYPE_NULL);
+        Assert.notNull(type, ERROR_TYPE_NULL);
 
         return count(type.getSimpleName());
     }
 
     public long count(String collectionName) {
-        Assert.hasText(collectionName, COLLECTION_STRING_EMPTY);
+        Assert.hasText(collectionName, ERROR_COLLECTION_STRING_EMPTY);
 
         long count = 0;
         ArangoCollection collection = database.collection(collectionName);
@@ -147,7 +136,7 @@ public class ArangoOperation {
 
     public <T extends Entity> T insert(T objectToSave, String collectionName) {
         Assert.notNull(objectToSave, "Object about to be saved cannot be null!");
-        Assert.hasText(collectionName, "Collection name cannot be null!");
+        Assert.hasText(collectionName, ERROR_COLLECTION_STRING_EMPTY);
 
         ArangoCollection collection = collection(collectionName);
         DocumentCreateEntity<T> result = collection.insertDocument(objectToSave);
@@ -163,14 +152,14 @@ public class ArangoOperation {
 
     public <T extends Entity> Collection<T> insert(Collection<T> batchToSave, String collectionName) {
         Assert.notEmpty(batchToSave, "List of object about to be saved cannot be empty!");
-        Assert.hasText(collectionName, COLLECTION_STRING_EMPTY);
+        Assert.hasText(collectionName, ERROR_COLLECTION_STRING_EMPTY);
 
         ArangoCollection collection = collection(collectionName);
         MultiDocumentEntity<DocumentCreateEntity<T>> result = collection.insertDocuments(batchToSave);
 
         if (result.getErrors().size() > 0) {
             if (result.getDocuments().size() > 0) {
-                throw new RuntimeException("Major error only some of the batch were saved!");
+                throw new RuntimeException("Major error only some of the batch were saved! Please retry!");
             } else {
                 throw new RuntimeException("Batch save failed!");
             }
@@ -199,6 +188,7 @@ public class ArangoOperation {
     }
 
     private <T> String name(Class<T> type) {
+
         return type.getSimpleName().toString().toLowerCase();
     }
 

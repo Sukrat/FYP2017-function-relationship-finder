@@ -15,10 +15,11 @@
         }
 
         function subscribeLoading(onNext) {
-            return vm.messageSubject.subscribe({next: onNext});
+            return vm.loadingSubject.subscribe({next: onNext});
         }
 
         function error(errors) {
+            vm.loading(false);
             _.forEach(vm.messageSubject.observers, function (observer) {
                 observer.next({
                     error: errors
@@ -27,6 +28,7 @@
         }
 
         function success(messages) {
+            vm.loading(false);
             _.forEach(vm.messageSubject.observers, function (observer) {
                 observer.next({
                     success: messages
@@ -35,10 +37,9 @@
         }
 
         function loading(isOn) {
-            _.forEach(vm.messageSubject.observers, function (observer) {
+            _.forEach(vm.loadingSubject.observers, function (observer) {
                 observer.next(isOn);
             });
         }
-
     }])
 })();

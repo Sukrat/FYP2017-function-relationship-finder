@@ -1,6 +1,5 @@
 package functlyser.repository;
 
-import com.arangodb.entity.DocumentEntity;
 import functlyser.model.Entity;
 
 import java.util.Date;
@@ -52,5 +51,4 @@ public class TestData extends Entity {
     public void setCreatedOn(Date createdOn) {
         this.createdOn = createdOn;
     }
-
 }

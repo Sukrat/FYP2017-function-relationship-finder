@@ -7,7 +7,7 @@
                 vm.uploadFile = uploadFile;
                 vm.deleteFile = deleteFile;
                 vm.getFileNames = getFileNames;
-
+                vm.deleteAllFiles = deleteAllFiles;
 
                 function uploadFile(file) {
                     var defer = $q.defer();
@@ -38,7 +38,7 @@
                 }
 
                 function getFileNames() {
-                    return $http.get("/data/listexcel")
+                    return $http.get("/data/filenames")
                         .then(function (response) {
                             return response.data;
                         }).catch(function (error) {
@@ -47,5 +47,14 @@
                         })
                 }
 
+                function deleteAllFiles() {
+                    return $http.delete("/data/deleteall")
+                        .then(function (response) {
+                            return response.data;
+                        }).catch(function (error) {
+                            console.log(error);
+                            return $q.reject(error.data.messages);
+                        })
+                }
             }])
 })();

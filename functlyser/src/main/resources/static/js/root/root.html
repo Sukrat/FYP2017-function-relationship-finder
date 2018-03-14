@@ -1,3 +1,6 @@
+<div class="loading" ng-if="$ctrl.loading">
+    Loading
+</div>
 <div class="row">
     <div class="col">
         <div class="alert alert-success" role="alert" ng-if="$ctrl.message.success">
@@ -10,9 +13,6 @@
                 <li ng-repeat="message in $ctrl.message.error track by $index">{{message}}</li>
             </ul>
         </div>
-    </div>
-    <div class="loading" ng-if="loading">
-        Loading
     </div>
 </div>
 <div class="row">

@@ -6,7 +6,6 @@ import functlyser.exception.ApiException;
 import functlyser.model.Data;
 import functlyser.model.GroupedData;
 import functlyser.model.Regression;
-import org.hamcrest.core.Is;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 

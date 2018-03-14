@@ -2,7 +2,6 @@ package functlyser.model.validator;
 
 import functlyser.Faker;
 import functlyser.model.Data;
-import org.bson.types.ObjectId;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mockito;
@@ -10,7 +9,6 @@ import org.springframework.validation.Errors;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.HashMap;
 
 import static org.junit.Assert.*;
 import static org.mockito.Matchers.anyString;

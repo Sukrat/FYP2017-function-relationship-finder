@@ -2,13 +2,8 @@ package functlyser;
 
 import com.arangodb.ArangoDB;
 import com.arangodb.ArangoDatabase;
-import org.hibernate.validator.constraints.NotBlank;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-
-import java.util.Collection;
 
 @Configuration
 public class ArangoDbConfiguration {

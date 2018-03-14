@@ -4,7 +4,6 @@ package functlyser.repository;
 import com.arangodb.ArangoCollection;
 import com.arangodb.ArangoCursor;
 import com.arangodb.ArangoDatabase;
-import functlyser.BaseSpringTest;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -18,7 +17,6 @@ import java.util.*;
 
 import static org.hamcrest.MatcherAssert.*;
 import static org.hamcrest.Matchers.*;
-import static org.hamcrest.Matchers.isEmptyOrNullString;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
@@ -51,7 +49,7 @@ public class ArangoOperationTest {
     }
 
     @Test
-    public void testCollection_WithTypeParam() {
+    public void collection_WithTypeParam() {
         Class<Test> type = Test.class;
 
         ArangoCollection result = sut.collection(type);
@@ -62,14 +60,14 @@ public class ArangoOperationTest {
     }
 
     @Test(expected = IllegalArgumentException.class)
-    public void testCollection_WithNullTypeParam() {
+    public void collection_WithNullTypeParam() {
         Class<Test> type = null;
 
         ArangoCollection result = sut.collection(type);
     }
 
     @Test
-    public void testCollection_mustCreateIfNotPresent() {
+    public void collection_mustCreateIfNotPresent() {
         String collectionName = "sukrat";
 
         ArangoCollection result = sut.collection(collectionName);
@@ -81,7 +79,7 @@ public class ArangoOperationTest {
     }
 
 //    @Test
-//    public void testCollection_ifAlreadyCreatedShouldGiveCacheValue() {
+//    public void collection_ifAlreadyCreatedShouldGiveCacheValue() {
 //        ArangoCollection resultX = sut.collection("sukrat");
 //        ArangoCollection resultY = sut.collection("sukrat");
 //
@@ -90,12 +88,12 @@ public class ArangoOperationTest {
 
 
     @Test(expected = IllegalArgumentException.class)
-    public void testCollection_withEmptyCollectionName() {
+    public void collection_withEmptyCollectionName() {
         ArangoCollection result = sut.collection("");
     }
 
     @Test
-    public void testGetCollectionNames() {
+    public void getCollectionNames() {
         database.createCollection("t1");
         database.createCollection("t2");
 
@@ -105,7 +103,7 @@ public class ArangoOperationTest {
     }
 
     @Test
-    public void testCollectionExists_WithTypeWhenTrue() {
+    public void collectionExists_WithTypeWhenTrue() {
         Class<Test> type = Test.class;
         database.createCollection("test");
 
@@ -115,7 +113,7 @@ public class ArangoOperationTest {
     }
 
     @Test
-    public void testCollectionExists_WithTypeWhenFalse() {
+    public void collectionExists_WithTypeWhenFalse() {
         Class<Test> type = Test.class;
 
         boolean result = sut.collectionExists(type);
@@ -124,14 +122,14 @@ public class ArangoOperationTest {
     }
 
     @Test(expected = IllegalArgumentException.class)
-    public void testCollectionExists_WithNullTypeShouldThrow() {
+    public void collectionExists_WithNullTypeShouldThrow() {
         Class<Test> type = null;
 
         boolean result = sut.collectionExists(type);
     }
 
     @Test
-    public void testCollectionExists_IfPresentReturnTrue() {
+    public void collectionExists_IfPresentReturnTrue() {
         String collectionName = "sukrat";
         database.createCollection(collectionName);
 
@@ -141,7 +139,7 @@ public class ArangoOperationTest {
     }
 
     @Test
-    public void testCollectionExists_IfNotPresentReturnFalse() {
+    public void collectionExists_IfNotPresentReturnFalse() {
         String collectionName = "sukrat";
 
         boolean result = sut.collectionExists(collectionName);
@@ -150,14 +148,14 @@ public class ArangoOperationTest {
     }
 
     @Test(expected = IllegalArgumentException.class)
-    public void testCollectionExists_IfEmptyShouldThrow() {
+    public void collectionExists_IfEmptyShouldThrow() {
         String collectionName = "";
 
         boolean result = sut.collectionExists(collectionName);
     }
 
     @Test
-    public void testDropCollection_WithType() {
+    public void dropCollection_WithType() {
         Class<Test> type = Test.class;
         database.createCollection("test");
 
@@ -168,14 +166,14 @@ public class ArangoOperationTest {
     }
 
     @Test(expected = IllegalArgumentException.class)
-    public void testDropCollection_WithNullShouldThrow() {
+    public void dropCollection_WithNullShouldThrow() {
         Class<Test> type = null;
 
         sut.dropCollection(type);
     }
 
     @Test
-    public void testDropCollection() {
+    public void dropCollection() {
         String collectionName = "sukrat";
         database.createCollection(collectionName);
 
@@ -186,7 +184,7 @@ public class ArangoOperationTest {
     }
 
     @Test
-    public void testDropCollection_whenCollectionNotPresentStillWork() {
+    public void dropCollection_whenCollectionNotPresentStillWork() {
         String collectionName = "sukrat";
 
         sut.dropCollection(collectionName);
@@ -196,14 +194,14 @@ public class ArangoOperationTest {
     }
 
     @Test(expected = IllegalArgumentException.class)
-    public void testDropCollection_whenEmptyStringShouldThrow() {
+    public void dropCollection_whenEmptyStringShouldThrow() {
         String collectionName = "";
 
         sut.dropCollection(collectionName);
     }
 
     @Test
-    public void testFindAny() {
+    public void findAny() {
         Class<TestData> type = TestData.class;
         database.createCollection("testdata");
         database.collection("testdata").insertDocument(new TestData("sukrat", 35, 6.2));
@@ -215,7 +213,7 @@ public class ArangoOperationTest {
 
 
     @Test
-    public void testFindAll() {
+    public void findAll() {
         Class<TestData> type = TestData.class;
         database.createCollection("testdata");
         database.collection("testdata").insertDocument(new TestData("sukrat", 35, 6.2));
@@ -228,7 +226,7 @@ public class ArangoOperationTest {
     }
 
     @Test
-    public void testFindAll_WhenEmpty() {
+    public void findAll_WhenEmpty() {
         Class<TestData> type = TestData.class;
         database.createCollection("testdata");
 
@@ -238,7 +236,7 @@ public class ArangoOperationTest {
     }
 
     @Test
-    public void testFindAll_WhenNoCollection() {
+    public void findAll_WhenNoCollection() {
         Class<TestData> type = TestData.class;
 
         ArangoCursor<TestData> all = sut.findAll(TestData.class);
@@ -247,7 +245,7 @@ public class ArangoOperationTest {
     }
 
     @Test
-    public void testFindAll_WhenString() {
+    public void findAll_WhenString() {
         String collectionName = "testdata";
         database.createCollection(collectionName);
         database.collection(collectionName).insertDocument(new TestData("sukrat", 35, 6.2));
@@ -260,12 +258,12 @@ public class ArangoOperationTest {
     }
 
     @Test(expected = IllegalArgumentException.class)
-    public void testFindAll_WhenEmptyString() {
+    public void findAll_WhenEmptyString() {
         ArangoCursor<TestData> all = sut.findAll("", TestData.class);
     }
 
     @Test
-    public void testCount() {
+    public void count() {
         String collectionName = "testdata";
         database.createCollection(collectionName);
         database.collection(collectionName).insertDocument(new TestData("sukrat", 35, 6.2));
@@ -278,7 +276,7 @@ public class ArangoOperationTest {
     }
 
     @Test
-    public void testCount_IfDocumentDonotExist() {
+    public void count_IfDocumentDonotExist() {
         String collectionName = "testdata";
 
         long result = sut.count(collectionName);
@@ -287,7 +285,7 @@ public class ArangoOperationTest {
     }
 
     @Test
-    public void testInsert() {
+    public void insert() {
         String collectionName = "testdata";
         TestData testData = new TestData("sukrat", 35, 6.2);
 
@@ -297,7 +295,7 @@ public class ArangoOperationTest {
     }
 
     @Test
-    public void testInsert_WithCollectionName() {
+    public void insert_WithCollectionName() {
         String collectionName = "testdatas";
         TestData testData = new TestData("sukrat", 35, 6.2);
 
@@ -307,7 +305,7 @@ public class ArangoOperationTest {
     }
 
     @Test
-    public void testInsert_Bulk() {
+    public void insert_Bulk() {
         String collectionName = "testdata";
         TestData testData = new TestData("sukrat", 35, 6.2);
         TestData testData2 = new TestData("sukrat2", 35, 6.2);
