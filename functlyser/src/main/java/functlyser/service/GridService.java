@@ -4,7 +4,7 @@ import com.arangodb.ArangoCursor;
 import com.arangodb.entity.BaseDocument;
 import functlyser.exception.ApiException;
 import functlyser.model.Data;
-import functlyser.model.GroupedData;
+import functlyser.model.GridData;
 import functlyser.model.Regression;
 import functlyser.repository.ArangoOperation;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,62 +26,67 @@ public class GridService extends Service {
         this.arangoOperation = arangoOperation;
     }
 
-    public long groupByNdimensionAndInsert(List<Double> tolerances) {
+    public long cluster(List<Double> tolerances) {
         Data any = arangoOperation.findAny(Data.class);
         if (any == null) {
             throw new ApiException("No data found in the database!");
         }
+        int startIndex = 1;
+        int endIndex = any.getColumns().size();
+        int numParameterColumns = any.getColumns().size() - 1;
+
         if (tolerances.size() == 1) {
             double tolerance = tolerances.get(0);
-            for (int i = 1; i < any.getColumns().size(); i++) {
+            // as one of the tolerances is already in the list
+            for (int i = startIndex + 1; i < endIndex; i++) {
                 tolerances.add(tolerance);
             }
         }
-        if (any.getColumns().size() != tolerances.size()) {
+        if (numParameterColumns != tolerances.size()) {
             throw new ApiException(
-                    format("Number of tolerance must be equal to the data columns. (expected: %d actual: %d)",
-                            any.getColumns().size(), tolerances.size()));
+                    format("Number of tolerance must be equal to the data columns or enter one tolerance for all (expected: %d actual: %d)",
+                            numParameterColumns, tolerances.size()));
         }
 
         // deleting all the records in grouped data
-        arangoOperation.collection(GroupedData.class).truncate();
+        arangoOperation.collection(GridData.class).truncate();
 
         StringBuilder builder = new StringBuilder();
         builder.append("FOR r in @@collection\n");
-        builder.append("COLLECT grid_index = [ \n");
+        builder.append("COLLECT boxIndex = [ \n");
         // ignoring first tolerance as that is for ouput column
-        for (int i = 1; i < tolerances.size(); i++) {
-            builder.append(format("FLOOR(r.columns[%1$d] / @tolerance%1$d)", i));
-            if (i < tolerances.size() - 1) {
+        for (int i = startIndex; i < endIndex; i++) {
+            builder.append(format("FLOOR(r.columns.%1$s / @tolerance%2$d)", Data.colName(i), i));
+            if (i < endIndex - 1) {
                 builder.append(", ");
             }
         }
-        builder.append(" ] INTO values = r\n");
+        builder.append(" ] INTO members = r._id\n");
         builder.append("INSERT {\n");
-        builder.append("gridIndex: grid_index, \n");
-        builder.append("dataMembers: values \n");
+        builder.append("boxIndex: boxIndex, \n");
+        builder.append("members: members \n");
         builder.append("} INTO @@newCollection\n");
         builder.append("RETURN { count: 1}\n");
 
         Map<String, Object> bindVar = new HashMap<>();
         bindVar.put("@collection", arangoOperation.collectionName(Data.class));
-        bindVar.put("@newCollection", arangoOperation.collectionName(GroupedData.class));
+        bindVar.put("@newCollection", arangoOperation.collectionName(GridData.class));
         // ignoring first tolerance as that is for ouput column
-        for (int i = 1; i < tolerances.size(); i++) {
-            bindVar.put(format("tolerance%1$d", i), fixTolerance(tolerances.get(i)));
+        for (int i = startIndex; i < endIndex; i++) {
+            bindVar.put(format("tolerance%1$d", i), fixTolerance(tolerances.get(i - 1)));
         }
 
-        ArangoCursor<BaseDocument> datas = arangoOperation.query(builder.toString(), bindVar, BaseDocument.class);
+        ArangoCursor<BaseDocument> result = arangoOperation.query(builder.toString(), bindVar, BaseDocument.class);
 
-        return datas.asListRemaining().size();
+        return result.asListRemaining().size();
     }
 
-    public List<GroupedData> getFunctionTerminator(double tolerance) {
+    public List<GridData> getFunctionTerminator(double tolerance) {
         Data any = arangoOperation.findAny(Data.class);
         if (any == null) {
             throw new ApiException("No data found in the database!");
         }
-        GroupedData anyGrouped = arangoOperation.findAny(GroupedData.class);
+        GridData anyGrouped = arangoOperation.findAny(GridData.class);
         if (anyGrouped == null) {
             throw new ApiException("Data has not been grouped!");
         }
@@ -97,9 +102,9 @@ public class GridService extends Service {
         builder.append("RETURN r\n");
 
         Map<String, Object> bindVar = new HashMap<>();
-        bindVar.put("@collection", arangoOperation.collectionName(GroupedData.class));
+        bindVar.put("@collection", arangoOperation.collectionName(GridData.class));
         bindVar.put("tolerance", fixTolerance(tolerance));
-        ArangoCursor<GroupedData> datas = arangoOperation.query(builder.toString(), bindVar, GroupedData.class);
+        ArangoCursor<GridData> datas = arangoOperation.query(builder.toString(), bindVar, GridData.class);
         return datas.asListRemaining();
     }
 
@@ -108,7 +113,7 @@ public class GridService extends Service {
         if (any == null) {
             throw new ApiException("No data found in the database!");
         }
-        GroupedData anyGrouped = arangoOperation.findAny(GroupedData.class);
+        GridData anyGrouped = arangoOperation.findAny(GridData.class);
         if (anyGrouped == null) {
             throw new ApiException("Data has not been grouped!");
         }
@@ -151,7 +156,7 @@ public class GridService extends Service {
         builder.append("}\n");
 
         Map<String, Object> bindVar = new HashMap<>();
-        bindVar.put("@collection", arangoOperation.collectionName(GroupedData.class));
+        bindVar.put("@collection", arangoOperation.collectionName(GridData.class));
         bindVar.put("col", column);
         ArangoCursor<Regression> datas = arangoOperation.query(builder.toString(), bindVar, Regression.class);
 

@@ -1,7 +1,7 @@
 package functlyser.controller;
 
 import functlyser.controller.messages.Message;
-import functlyser.model.GroupedData;
+import functlyser.model.GridData;
 import functlyser.model.Regression;
 import functlyser.service.GridService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -29,16 +29,16 @@ public class AnalysisController extends Controller {
 
 
     @RequestMapping(value = "/analysis/grid/cluster", method = RequestMethod.POST)
-    public ResponseEntity<Message> isafunctionByGrid(@RequestBody ArrayList<Double> tolerances) {
-        long count = gridService.groupByNdimensionAndInsert(tolerances);
+    public ResponseEntity<Message> gridCluster(@RequestBody ArrayList<Double> tolerances) {
+        long count = gridService.cluster(tolerances);
         Message message = new Message(Arrays.asList(format("%d groups created!", count),
                 "Grid analysis successfully completed!"));
         return ResponseEntity.ok(message);
     }
 
     @RequestMapping(value = "/analysis/grid/functioncheck", method = RequestMethod.POST)
-    public ResponseEntity<List<GroupedData>> isafunctionByGrid(@RequestBody double tolerance) {
-        List<GroupedData> result = gridService.getFunctionTerminator(tolerance);
+    public ResponseEntity<List<GridData>> isafunctionByGrid(@RequestBody double tolerance) {
+        List<GridData> result = gridService.getFunctionTerminator(tolerance);
         return ResponseEntity.ok(result);
     }
 
