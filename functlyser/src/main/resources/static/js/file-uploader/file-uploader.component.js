@@ -8,7 +8,6 @@
                 vm.upload = upload;
                 vm.deleteFile = deleteFile;
                 vm.list = list;
-                vm.deleteAllFiles = deleteAllFiles;
                 list();
 
                 vm.percentage = 0;
@@ -53,21 +52,6 @@
                         }).catch((error) => {
                         RootService.error(error);
                     })
-                }
-
-                function deleteAllFiles() {
-                    if (confirm('Are you sure you want to delete all the data?')) {
-                        RootService.loading(true);
-                        FileUploaderService.deleteAllFiles()
-                            .then((data) => {
-                                RootService.success(data.messages);
-                                list();
-                            }).catch((error) => {
-                            RootService.error(error);
-                        })
-                    } else {
-                        RootService.error(['Delete all files command cancelled.']);
-                    }
                 }
             }]
     })

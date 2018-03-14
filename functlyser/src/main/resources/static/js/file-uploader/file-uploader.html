@@ -22,11 +22,7 @@
                 <tr>
                     <th scope="col">#</th>
                     <th scope="col">Name</th>
-                    <th scope="col">Delete
-                        <button type="button" class="btn btn-danger btn-sm" ng-click="$ctrl.deleteAllFiles()">
-                            Delete All
-                        </button>
-                    </th>
+                    <th scope="col">Delete</th>
                 </tr>
                 </thead>
                 <tbody>
@@ -36,7 +32,7 @@
                     </td>
                     <td>{{filename}}</td>
                     <td>
-                        <button type="button" class="btn btn-danger btn-sm" ng-click="$ctrl.delete(filename)">
+                        <button type="button" class="btn btn-danger btn-sm" ng-click="$ctrl.deleteFile(filename)">
                             Delete
                         </button>
                     </td>

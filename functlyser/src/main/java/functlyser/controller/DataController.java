@@ -42,16 +42,16 @@ public class DataController extends Controller {
                 "attachment;filename=\"" + filename + "\"").body(file);
     }
 
-    //
-//    @RequestMapping(value = "/data/delete", method = RequestMethod.DELETE)
-//    public ResponseEntity<Message> delete(@RequestParam("filename") String filename) {
-//
-//        long deleteCount = dataService.delete(filename);
-//        Message message = new Message(Arrays.asList(format("%d records deleted!", deleteCount),
-//                format("%s successfully deleted!", filename)));
-//        return ResponseEntity.ok(message);
-//    }
-//
+
+    @RequestMapping(value = "/data/delete", method = RequestMethod.DELETE)
+    public ResponseEntity<Message> delete(@RequestParam("filename") String filename) {
+
+        long deleteCount = dataService.deleteCsvFile(filename);
+        Message message = new Message(Arrays.asList(format("%d records deleted!", deleteCount),
+                format("%s successfully deleted!", filename)));
+        return ResponseEntity.ok(message);
+    }
+
     @RequestMapping(value = "/data/filenames", method = RequestMethod.GET)
     public ResponseEntity<List<String>> listFileNames() {
         List<String> excelList = dataService.listCsvFileNames();

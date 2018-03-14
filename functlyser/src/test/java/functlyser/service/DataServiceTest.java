@@ -42,44 +42,6 @@ public class DataServiceTest extends BaseServiceTest {
         super.before();
         sut = new DataService(arangoOperation, dataValidator, csvService);
     }
-//
-//    @Test
-//    public void createMulti() {
-//        int num = 10;
-//        List<Data> dataList = getPerfectDataFor(num, "test.csv");
-//        Mockito.when(dataValidator.validate(anyObject())).thenReturn(errors);
-//        Mockito.when(errors.hasErrors()).thenReturn(false);
-//
-//        Collection<Data> multi = sut.createMulti(dataList);
-//
-//        assertTrue(multi.stream()
-//                .allMatch(m -> !isNullOrEmptyString(m.getId())));
-//        assertThat(arangoOperation.findAll(Data.class).asListRemaining().size(), equalTo(num));
-//    }
-//
-//    @Test(expected = ValidationException.class)
-//    public void createMulti_WhenDataIsNotValid() {
-//        int num = 10;
-//        List<Data> dataList = getPerfectDataFor(num, "test.csv");
-//        Mockito.when(dataValidator.validate(anyObject())).thenReturn(errors);
-//        Mockito.when(errors.hasErrors()).thenReturn(true);
-//
-//        Collection<Data> multi = sut.createMulti(dataList);
-//    }
-//
-//    @Test(expected = ApiException.class)
-//    public void createMulti_WhenDataIsNull() {
-//        List<Data> dataList = null;
-//
-//        Collection<Data> multi = sut.createMulti(dataList);
-//    }
-//
-//    @Test(expected = ApiException.class)
-//    public void createMulti_WhenDataIsEmpty() {
-//        List<Data> dataList = new ArrayList<>();
-//
-//        Collection<Data> multi = sut.createMulti(dataList);
-//    }
 
     @Test
     public void insertCsvFile_shouldWork() {
@@ -134,7 +96,7 @@ public class DataServiceTest extends BaseServiceTest {
         arangoOperation.insert(Faker.nextData("hello.csv", 10, 3),
                 Data.class);
 
-        Resource multi = sut.getCsvFile("test.csv");
+        Resource multi = sut.getCsvFile("hello.csv");
         assertThat(multi.contentLength(), greaterThan(0L));
     }
 
@@ -144,7 +106,7 @@ public class DataServiceTest extends BaseServiceTest {
                 Data.class);
 
         Resource multi = sut.getCsvFile("hello.csv");
-        assertThat(multi.contentLength(), greaterThan(0L));
+        assertThat(multi.contentLength(), is(0L));
     }
 
     @Test(expected = ApiException.class)
@@ -154,27 +116,27 @@ public class DataServiceTest extends BaseServiceTest {
         assertThat(multi.contentLength(), is(0L));
     }
 
-    //    @Test
-//    public void delete() throws IOException {
-//        arangoOperation.insert(getPerfectDataFor(10, "test.csv"),
-//                Data.class);
-//        arangoOperation.insert(getPerfectDataFor(10, "black.csv"),
-//                Data.class);
-//
-//
-//        long result = sut.delete("test.csv");
-//
-//        assertThat(result, is(10L));
-//        assertThat(arangoOperation.findAll(Data.class).asListRemaining().size(), is(10));
-//    }
-//
-//    @Test
-//    public void delete_whenFilenameNotPresent() throws IOException {
-//        long result = sut.delete("test.csv");
-//
-//        assertThat(result, is(0L));
-//    }
-//
+        @Test
+    public void deleteCsvFile() throws IOException {
+        arangoOperation.insert(Faker.nextData("test.csv", 10, 3),
+                Data.class);
+            arangoOperation.insert(Faker.nextData("black.csv", 10, 3),
+                    Data.class);
+
+
+        long result = sut.deleteCsvFile("test.csv");
+
+        assertThat(result, is(10L));
+        assertThat(arangoOperation.findAll(Data.class).asListRemaining().size(), is(10));
+    }
+
+    @Test
+    public void deleteCsvFile_whenFilenameNotPresent() throws IOException {
+        long result = sut.deleteCsvFile("test.csv");
+
+        assertThat(result, is(0L));
+    }
+
     @Test
     public void listCsvFileNames() throws IOException {
         arangoOperation.insert(Faker.nextData("testcsv.csv", 10, 3),
@@ -196,25 +158,6 @@ public class DataServiceTest extends BaseServiceTest {
         assertThat(result.size(), is(0));
     }
 
-//
-//    private List<Data> getPerfectDataFor(int num, String filename) {
-//        return getPerfectDataFor(num, filename, 3);
-//    }
-//
-//    private List<Data> getPerfectDataFor(int num, String filename, int numColumn) {
-//        List<Data> list = new ArrayList<>();
-//        for (int i = 0; i < num; i++) {
-//            Data data = new Data();
-//            data.setFileName(filename);
-//            data.setColumns(new HashMap<>());
-//            for (int j = 0; j < numColumn; j++) {
-////                data.getColumns().put(j + Faker.nextDouble());
-//            }
-//            list.add(data);
-//        }
-//        return list;
-//    }
-
     private String testCsvData() {
         return "69.53716376,43.85339759,27.0789345\n" +
                 "28.60979912,64.06039564,33.7528938\n" +
@@ -227,6 +170,4 @@ public class DataServiceTest extends BaseServiceTest {
                 "76.30360999,78.95775159,73.4413411\n" +
                 "88.56795563,1.081714266,11.8977555\n";
     }
-
-
 }

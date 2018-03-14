@@ -62,17 +62,17 @@ public class DataControllerTest extends BaseControllerTest {
         result.andExpect(status().isOk())
                 .andExpect(content().string(not(isEmptyOrNullString())));
     }
-//
-//    @Test
-//    public void testDelete() throws Exception {
-//        List<Data> datas = getPerfectDataFor(3, "test.csv", 7);
-//        arangoOperation.insert(datas, Data.class);
-//
-//        ResultActions result = mvcDelete("/data/delete?filename=test.csv");
-//
-//        result.andExpect(status().isOk())
-//                .andExpect(jsonPath("$.messages", not(isEmptyOrNullString())));
-//    }
+
+    @Test
+    public void delete() throws Exception {
+        List<Data> datas = Faker.nextData("test.csv", 3, 7);
+        arangoOperation.insert(datas, Data.class);
+
+        ResultActions result = mvcDelete("/data/delete?filename=test.csv");
+
+        result.andExpect(status().isOk())
+                .andExpect(jsonPath("$.messages", not(isEmptyOrNullString())));
+    }
 
     private String testData() {
         return "69.53716376,43.85339759,27.0789345\n" +
@@ -80,18 +80,4 @@ public class DataControllerTest extends BaseControllerTest {
                 "22.25475914,86.61652591,57.5153819\n" +
                 "48.64121873,86.71553793,31.9302133\n";
     }
-//
-//    private List<Data> getPerfectDataFor(int num, String filename, int numColumn) {
-//        List<Data> list = new ArrayList<>();
-//        for (int i = 0; i < num; i++) {
-//            Data data = new Data();
-//            data.setFileName(filename);
-////            data.setColumns(new ArrayList<>());
-//            for (int j = 0; j < numColumn; j++) {
-////                data.getColumns().add(j + Faker.nextDouble());
-//            }
-//            list.add(data);
-//        }
-//        return list;
-//    }
 }

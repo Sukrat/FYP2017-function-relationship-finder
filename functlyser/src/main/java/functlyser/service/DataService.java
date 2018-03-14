@@ -113,11 +113,7 @@ public class DataService extends Service {
         return resource;
     }
 
-    public Collection<Data> createMulti(Collection<Data> data) {
-        return multiSave(data);
-    }
-
-    public long delete(String filename) {
+    public long deleteCsvFile(String filename) {
         String query = "FOR r in @@collection FILTER r.fileName == @filename REMOVE r in @@collection RETURN r";
         Map<String, Object> bindVar = new HashMap<>();
         bindVar.put("@collection", arangoOperation.collectionName(Data.class));
