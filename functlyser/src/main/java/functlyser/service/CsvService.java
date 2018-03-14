@@ -2,19 +2,17 @@ package functlyser.service;
 
 import functlyser.exception.ApiException;
 import javafx.util.Pair;
+import org.springframework.core.io.ByteArrayResource;
+import org.springframework.core.io.Resource;
 import org.springframework.stereotype.Component;
 import org.supercsv.cellprocessor.ift.CellProcessor;
 import org.supercsv.exception.SuperCsvConstraintViolationException;
 import org.supercsv.exception.SuperCsvException;
-import org.supercsv.io.CsvMapReader;
-import org.supercsv.io.ICsvMapReader;
+import org.supercsv.io.*;
 import org.supercsv.prefs.CsvPreference;
 import org.supercsv.util.Util;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.Reader;
+import java.io.*;
 import java.util.*;
 import java.util.function.Function;
 
@@ -75,5 +73,40 @@ public class CsvService {
             }
         }
         return list;
+    }
+
+    public <T> Resource convert(Iterable<T> from, boolean writeHeader, String[] header, CellProcessor[] processors,
+                                Function<T, Map<String, Object>> converter) {
+        ICsvMapWriter mapWriter = null;
+        ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+        try {
+            Writer writer = new OutputStreamWriter(byteArrayOutputStream);
+            mapWriter = new CsvMapWriter(writer, CsvPreference.STANDARD_PREFERENCE);
+
+            // write the header
+            if (writeHeader) {
+                mapWriter.writeHeader(header);
+            }
+
+            for (T elem : from) {
+                Map<String, Object> row = converter.apply(elem);
+                mapWriter.write(row, header, processors);
+            }
+        } catch (IOException e) {
+            throw new ApiException("Writing on file failed! " + e.getMessage());
+        } catch (SuperCsvConstraintViolationException e) {
+            throw new ApiException(e.getMessage());
+        } catch (SuperCsvException e) {
+            throw new ApiException(e.getMessage());
+        } finally {
+            if (mapWriter != null) {
+                try {
+                    mapWriter.close();
+                } catch (IOException e) {
+
+                }
+            }
+        }
+        return new ByteArrayResource(byteArrayOutputStream.toByteArray());
     }
 }

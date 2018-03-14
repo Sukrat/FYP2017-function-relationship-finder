@@ -52,16 +52,16 @@ public class DataControllerTest extends BaseControllerTest {
                 .andExpect(content().string(not(isEmptyOrNullString())));
     }
 
-//    @Test
-//    public void testDownloadCsv() throws Exception {
-//        List<Data> datas = getPerfectDataFor(3, "test.csv", 7);
-//        arangoOperation.insert(datas, Data.class);
-//
-//        ResultActions result = mvcGet("/data/download?filename=test.csv");
-//
-//        result.andExpect(status().isOk())
-//                .andExpect(content().string(not(isEmptyOrNullString())));
-//    }
+    @Test
+    public void downloadCsv() throws Exception {
+        List<Data> datas = Faker.nextData("test.csv", 3, 7);
+        arangoOperation.insert(datas, Data.class);
+
+        ResultActions result = mvcGet("/data/download?filename=test.csv");
+
+        result.andExpect(status().isOk())
+                .andExpect(content().string(not(isEmptyOrNullString())));
+    }
 //
 //    @Test
 //    public void testDelete() throws Exception {

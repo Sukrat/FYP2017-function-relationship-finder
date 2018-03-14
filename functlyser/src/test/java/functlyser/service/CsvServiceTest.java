@@ -4,11 +4,15 @@ import functlyser.exception.ApiException;
 import javafx.util.Pair;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.Resource;
 import org.supercsv.cellprocessor.ParseDouble;
 import org.supercsv.cellprocessor.constraint.NotNull;
 import org.supercsv.cellprocessor.ift.CellProcessor;
 
 import java.io.ByteArrayInputStream;
+import java.io.IOException;
+import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -106,5 +110,33 @@ public class CsvServiceTest extends BaseServiceTest {
         assertTrue(result.stream().allMatch(m -> m.size() == 3));
     }
 
+    @Test
+    public void convert_Resource() throws Exception {
+        List<String> from = Arrays.asList("abc", "cde");
+        String[] header = new String[]{"1", "2"};
+        CellProcessor[] cellProcessor = new CellProcessor[]{new NotNull(), new NotNull()};
 
+
+        Resource result = sut.convert(from, false, header, cellProcessor, (elem) -> new HashMap<String, Object>() {{
+            put(header[0], elem);
+            put(header[1], elem);
+        }});
+
+        assertThat(result.contentLength(), greaterThan(0l));
+    }
+
+    @Test
+    public void convert_Resource_whenEmpty() throws Exception {
+        List<String> from = Arrays.asList();
+        String[] header = new String[]{"1", "2"};
+        CellProcessor[] cellProcessor = new CellProcessor[]{new NotNull(), new NotNull()};
+
+
+        Resource result = sut.convert(from, false, header, cellProcessor, (elem) -> new HashMap<String, Object>() {{
+            put(header[0], elem);
+            put(header[1], elem);
+        }});
+
+        assertThat(result.contentLength(), is(0l));
+    }
 }

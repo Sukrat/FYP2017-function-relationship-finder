@@ -91,26 +91,26 @@ public class DataService extends Service {
         return new Pair<>(headers, processors);
     }
 
-    public Resource downloadCsv(String filename) {
+    public Resource getCsvFile(String filename) {
         String query = "FOR r in @@collection FILTER r.fileName == @filename RETURN r";
         Map<String, Object> bindVar = new HashMap<>();
         bindVar.put("@collection", arangoOperation.collectionName(Data.class));
         bindVar.put("filename", filename);
         ArangoCursor<Data> datas = arangoOperation.query(query, bindVar, Data.class);
 
-        ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
-        Writer writer = new OutputStreamWriter(byteArrayOutputStream);
-        CsvListWriter mapWriter = new CsvListWriter(writer, CsvPreference.STANDARD_PREFERENCE);
-
-        try {
-            for (Data data : datas) {
-                mapWriter.write(data.getColumns());
-            }
-            mapWriter.close();
-        } catch (IOException e) {
-            throw new ApiException(e.getMessage());
+        Data sample = arangoOperation.findAny(Data.class);
+        if (sample == null) {
+            throw new ApiException("Data not found!");
         }
-        return new ByteArrayResource(byteArrayOutputStream.toByteArray());
+
+        Pair<String[], CellProcessor[]> params = getArgumentsForCsv(sample.getColumns().size());
+        Resource resource = csvService.convert(datas, false, params.getKey(), params.getValue(), (elem) -> {
+            return elem.getColumns()
+                    .entrySet()
+                    .stream()
+                    .collect(Collectors.toMap(m -> m.getKey(), m -> m.getValue()));
+        });
+        return resource;
     }
 
     public Collection<Data> createMulti(Collection<Data> data) {

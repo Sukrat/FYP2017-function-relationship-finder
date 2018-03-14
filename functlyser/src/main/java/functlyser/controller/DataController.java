@@ -34,14 +34,15 @@ public class DataController extends Controller {
         return ResponseEntity.ok(message);
     }
 
-    //    @RequestMapping(value = "/data/download", method = RequestMethod.GET)
-//    public ResponseEntity<Resource> downloadcsv(@RequestParam("filename") String filename) {
-//
-//        Resource file = dataService.downloadCsv(filename);
-//        return ResponseEntity.ok().header(HttpHeaders.CONTENT_DISPOSITION,
-//                "attachment;filename=\"" + filename + "\"").body(file);
-//    }
-//
+    @RequestMapping(value = "/data/download", method = RequestMethod.GET)
+    public ResponseEntity<Resource> downloadCsv(@RequestParam("filename") String filename) {
+
+        Resource file = dataService.getCsvFile(filename);
+        return ResponseEntity.ok().header(HttpHeaders.CONTENT_DISPOSITION,
+                "attachment;filename=\"" + filename + "\"").body(file);
+    }
+
+    //
 //    @RequestMapping(value = "/data/delete", method = RequestMethod.DELETE)
 //    public ResponseEntity<Message> delete(@RequestParam("filename") String filename) {
 //

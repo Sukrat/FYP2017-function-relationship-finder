@@ -127,25 +127,34 @@ public class DataServiceTest extends BaseServiceTest {
         Collection<Data> multi = sut.insertCsvFile(file);
     }
 
+    @Test
+    public void getCsvFile() throws IOException {
+        arangoOperation.insert(Faker.nextData("testcsv.csv", 10, 3),
+                Data.class);
+        arangoOperation.insert(Faker.nextData("hello.csv", 10, 3),
+                Data.class);
+
+        Resource multi = sut.getCsvFile("test.csv");
+        assertThat(multi.contentLength(), greaterThan(0L));
+    }
+
+    @Test
+    public void getCsvFile_whenFileIsNotThere() throws IOException {
+        arangoOperation.insert(Faker.nextData("testcsv.csv", 10, 3),
+                Data.class);
+
+        Resource multi = sut.getCsvFile("hello.csv");
+        assertThat(multi.contentLength(), greaterThan(0L));
+    }
+
+    @Test(expected = ApiException.class)
+    public void getCsvFile_whenDataIsNotPresent() throws IOException {
+        Resource multi = sut.getCsvFile("test.csv");
+
+        assertThat(multi.contentLength(), is(0L));
+    }
+
     //    @Test
-//    public void downloadCsv() throws IOException {
-//        arangoOperation.insert(getPerfectDataFor(10, "test.csv"),
-//                Data.class);
-//        arangoOperation.insert(getPerfectDataFor(10, "black.csv"),
-//                Data.class);
-//
-//        Resource multi = sut.downloadCsv("test.csv");
-//        assertThat(multi.contentLength(), greaterThan(0L));
-//    }
-//
-//    @Test
-//    public void downloadCsv_whenFileNameIsNotPresent() throws IOException {
-//        Resource multi = sut.downloadCsv("test.csv");
-//
-//        assertThat(multi.contentLength(), is(0L));
-//    }
-//
-//    @Test
 //    public void delete() throws IOException {
 //        arangoOperation.insert(getPerfectDataFor(10, "test.csv"),
 //                Data.class);
