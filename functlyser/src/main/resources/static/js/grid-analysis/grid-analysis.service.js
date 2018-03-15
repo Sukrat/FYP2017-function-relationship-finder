@@ -1,11 +1,12 @@
 (function () {
     var app = angular.module('app');
     app.service('GridAnalysisService',
-        ['$http', '$q', '_',
-            function ($http, $q, _) {
+        ['$http', '$q', '_', 'BufferParser',
+            function ($http, $q, _, BufferParser) {
                 var vm = this;
                 vm.cluster = cluster;
                 vm.checkFunction = checkFunction;
+                vm.analyseColumn = analyseColumn;
 
                 function cluster(tolerances) {
                     let defer = $q.defer();
@@ -38,21 +39,29 @@
                         .then((response) => {
                             return response.data;
                         }).catch((error) => {
-                            console.log(error);
-                            return $q.reject(error.data.messages);
+                            var err = BufferParser.parse(error.data);
+                            console.log(err);
+                            return $q.reject(err.messages);
                         })
                 }
 
-                //
-                // function analyseColumn(columnNo) {
-                //     return this.$http.post('/analysis/grid/column', _.toNumber(columnNo))
-                //         .then((response) => {
-                //             return response.data;
-                //         })
-                //         .catch((error) => {
-                //             console.log(error);
-                //             return this.$q.reject(error.data.messages);
-                //         })
-                // }
+
+                function analyseColumn(columnNo) {
+                    var colNo = _.toInteger(columnNo);
+                    if (_.isNaN(colNo)) {
+                        return $q.reject(['Please enter a valid integer!']);
+                    }
+                    return $http.post('/analysis/grid/column', colNo, {
+                        responseType: 'arraybuffer'
+                    })
+                        .then((response) => {
+                            return response.data;
+                        })
+                        .catch((error) => {
+                            var err = BufferParser.parse(error.data);
+                            console.log(err);
+                            return $q.reject(err.messages);
+                        })
+                }
             }])
 })();

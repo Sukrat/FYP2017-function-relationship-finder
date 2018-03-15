@@ -7,6 +7,7 @@
                 var vm = this;
                 vm.cluster = cluster;
                 vm.checkFunction = checkFunction;
+                vm.analyseColumn = analyseColumn;
 
                 vm.tolerances = "";
                 vm.outputTolerance = "";
@@ -38,17 +39,21 @@
                         })
                 }
 
-                //
-                // function analyseColumn(columnNo) {
-                //     this.loading = true;
-                //     return this.gridAnalysisService.analyseColumn(columnNo)
-                //         .then((response) => {
-                //             this.success(data)
-                //         })
-                //         .catch((error) => {
-                //             this.error(error)
-                //         })
-                // }
+
+                function analyseColumn(columnNo) {
+                    RootService.loading(true);
+                    return GridAnalysisService.analyseColumn(columnNo)
+                        .then((data) => {
+                            var blob = new Blob([data], {
+                                type: "text/plain;charset=utf-8"
+                            });
+                            FileSaver.saveAs(blob, "functionCheck.csv");
+                            RootService.success(["File successfully downloading!"]);
+                        })
+                        .catch((error) => {
+                            RootService.error(error)
+                        })
+                }
             }]
     })
 })();

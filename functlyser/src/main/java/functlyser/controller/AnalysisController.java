@@ -46,13 +46,10 @@ public class AnalysisController extends Controller {
     }
 
     @RequestMapping(value = "/analysis/grid/column", method = RequestMethod.POST)
-    public ResponseEntity<List<Regression>> analyseColumn(@RequestBody int columnNo) {
-        List<Regression> result = gridService.analyseColumn(columnNo);
-        return ResponseEntity.ok(result);
-    }
-
-    @RequestMapping(value = "/analysis/grid/additive", method = RequestMethod.POST)
-    public ResponseEntity additive(@RequestBody int numberOfVectors) {
-        return ResponseEntity.ok(null);
+    public ResponseEntity<Resource> analyseParameter(@RequestBody int columnNo) {
+        String filename = format("analysedColNo-%d", columnNo);
+        Resource file = gridService.analyseParameter(columnNo);
+        return ResponseEntity.ok().header(HttpHeaders.CONTENT_DISPOSITION,
+                "attachment;filename=\"" + filename + "\"").body(file);
     }
 }

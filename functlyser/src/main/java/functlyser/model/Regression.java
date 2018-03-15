@@ -2,33 +2,41 @@ package functlyser.model;
 
 public class Regression {
 
-    private int col;
+    private Double m1;
+    private Double m2;
 
-    private Double a;
+    private Double c1;
+    private Double c2;
 
-    private Double b;
-
-    public int getCol() {
-        return col;
+    public Double getM1() {
+        return m1;
     }
 
-    public void setCol(int col) {
-        this.col = col;
+    public void setM1(Double m1) {
+        this.m1 = m1;
     }
 
-    public Double getA() {
-        return a;
+    public Double getM2() {
+        return m2;
     }
 
-    public void setA(Double a) {
-        this.a = a;
+    public void setM2(Double m2) {
+        this.m2 = m2;
     }
 
-    public Double getB() {
-        return b;
+    public Double getC1() {
+        return c1;
     }
 
-    public void setB(Double b) {
-        this.b = b;
+    public void setC1(Double c1) {
+        this.c1 = c1;
+    }
+
+    public Double getC2() {
+        return c2;
+    }
+
+    public void setC2(Double c2) {
+        this.c2 = c2;
     }
 }

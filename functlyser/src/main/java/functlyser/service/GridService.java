@@ -3,6 +3,7 @@ package functlyser.service;
 import com.arangodb.ArangoCursor;
 import com.arangodb.entity.BaseDocument;
 import functlyser.exception.ApiException;
+import functlyser.model.CompiledRegression;
 import functlyser.model.Data;
 import functlyser.model.GridData;
 import functlyser.model.Regression;
@@ -11,7 +12,9 @@ import javafx.util.Pair;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.Resource;
 import org.springframework.stereotype.Component;
+import org.supercsv.cellprocessor.Optional;
 import org.supercsv.cellprocessor.ParseDouble;
+import org.supercsv.cellprocessor.ParseInt;
 import org.supercsv.cellprocessor.constraint.NotNull;
 import org.supercsv.cellprocessor.ift.CellProcessor;
 
@@ -134,7 +137,7 @@ public class GridService extends Service {
         });
     }
 
-    public List<Regression> analyseColumn(int column) {
+    public Resource analyseParameter(int column) {
         Data any = arangoOperation.findAny(Data.class);
         if (any == null) {
             throw new ApiException("No data found in the database!");
@@ -146,23 +149,85 @@ public class GridService extends Service {
         if (column == 0) {
             throw new ApiException("Choose parameter column to be analysed cannot analyse output column!");
         }
+
+        if (column == -1) {
+            return analyseAll(any);
+        }
+
         if (column < 0 || column >= any.getColumns().size()) {
             throw new ApiException(format("Column number doesnot exist! (Expected: < %d and > 0 and got: )",
                     any.getColumns().size(), column));
         }
 
+        ArangoCursor<Regression> regressions = analyseColumnByColNos(column);
+
+        return csvService.convert(regressions, true,
+                new String[]{"colNo", "m1", "m2", "c1", "c2"},
+                new CellProcessor[]{new NotNull(new ParseInt()),
+                        new Optional(new ParseDouble()),
+                        new Optional(new ParseDouble()),
+                        new Optional(new ParseDouble()),
+                        new Optional(new ParseDouble())},
+                (elem) -> {
+                    HashMap<String, Object> map = new HashMap<>();
+                    map.put("colNo", column);
+                    map.put("m1", elem.getM1());
+                    map.put("m2", elem.getM2());
+                    map.put("c1", elem.getC1());
+                    map.put("c2", elem.getC2());
+                    return map;
+                });
+    }
+
+    private Resource analyseAll(Data sample) {
+        List<Integer> colNos = new ArrayList<>();
+        for (int i = 1; i < sample.getColumns().size(); i++) {
+            colNos.add(i);
+        }
+
+        List<CompiledRegression> compiledRegressions = colNos.parallelStream()
+                .map(colNo -> {
+                    ArangoCursor<Regression> regressions = analyseColumnByColNos(colNo);
+                    return CompiledRegression.compiledRegression(colNo, regressions);
+                })
+                .collect(Collectors.toList());
+
+        return csvService.convert(compiledRegressions, true,
+                new String[]{"colNo", "meanM", "stdDevM", "meanC", "stdDevC"},
+                new CellProcessor[]{new NotNull(new ParseInt()),
+                        new Optional(new ParseDouble()),
+                        new Optional(new ParseDouble()),
+                        new Optional(new ParseDouble()),
+                        new Optional(new ParseDouble())},
+                (elem) -> {
+                    HashMap<String, Object> map = new HashMap<>();
+                    map.put("colNo", elem.getColNo());
+                    map.put("meanM", elem.getMeanM());
+                    map.put("stdDevM", elem.getStdDevM());
+                    map.put("meanC", elem.getMeanC());
+                    map.put("stdDevC", elem.getStdDevC());
+                    return map;
+                });
+    }
+
+    private ArangoCursor<Regression> analyseColumnByColNos(int column) {
         StringBuilder builder = new StringBuilder();
-        builder.append("FOR r IN @@collection\n");
-        builder.append("COLLECT index = APPEND(SLICE(r.gridIndex, 0, @col-1), SLICE(r.gridIndex, @col))\n");
-        builder.append("INTO list = r.dataMembers\n");
+        builder.append("FOR r IN @@clusterCollection\n");
+        builder.append("COLLECT index = APPEND(SLICE(r.boxIndex, 0, @col-1), SLICE(r.boxIndex, @col))\n");
+        builder.append("INTO list = r.members\n");
         builder.append("let members = FLATTEN(list)\n");
         builder.append("FILTER COUNT(members) > 1\n");
-        builder.append("let v = ( FOR m IN members COLLECT AGGREGATE\n")
-                .append("sX = SUM(m.columns[@col]),\n")
-                .append("sY = SUM(m.columns[0]),\n")
-                .append("sXX = SUM(POW(m.columns[@col], 2)),\n")
-                .append("sXY = SUM(m.columns[@col] * m.columns[0]),\n")
-                .append("n = LENGTH(m)\n")
+        builder.append("let v = ( FOR member IN members\n")
+                .append("LET elem = FIRST(\n")
+                .append("FOR d IN @@dataCollection FILTER d._id == member LIMIT 1 RETURN d\n")
+                .append(")\n")
+                .append("\n")
+                .append("COLLECT AGGREGATE\n")
+                .append(format("sX = SUM(elem.columns.%s),\n", Data.colName(column)))
+                .append(format("sY = SUM(elem.columns.%s),\n", Data.colName(0))) //output column
+                .append(format("sXX = SUM(POW(elem.columns.%s, 2)),\n", Data.colName(column)))
+                .append(format("sXY = SUM(elem.columns.%s * elem.columns.%s),\n", Data.colName(column), Data.colName(0)))
+                .append("n = LENGTH(elem)\n")
                 .append("return { \n")
                 .append("sX: sX,\n")
                 .append("sY: sY,\n")
@@ -176,17 +241,19 @@ public class GridService extends Service {
         builder.append("let b1 = (v.sX * v.sXY) - (v.sXX * v.sY)\n");
         builder.append("let b2 = pow(v.sX, 2) - (v.n * v.sXX)\n");
         builder.append("RETURN {\n");
-        builder.append("col: @col,\n");
-        builder.append("a: a1 / a2,\n");
-        builder.append("b: b1 / b2\n");
+        builder.append("m1: a1,\n");
+        builder.append("m2: a2,\n");
+        builder.append("c1: b1,\n");
+        builder.append("c2: b2\n");
         builder.append("}\n");
 
         Map<String, Object> bindVar = new HashMap<>();
-        bindVar.put("@collection", arangoOperation.collectionName(GridData.class));
+        bindVar.put("@clusterCollection", arangoOperation.collectionName(GridData.class));
+        bindVar.put("@dataCollection", arangoOperation.collectionName(Data.class));
         bindVar.put("col", column);
         ArangoCursor<Regression> datas = arangoOperation.query(builder.toString(), bindVar, Regression.class);
 
-        return datas.asListRemaining();
+        return datas;
     }
 
     private double fixTolerance(double tolerance) {

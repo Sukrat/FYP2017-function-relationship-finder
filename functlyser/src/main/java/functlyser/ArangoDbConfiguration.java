@@ -17,6 +17,7 @@ public class ArangoDbConfiguration {
     @Bean
     public ArangoDB arangoDB(ArangoDbConfig dbConfig) {
         ArangoDB arangoDB = new ArangoDB.Builder()
+                .maxConnections(dbConfig.getNoOfConnections())
                 .user(dbConfig.getUsername())
                 .password(dbConfig.getPassword())
                 .build();

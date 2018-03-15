@@ -17,6 +17,8 @@ public class ArangoDbConfig {
 
     private String password;
 
+    private int noOfConnections = 8;
+
     public String getDbname() {
         return dbname;
     }
@@ -55,5 +57,13 @@ public class ArangoDbConfig {
 
     public void setPassword(String password) {
         this.password = password;
+    }
+
+    public int getNoOfConnections() {
+        return noOfConnections;
+    }
+
+    public void setNoOfConnections(int noOfConnections) {
+        this.noOfConnections = noOfConnections;
     }
 }

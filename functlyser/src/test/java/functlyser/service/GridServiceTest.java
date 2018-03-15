@@ -132,54 +132,54 @@ public class GridServiceTest extends BaseSpringTest {
         Resource result = sut.functionalCheck(2.0);
     }
 
-//    @Test
-//    public void testAnalyseColumn() {
-//        List<Data> perfectDataFor = getPerfectDataFor(30, "test.csv", 5);
-//        arangoOperation.insert(perfectDataFor, Data.class);
-//        GridData gridData = getPerfectGroupedData(Arrays.asList(4l, 5l, 6l));
-//        arangoOperation.insert(gridData);
-//        gridData = getPerfectGroupedData(Arrays.asList(5l, 6l, 7l));
-//        arangoOperation.insert(gridData);
-//
-//        List<Regression> result = sut.analyseColumn(1);
-//
-//        assertThat(result.size(), is(2));
-//        assertTrue(result.stream().allMatch(m->m.getCol() == 1));
-//    }
-//
-//    @Test(expected = ApiException.class)
-//    public void testAnalyseColumn_throwWhenIndexMoreThanColumns() {
-//        List<Data> perfectDataFor = getPerfectDataFor(30, "test.csv", 4);
-//        arangoOperation.insert(perfectDataFor, Data.class);
-//        GridData gridData = getPerfectGroupedData(Arrays.asList(4l, 5l, 6l));
-//        arangoOperation.insert(gridData);
-//        gridData = getPerfectGroupedData(Arrays.asList(5l, 6l, 7l));
-//        arangoOperation.insert(gridData);
-//
-//        List<Regression> result = sut.analyseColumn(4);
-//    }
-//
-//    @Test(expected = ApiException.class)
-//    public void testAnalyseColumn_throwWhenIndexLessThanColumns() {
-//        List<Data> perfectDataFor = getPerfectDataFor(30, "test.csv", 5);
-//        arangoOperation.insert(perfectDataFor, Data.class);
-//        GridData gridData = getPerfectGroupedData(Arrays.asList(4l, 5l, 6l));
-//        arangoOperation.insert(gridData);
-//        gridData = getPerfectGroupedData(Arrays.asList(5l, 6l, 7l));
-//        arangoOperation.insert(gridData);
-//
-//        List<Regression> result = sut.analyseColumn(-1);
-//    }
-//
-//    @Test(expected = ApiException.class)
-//    public void testAnalyseColumn_throwWhenIndexIsOutputColumns() {
-//        List<Data> perfectDataFor = getPerfectDataFor(30, "test.csv", 5);
-//        arangoOperation.insert(perfectDataFor, Data.class);
-//        GridData gridData = getPerfectGroupedData(Arrays.asList(4l, 5l, 6l));
-//        arangoOperation.insert(gridData);
-//        gridData = getPerfectGroupedData(Arrays.asList(5l, 6l, 7l));
-//        arangoOperation.insert(gridData);
-//
-//        List<Regression> result = sut.analyseColumn(0);    }
+    @Test
+    public void analyseParameter() throws IOException {
+        List<Data> perfectDataFor = Faker.nextData("test.csv", 30, 5);
+        arangoOperation.insert(perfectDataFor, Data.class);
+        sut.cluster(Arrays.asList(2.0));
+
+        Resource result = sut.analyseParameter(1);
+
+        assertThat(result.contentLength(), is(greaterThan(0l)));
+    }
+
+
+    @Test(expected = ApiException.class)
+    public void analyseParameter_throwWhenIndexMoreThanColumns() {
+        List<Data> perfectDataFor = Faker.nextData("test.csv", 30, 5);
+        arangoOperation.insert(perfectDataFor, Data.class);
+        sut.cluster(Arrays.asList(2.0));
+
+        sut.analyseParameter(6);
+    }
+
+    @Test(expected = ApiException.class)
+    public void analyseParameter_throwWhenIndexLessThanColumns() {
+        List<Data> perfectDataFor = Faker.nextData("test.csv", 30, 5);
+        arangoOperation.insert(perfectDataFor, Data.class);
+        sut.cluster(Arrays.asList(2.0));
+
+        sut.analyseParameter(-5);
+    }
+
+    @Test(expected = ApiException.class)
+    public void analyseParameter_throwWhenIndex0Columns() {
+        List<Data> perfectDataFor = Faker.nextData("test.csv", 30, 5);
+        arangoOperation.insert(perfectDataFor, Data.class);
+        sut.cluster(Arrays.asList(2.0));
+
+        sut.analyseParameter(0);
+    }
+
+    @Test
+    public void analyseParameter_throwWhenIndexMinus1Columns() throws IOException {
+        List<Data> perfectDataFor = Faker.nextData("test.csv", 30, 5);
+        arangoOperation.insert(perfectDataFor, Data.class);
+        sut.cluster(Arrays.asList(2.0));
+
+        Resource result = sut.analyseParameter(-1);
+
+        assertThat(result.contentLength(), is(greaterThan(0l)));
+    }
 
 }
