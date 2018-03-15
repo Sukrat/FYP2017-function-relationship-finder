@@ -1,13 +1,11 @@
 package functlyser;
 
 import functlyser.model.Data;
+import functlyser.model.GridData;
 import org.junit.Assert;
 
 import java.nio.charset.Charset;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Random;
+import java.util.*;
 
 public class Faker {
 
@@ -61,4 +59,19 @@ public class Faker {
         return list;
     }
 
+//    public static List<Data> nextGridData(int num) {
+//        List<GridData> list = new ArrayList<>();
+//        for (int i = 0; i < num; i++) {
+//            GridData gridData = new GridData();
+//            gridData.setBoxIndex(Arrays.asList((long) i, (long) i + 1, (long) i + 2));
+//            gridData.
+//            data.setFileName("testcsv.csv");
+//            data.setColumns(new HashMap<>());
+//            for (int j = 0; j < col; j++) {
+//                data.getColumns().put(Data.colName(i), Faker.nextDouble());
+//            }
+//            list.add(data);
+//        }
+//        return list;
+//    }
 }

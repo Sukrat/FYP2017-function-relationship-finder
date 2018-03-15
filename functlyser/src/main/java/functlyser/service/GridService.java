@@ -7,12 +7,19 @@ import functlyser.model.Data;
 import functlyser.model.GridData;
 import functlyser.model.Regression;
 import functlyser.repository.ArangoOperation;
+import javafx.util.Pair;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.Resource;
 import org.springframework.stereotype.Component;
+import org.supercsv.cellprocessor.ParseDouble;
+import org.supercsv.cellprocessor.constraint.NotNull;
+import org.supercsv.cellprocessor.ift.CellProcessor;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 import static java.lang.String.format;
 
@@ -21,9 +28,12 @@ public class GridService extends Service {
 
     private ArangoOperation arangoOperation;
 
+    private CsvService csvService;
+
     @Autowired
-    public GridService(ArangoOperation arangoOperation) {
+    public GridService(ArangoOperation arangoOperation, CsvService csvService) {
         this.arangoOperation = arangoOperation;
+        this.csvService = csvService;
     }
 
     public long cluster(List<Double> tolerances) {
@@ -35,24 +45,25 @@ public class GridService extends Service {
         int endIndex = any.getColumns().size();
         int numParameterColumns = any.getColumns().size() - 1;
 
-        if (tolerances.size() == 1) {
-            double tolerance = tolerances.get(0);
+        List<Double> paramTolerances = new ArrayList<>(tolerances);
+        if (paramTolerances.size() == 1) {
+            double tolerance = paramTolerances.get(0);
             // as one of the tolerances is already in the list
             for (int i = startIndex + 1; i < endIndex; i++) {
-                tolerances.add(tolerance);
+                paramTolerances.add(tolerance);
             }
         }
-        if (numParameterColumns != tolerances.size()) {
+        if (numParameterColumns != paramTolerances.size()) {
             throw new ApiException(
                     format("Number of tolerance must be equal to the data columns or enter one tolerance for all (expected: %d actual: %d)",
-                            numParameterColumns, tolerances.size()));
+                            numParameterColumns, paramTolerances.size()));
         }
 
         // deleting all the records in grouped data
         arangoOperation.collection(GridData.class).truncate();
 
         StringBuilder builder = new StringBuilder();
-        builder.append("FOR r in @@collection\n");
+        builder.append("FOR r IN @@collection\n");
         builder.append("COLLECT boxIndex = [ \n");
         // ignoring first tolerance as that is for ouput column
         for (int i = startIndex; i < endIndex; i++) {
@@ -73,7 +84,7 @@ public class GridService extends Service {
         bindVar.put("@newCollection", arangoOperation.collectionName(GridData.class));
         // ignoring first tolerance as that is for ouput column
         for (int i = startIndex; i < endIndex; i++) {
-            bindVar.put(format("tolerance%1$d", i), fixTolerance(tolerances.get(i - 1)));
+            bindVar.put(format("tolerance%1$d", i), fixTolerance(paramTolerances.get(i - 1)));
         }
 
         ArangoCursor<BaseDocument> result = arangoOperation.query(builder.toString(), bindVar, BaseDocument.class);
@@ -81,31 +92,46 @@ public class GridService extends Service {
         return result.asListRemaining().size();
     }
 
-    public List<GridData> getFunctionTerminator(double tolerance) {
+    public Resource functionalCheck(double tolerance) {
         Data any = arangoOperation.findAny(Data.class);
         if (any == null) {
             throw new ApiException("No data found in the database!");
         }
         GridData anyGrouped = arangoOperation.findAny(GridData.class);
         if (anyGrouped == null) {
-            throw new ApiException("Data has not been grouped!");
+            throw new ApiException("Data has not been clustered!");
         }
 
         StringBuilder builder = new StringBuilder();
-        builder.append("FOR r in @@collection\n");
-        builder.append("FILTER COUNT(r.dataMembers) > 1\n");
+        builder.append("LET result = FLATTEN(");
+        builder.append("FOR r IN @@clusterCollection\n");
+        builder.append("FILTER COUNT(r.members) > 1\n");
         builder.append("LET grouped_y = \n")
-                .append("( FOR member IN r.dataMembers\n")
-                .append("COLLECT y = FLOOR(member.columns[0] / @tolerance) INTO values\n")
-                .append("RETURN { values: values} )\n");
+                .append("( FOR member IN r.members\n")
+                .append("LET elem = FIRST(\n")
+                .append("FOR d in @@dataCollection FILTER d._id == member LIMIT 1 RETURN d\n")
+                .append(")\n")
+                .append(format("COLLECT y = FLOOR(elem.columns.%s / @tolerance) INTO elems = elem\n", Data.colName(0)))
+                .append("RETURN elems )\n");
         builder.append("FILTER COUNT(grouped_y) > 1\n");
+        builder.append("RETURN FLATTEN(grouped_y)\n");
+        builder.append(")\n");
+        builder.append("FOR r in result\n");
         builder.append("RETURN r\n");
 
         Map<String, Object> bindVar = new HashMap<>();
-        bindVar.put("@collection", arangoOperation.collectionName(GridData.class));
+        bindVar.put("@clusterCollection", arangoOperation.collectionName(GridData.class));
+        bindVar.put("@dataCollection", arangoOperation.collectionName(Data.class));
         bindVar.put("tolerance", fixTolerance(tolerance));
-        ArangoCursor<GridData> datas = arangoOperation.query(builder.toString(), bindVar, GridData.class);
-        return datas.asListRemaining();
+        ArangoCursor<Data> datas = arangoOperation.query(builder.toString(), bindVar, Data.class);
+
+        Pair<String[], CellProcessor[]> params = getArgumentsForCsv(any.getColumns().size());
+        return csvService.convert(datas, false, params.getKey(), params.getValue(), (elem) -> {
+            return elem.getColumns()
+                    .entrySet()
+                    .stream()
+                    .collect(Collectors.toMap(m -> m.getKey(), m -> m.getValue()));
+        });
     }
 
     public List<Regression> analyseColumn(int column) {
@@ -165,5 +191,15 @@ public class GridService extends Service {
 
     private double fixTolerance(double tolerance) {
         return tolerance == 0.0 ? 1.0 : Math.abs(tolerance);
+    }
+
+    private Pair<String[], CellProcessor[]> getArgumentsForCsv(int size) {
+        CellProcessor[] processors = new CellProcessor[size];
+        String[] headers = new String[size];
+        for (int i = 0; i < size; i++) {
+            headers[i] = format("%s%d", Data.prefixColumn, i);
+            processors[i] = new NotNull(new ParseDouble());
+        }
+        return new Pair<>(headers, processors);
     }
 }

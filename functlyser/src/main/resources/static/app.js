@@ -3,6 +3,7 @@
 
     app.constant('$', window.$);
     app.constant('_', window._);
+    app.constant('FileSaver', {saveAs: window.saveAs});
 
     app.config(($locationProvider, $routeProvider) => {
         $locationProvider.hashPrefix('!');

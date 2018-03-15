@@ -6,14 +6,19 @@ import functlyser.exception.ApiException;
 import functlyser.model.Data;
 import functlyser.model.GridData;
 import functlyser.model.Regression;
+import org.junit.Assert;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.Resource;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.greaterThan;
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertTrue;
 
@@ -92,51 +97,41 @@ public class GridServiceTest extends BaseSpringTest {
         sut.cluster(tolerances);
     }
 
-//    @Test
-//    public void testGetFunctionTerminator() {
-//        List<Data> perfectDataFor = getPerfectDataFor(30, "test.csv", 5);
-//        arangoOperation.insert(perfectDataFor, Data.class);
-//        GridData gridData = getPerfectGroupedData(Arrays.asList(4l, 5l, 6l));
-//        arangoOperation.insert(gridData);
-//        gridData = getPerfectGroupedData(Arrays.asList(5l, 6l, 7l));
-//        arangoOperation.insert(gridData);
-//
-//        List<GridData> result = sut.getFunctionTerminator(2.0);
-//
-//        assertThat(result.size(), is(0));
-//    }
-//
-//    @Test
-//    public void testGetFunctionTerminator_WhereItIsNotAFunction() {
-//        List<Data> perfectDataFor = getPerfectDataFor(30, "test.csv", 5);
-//        arangoOperation.insert(perfectDataFor, Data.class);
-//        GridData gridData = getPerfectGroupedData(Arrays.asList(4l, 5l, 6l));
-////        gridData.getMembers().get(0).getColumns().set(0, 5.0);
-//        arangoOperation.insert(gridData);
-//        GridData gridData2 = getPerfectGroupedData(Arrays.asList(5l, 6l, 7l));
-//        arangoOperation.insert(gridData2);
-//
-//        List<GridData> result = sut.getFunctionTerminator(2.0);
-//
-//        assertThat(result.size(), is(1));
-//        assertThat(result.get(0).getId(), is(gridData.getId()));
-//    }
-//
-//    @Test(expected = ApiException.class)
-//    public void testGetFunctionTerminator_NoDataShouldThrow() {
-//        List<GridData> result = sut.getFunctionTerminator(2.0);
-//    }
-//
-//    @Test(expected = ApiException.class)
-//    public void testGetFunctionTerminator_NoGridDataShouldThrow() {
-//        List<Data> perfectDataFor = getPerfectDataFor(30, "test.csv", 5);
-//        arangoOperation.insert(perfectDataFor, Data.class);
-//
-//        List<GridData> result = sut.getFunctionTerminator(2.0);
-//
-//        assertThat(result.size(), is(1));
-//    }
-//
+    @Test
+    public void functionalCheck() throws IOException {
+        List<Data> perfectDataFor = Faker.nextData("test.csv", 30, 5);
+        arangoOperation.insert(perfectDataFor, Data.class);
+        sut.cluster(Arrays.asList(2.0));
+
+        Resource result = sut.functionalCheck(2.0);
+
+        assertThat(result.contentLength(), is(0l));
+    }
+
+    @Test
+    public void functionalCheck_WhereItIsNotAFunction() throws IOException {
+        List<Data> perfectDataFor = Faker.nextData("test.csv", 30, 5);
+        arangoOperation.insert(perfectDataFor, Data.class);
+        sut.cluster(Arrays.asList(2.0));
+
+        Resource result = sut.functionalCheck(1.0);
+
+        Assert.assertThat(result.contentLength(), greaterThan(0L));
+    }
+
+    @Test(expected = ApiException.class)
+    public void functionalCheck_NoDataShouldThrow() {
+        Resource result = sut.functionalCheck(2.0);
+    }
+
+    @Test(expected = ApiException.class)
+    public void functionalCheck_NoGridDataShouldThrow() {
+        List<Data> perfectDataFor = Faker.nextData("test.csv", 10, 5);
+        arangoOperation.insert(perfectDataFor, Data.class);
+
+        Resource result = sut.functionalCheck(2.0);
+    }
+
 //    @Test
 //    public void testAnalyseColumn() {
 //        List<Data> perfectDataFor = getPerfectDataFor(30, "test.csv", 5);

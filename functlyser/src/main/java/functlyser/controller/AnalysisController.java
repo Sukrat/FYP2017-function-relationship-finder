@@ -1,10 +1,11 @@
 package functlyser.controller;
 
 import functlyser.controller.messages.Message;
-import functlyser.model.GridData;
 import functlyser.model.Regression;
 import functlyser.service.GridService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.Resource;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -37,9 +38,11 @@ public class AnalysisController extends Controller {
     }
 
     @RequestMapping(value = "/analysis/grid/functioncheck", method = RequestMethod.POST)
-    public ResponseEntity<List<GridData>> isafunctionByGrid(@RequestBody double tolerance) {
-        List<GridData> result = gridService.getFunctionTerminator(tolerance);
-        return ResponseEntity.ok(result);
+    public ResponseEntity<Resource> functionCheck(@RequestBody double tolerance) {
+        String filename = format("functioncheck-%f", tolerance);
+        Resource file = gridService.functionalCheck(tolerance);
+        return ResponseEntity.ok().header(HttpHeaders.CONTENT_DISPOSITION,
+                "attachment;filename=\"" + filename + "\"").body(file);
     }
 
     @RequestMapping(value = "/analysis/grid/column", method = RequestMethod.POST)
