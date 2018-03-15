@@ -113,8 +113,8 @@ public class CompiledRegression {
             mStdDev += Math.pow(elem.getKey() - mMean, 2);
             cStdDev += Math.pow(elem.getValue() - cMean, 2);
 
-            mStdDevWeighted += Math.pow((elem.getKey() - mMeanWeighted) * dataPoints.get(tempIndex), 2);
-            cStdDevWeighted += Math.pow((elem.getValue() - cMeanWeighted) * dataPoints.get(tempIndex), 2);
+            mStdDevWeighted += Math.pow((elem.getKey() - mMeanWeighted), 2) * dataPoints.get(tempIndex);
+            cStdDevWeighted += Math.pow((elem.getValue() - cMeanWeighted), 2) * dataPoints.get(tempIndex);
             tempIndex++;
         }
         mStdDev = Math.sqrt(mStdDev / list.size());

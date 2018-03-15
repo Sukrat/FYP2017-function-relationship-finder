@@ -24,18 +24,21 @@ public class CompiledRegressionTest {
                 setM2(10.0);
                 setC1(105.615);
                 setC2(10.0);
+                setNumOfDataPoints(3l);
             }});
             add(new Regression() {{
                 setM1(356.446);
                 setM2(100.);
                 setC1(2.256 * 2);
                 setC2(2.0);
+                setNumOfDataPoints(1l);
             }});
             add(new Regression() {{
                 setM1(5.64564);
                 setM2(1.0);
                 setC1(55.0);
                 setC2(0.0);
+                setNumOfDataPoints(3l);
             }});
         }};
 
@@ -46,6 +49,11 @@ public class CompiledRegressionTest {
         assertThat(result.getStdDevM(), is(closeTo(1.4715, .001)));
         assertThat(result.getMeanC(), is(closeTo(4.2725, .001)));
         assertThat(result.getStdDevC(), is(closeTo(4.5413, .001)));
+
+        assertThat(result.getWeightedMeanM(), is(closeTo(3.810082857, .001)));
+        assertThat(result.getWeightedStdDevM(), is(closeTo(1.664518435, .001)));
+        assertThat(result.getWeightedMeanC(), is(closeTo(4.848642857, .001)));
+        assertThat(result.getWeightedStdDevC(), is(closeTo(5.002285476, .001)));
     }
 
     @Test
