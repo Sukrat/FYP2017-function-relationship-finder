@@ -1,8 +1,8 @@
 (function () {
     var app = angular.module('app');
     app.service('FileUploaderService',
-        ['$http', '$q', 'Upload',
-            function ($http, $q, Upload) {
+        ['$http', '$q', 'Upload','ErrorMessageHandler',
+            function ($http, $q, Upload, ErrorMessageHandler) {
                 var vm = this;
                 vm.uploadFile = uploadFile;
                 vm.deleteFile = deleteFile;
@@ -17,7 +17,7 @@
                         defer.resolve(response.data);
                     }, function (error) {
                         console.log(error);
-                        defer.reject(error.data.messages);
+                        defer.reject(ErrorMessageHandler.getError(error.data));
                     }, function (notify) {
                         var progressPercentage = parseInt(100.0 * notify.loaded / notify.total);
                         defer.notify(progressPercentage);
@@ -32,7 +32,7 @@
                         })
                         .catch(function (error) {
                             console.log(error);
-                            return $q.reject(error.data.messages);
+                            return $q.reject(ErrorMessageHandler.getError(error.data));
                         })
                 }
 
@@ -42,7 +42,7 @@
                             return response.data;
                         }).catch(function (error) {
                             console.log(error);
-                            return $q.reject(error.data.messages);
+                            return $q.reject(ErrorMessageHandler.getError(error.data));
                         })
                 }
             }])

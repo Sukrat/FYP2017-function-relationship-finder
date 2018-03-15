@@ -1,8 +1,8 @@
 (function () {
     var app = angular.module('app');
     app.service('GridAnalysisService',
-        ['$http', '$q', '_', 'BufferParser',
-            function ($http, $q, _, BufferParser) {
+        ['$http', '$q', '_', 'BufferParser', 'ErrorMessageHandler',
+            function ($http, $q, _, BufferParser, ErrorMessageHandler) {
                 var vm = this;
                 vm.cluster = cluster;
                 vm.checkFunction = checkFunction;
@@ -22,7 +22,7 @@
                                 defer.resolve(response.data)
                             })
                             .catch((error) => {
-                                defer.reject(error.data.messages);
+                                defer.reject(ErrorMessageHandler.getError(error.data));
                             })
                     }
                     return defer.promise;
@@ -41,7 +41,7 @@
                         }).catch((error) => {
                             var err = BufferParser.parse(error.data);
                             console.log(err);
-                            return $q.reject(err.messages);
+                            return $q.reject(ErrorMessageHandler.getError(err));
                         })
                 }
 
@@ -60,7 +60,7 @@
                         .catch((error) => {
                             var err = BufferParser.parse(error.data);
                             console.log(err);
-                            return $q.reject(err.messages);
+                            return $q.reject(ErrorMessageHandler.getError(err));
                         })
                 }
             }])

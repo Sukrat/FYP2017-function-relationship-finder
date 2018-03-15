@@ -2,6 +2,8 @@ package functlyser.model;
 
 public class Regression {
 
+    private Long numOfDataPoints;
+
     private Double m1;
     private Double m2;
 
@@ -38,5 +40,13 @@ public class Regression {
 
     public void setC2(Double c2) {
         this.c2 = c2;
+    }
+
+    public Long getNumOfDataPoints() {
+        return numOfDataPoints;
+    }
+
+    public void setNumOfDataPoints(Long numOfDataPoints) {
+        this.numOfDataPoints = numOfDataPoints;
     }
 }

@@ -17,6 +17,12 @@ public class CompiledRegression {
 
     private Double stdDevC;
 
+    private Double weightedMeanM;
+    private Double weightedStdDevM;
+
+    private Double weightedMeanC;
+    private Double weightedStdDevC;
+
     public int getColNo() {
         return colNo;
     }
@@ -64,6 +70,11 @@ public class CompiledRegression {
         List<Pair<Double, Double>> list = new ArrayList<>();
         Double mMean = 0.0;
         Double cMean = 0.0;
+
+        Double mMeanWeighted = 0.0;
+        Double cMeanWeighted = 0.0;
+        List<Long> dataPoints = new ArrayList<>();
+        Long totalNumOfDataPoints = 0l;
         for (Regression regression : regressionIterator) {
             Double m1 = regression.getM1();
             Double m2 = regression.getM2();
@@ -76,6 +87,11 @@ public class CompiledRegression {
             list.add(new Pair<>(m, c));
             mMean += m;
             cMean += c;
+
+            mMeanWeighted += (m * regression.getNumOfDataPoints());
+            cMeanWeighted += (c * regression.getNumOfDataPoints());
+            totalNumOfDataPoints += regression.getNumOfDataPoints();
+            dataPoints.add(regression.getNumOfDataPoints());
         }
         if (list.size() == 0) {
             return compiledRegression;
@@ -83,19 +99,71 @@ public class CompiledRegression {
         mMean = mMean / list.size();
         cMean = cMean / list.size();
 
+        mMeanWeighted /= totalNumOfDataPoints;
+        cMeanWeighted /= totalNumOfDataPoints;
+
         Double mStdDev = 0.0;
         Double cStdDev = 0.0;
+
+        Double mStdDevWeighted = 0.0;
+        Double cStdDevWeighted = 0.0;
+        int tempIndex = 0;
+
         for (Pair<Double, Double> elem : list) {
             mStdDev += Math.pow(elem.getKey() - mMean, 2);
             cStdDev += Math.pow(elem.getValue() - cMean, 2);
+
+            mStdDevWeighted += Math.pow((elem.getKey() - mMeanWeighted) * dataPoints.get(tempIndex), 2);
+            cStdDevWeighted += Math.pow((elem.getValue() - cMeanWeighted) * dataPoints.get(tempIndex), 2);
+            tempIndex++;
         }
         mStdDev = Math.sqrt(mStdDev / list.size());
         cStdDev = Math.sqrt(cStdDev / list.size());
+
+        mStdDevWeighted = Math.sqrt(mStdDevWeighted / totalNumOfDataPoints);
+        cStdDevWeighted = Math.sqrt(cStdDevWeighted / totalNumOfDataPoints);
 
         compiledRegression.setMeanM(mMean);
         compiledRegression.setStdDevM(mStdDev);
         compiledRegression.setMeanC(cMean);
         compiledRegression.setStdDevC(cStdDev);
+
+        compiledRegression.setWeightedMeanM(mMeanWeighted);
+        compiledRegression.setWeightedStdDevM(mStdDevWeighted);
+        compiledRegression.setWeightedMeanC(cMeanWeighted);
+        compiledRegression.setWeightedStdDevC(cStdDevWeighted);
         return compiledRegression;
+    }
+
+    public Double getWeightedMeanM() {
+        return weightedMeanM;
+    }
+
+    public void setWeightedMeanM(Double weightedMeanM) {
+        this.weightedMeanM = weightedMeanM;
+    }
+
+    public Double getWeightedStdDevM() {
+        return weightedStdDevM;
+    }
+
+    public void setWeightedStdDevM(Double weightedStdDevM) {
+        this.weightedStdDevM = weightedStdDevM;
+    }
+
+    public Double getWeightedMeanC() {
+        return weightedMeanC;
+    }
+
+    public void setWeightedMeanC(Double weightedMeanC) {
+        this.weightedMeanC = weightedMeanC;
+    }
+
+    public Double getWeightedStdDevC() {
+        return weightedStdDevC;
+    }
+
+    public void setWeightedStdDevC(Double weightedStdDevC) {
+        this.weightedStdDevC = weightedStdDevC;
     }
 }

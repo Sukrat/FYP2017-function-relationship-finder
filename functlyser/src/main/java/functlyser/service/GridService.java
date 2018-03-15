@@ -15,6 +15,7 @@ import org.springframework.stereotype.Component;
 import org.supercsv.cellprocessor.Optional;
 import org.supercsv.cellprocessor.ParseDouble;
 import org.supercsv.cellprocessor.ParseInt;
+import org.supercsv.cellprocessor.ParseLong;
 import org.supercsv.cellprocessor.constraint.NotNull;
 import org.supercsv.cellprocessor.ift.CellProcessor;
 
@@ -162,12 +163,13 @@ public class GridService extends Service {
         ArangoCursor<Regression> regressions = analyseColumnByColNos(column);
 
         return csvService.convert(regressions, true,
-                new String[]{"colNo", "m1", "m2", "c1", "c2"},
+                new String[]{"colNo", "m1", "m2", "c1", "c2", "numOfDataPoints"},
                 new CellProcessor[]{new NotNull(new ParseInt()),
                         new Optional(new ParseDouble()),
                         new Optional(new ParseDouble()),
                         new Optional(new ParseDouble()),
-                        new Optional(new ParseDouble())},
+                        new Optional(new ParseDouble()),
+                        new Optional(new ParseLong())},
                 (elem) -> {
                     HashMap<String, Object> map = new HashMap<>();
                     map.put("colNo", column);
@@ -175,6 +177,7 @@ public class GridService extends Service {
                     map.put("m2", elem.getM2());
                     map.put("c1", elem.getC1());
                     map.put("c2", elem.getC2());
+                    map.put("numOfDataPoints", elem.getNumOfDataPoints());
                     return map;
                 });
     }
@@ -193,8 +196,13 @@ public class GridService extends Service {
                 .collect(Collectors.toList());
 
         return csvService.convert(compiledRegressions, true,
-                new String[]{"colNo", "meanM", "stdDevM", "meanC", "stdDevC"},
+                new String[]{"colNo", "meanM", "stdDevM", "weightedMeanM", "weightedStdDevM",
+                        "meanC", "stdDevC", "weightedMeanC", "weightedStdDevC"},
                 new CellProcessor[]{new NotNull(new ParseInt()),
+                        new Optional(new ParseDouble()),
+                        new Optional(new ParseDouble()),
+                        new Optional(new ParseDouble()),
+                        new Optional(new ParseDouble()),
                         new Optional(new ParseDouble()),
                         new Optional(new ParseDouble()),
                         new Optional(new ParseDouble()),
@@ -202,10 +210,17 @@ public class GridService extends Service {
                 (elem) -> {
                     HashMap<String, Object> map = new HashMap<>();
                     map.put("colNo", elem.getColNo());
+
                     map.put("meanM", elem.getMeanM());
                     map.put("stdDevM", elem.getStdDevM());
                     map.put("meanC", elem.getMeanC());
                     map.put("stdDevC", elem.getStdDevC());
+
+                    map.put("weightedMeanM", elem.getWeightedMeanM());
+                    map.put("weightedStdDevM", elem.getWeightedStdDevM());
+                    map.put("weightedMeanC", elem.getWeightedMeanC());
+                    map.put("weightedStdDevC", elem.getWeightedStdDevC());
+
                     return map;
                 });
     }
@@ -241,6 +256,7 @@ public class GridService extends Service {
         builder.append("let b1 = (v.sX * v.sXY) - (v.sXX * v.sY)\n");
         builder.append("let b2 = pow(v.sX, 2) - (v.n * v.sXX)\n");
         builder.append("RETURN {\n");
+        builder.append("numOfDataPoints: v.n,\n");
         builder.append("m1: a1,\n");
         builder.append("m2: a2,\n");
         builder.append("c1: b1,\n");

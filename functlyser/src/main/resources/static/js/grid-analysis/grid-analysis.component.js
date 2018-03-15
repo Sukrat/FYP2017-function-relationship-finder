@@ -31,7 +31,7 @@
                             var blob = new Blob([data], {
                                 type: "text/plain;charset=utf-8"
                             });
-                            FileSaver.saveAs(blob, "functionCheck.csv");
+                            FileSaver.saveAs(blob, "function-check.csv");
                             RootService.success(["File successfully downloading!"]);
                         })
                         .catch((error) => {
@@ -47,7 +47,7 @@
                             var blob = new Blob([data], {
                                 type: "text/plain;charset=utf-8"
                             });
-                            FileSaver.saveAs(blob, "functionCheck.csv");
+                            FileSaver.saveAs(blob, "analyse-column.csv");
                             RootService.success(["File successfully downloading!"]);
                         })
                         .catch((error) => {

@@ -13,6 +13,19 @@
         }
     })());
 
+    app.constant('ErrorMessageHandler', new (function () {
+        var vm = this;
+        vm.getError = function (data) {
+            if (data.messages) {
+                return data.messages;
+            } else if (data.message) {
+                return [data.message];
+            } else {
+                return [data];
+            }
+        }
+    })());
+
     app.config(($locationProvider, $routeProvider) => {
         $locationProvider.hashPrefix('!');
         $routeProvider
