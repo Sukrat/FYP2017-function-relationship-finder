@@ -37,7 +37,7 @@
                         responseType: 'arraybuffer'
                     })
                         .then((response) => {
-                            return response.data;
+                            return response;
                         }).catch((error) => {
                             var err = BufferParser.parse(error.data);
                             console.log(err);
@@ -55,7 +55,7 @@
                         responseType: 'arraybuffer'
                     })
                         .then((response) => {
-                            return response.data;
+                            return response;
                         })
                         .catch((error) => {
                             var err = BufferParser.parse(error.data);

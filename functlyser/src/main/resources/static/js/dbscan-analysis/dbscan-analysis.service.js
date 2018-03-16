@@ -20,7 +20,7 @@
                         }
                     })
                         .then((response) => {
-                            return response.data;
+                            return response;
                         }).catch((error) => {
                             var err = BufferParser.parse(error.data);
                             console.log(err);
@@ -42,7 +42,7 @@
                         }
                     })
                         .then((response) => {
-                            return response.data;
+                            return response;
                         })
                         .catch((error) => {
                             var err = BufferParser.parse(error.data);

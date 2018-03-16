@@ -27,11 +27,8 @@
                 function checkFunction(outputTolerance) {
                     RootService.loading(true);
                     GridAnalysisService.checkFunction(outputTolerance)
-                        .then((data) => {
-                            var blob = new Blob([data], {
-                                type: "text/plain;charset=utf-8"
-                            });
-                            FileSaver.saveAs(blob, "function-check.csv");
+                        .then((response) => {
+                            FileSaver.saveResponseAsFile(response);
                             RootService.success(["File successfully downloading!"]);
                         })
                         .catch((error) => {
@@ -43,11 +40,8 @@
                 function analyseColumn(columnNo) {
                     RootService.loading(true);
                     return GridAnalysisService.analyseColumn(columnNo)
-                        .then((data) => {
-                            var blob = new Blob([data], {
-                                type: "text/plain;charset=utf-8"
-                            });
-                            FileSaver.saveAs(blob, "analyse-column.csv");
+                        .then((response) => {
+                            FileSaver.saveResponseAsFile(response);
                             RootService.success(["File successfully downloading!"]);
                         })
                         .catch((error) => {

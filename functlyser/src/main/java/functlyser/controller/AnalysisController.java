@@ -38,7 +38,7 @@ public class AnalysisController extends Controller {
 
     @RequestMapping(value = "/analysis/grid/functioncheck", method = RequestMethod.POST)
     public ResponseEntity<Resource> functionCheck(@RequestBody double tolerance) {
-        String filename = format("functioncheck-%f", tolerance);
+        String filename = format("functioncheck-%.1f.csv", tolerance);
         Resource file = gridService.functionalCheck(tolerance);
         return ResponseEntity.ok().header(HttpHeaders.CONTENT_DISPOSITION,
                 "attachment;filename=\"" + filename + "\"").body(file);
@@ -46,7 +46,7 @@ public class AnalysisController extends Controller {
 
     @RequestMapping(value = "/analysis/grid/column", method = RequestMethod.POST)
     public ResponseEntity<Resource> analyseParameter(@RequestBody int columnNo) {
-        String filename = format("analysedColNo-%d", columnNo);
+        String filename = format("analysedColNo-%d.csv", columnNo);
         Resource file = gridService.analyseParameter(columnNo);
         return ResponseEntity.ok().header(HttpHeaders.CONTENT_DISPOSITION,
                 "attachment;filename=\"" + filename + "\"").body(file);
@@ -55,7 +55,7 @@ public class AnalysisController extends Controller {
     @RequestMapping(value = "/analysis/dbscan/functioncheck", method = RequestMethod.POST)
     public ResponseEntity<Resource> dbscanFunctionCheck(@RequestParam("radius") double radius,
                                                         @RequestBody double outputTolerance) {
-        String filename = format("scan-functioncheck-%f-%f", radius, outputTolerance);
+        String filename = format("scan-functioncheck-%.1f-%.1f.csv", radius, outputTolerance);
         Resource file = scanService.functionalCheck(radius, outputTolerance);
         return ResponseEntity.ok().header(HttpHeaders.CONTENT_DISPOSITION,
                 "attachment;filename=\"" + filename + "\"").body(file);
@@ -64,7 +64,7 @@ public class AnalysisController extends Controller {
     @RequestMapping(value = "/analysis/dbscan/column", method = RequestMethod.POST)
     public ResponseEntity<Resource> dbscanAnalyseParameter(@RequestParam("radius") double radius,
                                                            @RequestBody int columnNo) {
-        String filename = format("analysedColNo-%f-%d", radius, columnNo);
+        String filename = format("analysedColNo-%.1f-%d.csv", radius, columnNo);
         Resource file = scanService.analyseParameter(radius, columnNo);
         return ResponseEntity.ok().header(HttpHeaders.CONTENT_DISPOSITION,
                 "attachment;filename=\"" + filename + "\"").body(file);

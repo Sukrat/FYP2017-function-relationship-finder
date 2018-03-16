@@ -3,7 +3,16 @@
 
     app.constant('$', window.$);
     app.constant('_', window._);
-    app.constant('FileSaver', {saveAs: window.saveAs});
+    app.constant('FileSaver', {
+        saveAs: window.saveAs,
+        saveResponseAsFile: function (response) {
+            var blob = new Blob([response.data], {
+                type: "text/plain;charset=utf-8"
+            });
+            var fileName = response.headers()['content-disposition'].split(';')[1].replace('filename="', '').replace('"', '');
+            window.saveAs(blob, fileName);
+        }
+    });
     app.constant('BufferParser', new (function () {
         var vm = this;
         var textDecoder = new TextDecoder();
