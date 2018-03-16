@@ -54,9 +54,18 @@ public class AnalysisController extends Controller {
 
     @RequestMapping(value = "/analysis/dbscan/functioncheck", method = RequestMethod.POST)
     public ResponseEntity<Resource> dbscanFunctionCheck(@RequestParam("radius") double radius,
-                                                        @RequestParam("outputTolerance") double outputTolerance) {
+                                                        @RequestBody double outputTolerance) {
         String filename = format("scan-functioncheck-%f-%f", radius, outputTolerance);
         Resource file = scanService.functionalCheck(radius, outputTolerance);
+        return ResponseEntity.ok().header(HttpHeaders.CONTENT_DISPOSITION,
+                "attachment;filename=\"" + filename + "\"").body(file);
+    }
+
+    @RequestMapping(value = "/analysis/dbscan/column", method = RequestMethod.POST)
+    public ResponseEntity<Resource> dbscanAnalyseParameter(@RequestParam("radius") double radius,
+                                                           @RequestBody int columnNo) {
+        String filename = format("analysedColNo-%f-%d", radius, columnNo);
+        Resource file = scanService.analyseParameter(radius, columnNo);
         return ResponseEntity.ok().header(HttpHeaders.CONTENT_DISPOSITION,
                 "attachment;filename=\"" + filename + "\"").body(file);
     }

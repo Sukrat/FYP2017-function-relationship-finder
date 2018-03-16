@@ -48,4 +48,33 @@ public class ScanServiceTest extends BaseSpringTest {
         Resource result = sut.functionalCheck(2.0, 1.0);
     }
 
+
+    @Test
+    public void analyseParameter() throws IOException {
+        List<Data> perfectDataFor = Faker.nextData("test.csv", 30, 5);
+        arangoOperation.insert(perfectDataFor, Data.class);
+
+        Resource result = sut.analyseParameter(2.0, 1);
+
+        assertThat(result.contentLength(), is(greaterThan(0l)));
+    }
+
+    @Test(expected = ApiException.class)
+    public void analyseParameter_throwWhenIndex0Columns() {
+        List<Data> perfectDataFor = Faker.nextData("test.csv", 30, 5);
+        arangoOperation.insert(perfectDataFor, Data.class);
+
+        sut.analyseParameter(2.0, 0);
+    }
+
+    @Test
+    public void analyseParameter_throwWhenIndexMinus1Columns() throws IOException {
+        List<Data> perfectDataFor = Faker.nextData("test.csv", 30, 5);
+        arangoOperation.insert(perfectDataFor, Data.class);
+
+        Resource result = sut.analyseParameter(2.0, -1);
+
+        assertThat(result.contentLength(), is(greaterThan(0l)));
+    }
+
 }

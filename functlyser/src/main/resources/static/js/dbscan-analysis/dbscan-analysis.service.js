@@ -5,6 +5,7 @@
             function ($http, $q, _, BufferParser, ErrorMessageHandler) {
                 var vm = this;
                 vm.checkFunction = checkFunction;
+                vm.analyseColumn = analyseColumn;
 
                 function checkFunction(radius, outputTolerance) {
                     var radiusTol = _.toNumber(radius);
@@ -12,11 +13,10 @@
                     if (_.isNaN(tolerance) || _.isNaN(radiusTol)) {
                         return $q.reject(['Please enter a valid double!']);
                     }
-                    return $http.post('/analysis/dbscan/functioncheck', undefined, {
+                    return $http.post('/analysis/dbscan/functioncheck', tolerance, {
                         responseType: 'arraybuffer',
                         params: {
-                            radius: radiusTol,
-                            outputTolerance: tolerance
+                            radius: radiusTol
                         }
                     })
                         .then((response) => {
@@ -29,13 +29,17 @@
                 }
 
 
-                function analyseColumn(columnNo) {
+                function analyseColumn(radius, columnNo) {
+                    var radiusTol = _.toNumber(radius);
                     var colNo = _.toInteger(columnNo);
-                    if (_.isNaN(colNo)) {
-                        return $q.reject(['Please enter a valid integer!']);
+                    if (_.isNaN(colNo) || _.isNaN(radiusTol)) {
+                        return $q.reject(['Please enter a valid double for radius and integer for Col Number!']);
                     }
-                    return $http.post('/analysis/grid/column', colNo, {
-                        responseType: 'arraybuffer'
+                    return $http.post('/analysis/dbscan/column', colNo, {
+                        responseType: 'arraybuffer',
+                        params: {
+                            radius: radiusTol
+                        }
                     })
                         .then((response) => {
                             return response.data;

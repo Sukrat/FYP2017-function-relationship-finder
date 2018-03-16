@@ -6,9 +6,11 @@
             function (DbscanAnalysisService, RootService, FileSaver) {
                 var vm = this;
                 vm.checkFunction = checkFunction;
+                vm.analyseColumn = analyseColumn;
 
                 vm.radius = "";
                 vm.outputTolerance = "";
+                vm.analyseRadius = "";
                 vm.columnNo = "";
 
                 function checkFunction(radius, outputTolerance) {
@@ -27,14 +29,14 @@
                 }
 
 
-                function analyseColumn(columnNo) {
+                function analyseColumn(radius, columnNo) {
                     RootService.loading(true);
-                    return DbscanAnalysisService.analyseColumn(columnNo)
+                    return DbscanAnalysisService.analyseColumn(radius, columnNo)
                         .then((data) => {
                             var blob = new Blob([data], {
                                 type: "text/plain;charset=utf-8"
                             });
-                            FileSaver.saveAs(blob, "analyse-column.csv");
+                            FileSaver.saveAs(blob, "analyse-column-scan.csv");
                             RootService.success(["File successfully downloading!"]);
                         })
                         .catch((error) => {

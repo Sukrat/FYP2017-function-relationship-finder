@@ -28,11 +28,15 @@
     <div class="col">
         <h6>Analyse columns</h6>
         <form>
-            <div class="form-group">
+            <div class="form-group"><input type="text" ng-model="$ctrl.analyseRadius" class="form-control"
+                                           placeholder="Enter radius"
+            />
+                <br>
                 <input type="text" ng-model="$ctrl.columnNo" class="form-control"
                        placeholder="Enter the column nos. or -1 for all columns"/>
             </div>
-            <button class="btn btn-secondary" type="button" ng-click="$ctrl.analyseColumn($ctrl.columnNo)">Analyse
+            <button class="btn btn-secondary" type="button"
+                    ng-click="$ctrl.analyseColumn($ctrl.analyseRadius, $ctrl.columnNo)">Analyse
                 Column
             </button>
         </form>
