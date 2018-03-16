@@ -28,7 +28,7 @@ import java.util.stream.Collectors;
 import static java.lang.String.format;
 
 @Component
-public class GridService extends Service {
+public class GridService extends BaseSearchService {
 
     private ArangoOperation arangoOperation;
 
@@ -270,19 +270,5 @@ public class GridService extends Service {
         ArangoCursor<Regression> datas = arangoOperation.query(builder.toString(), bindVar, Regression.class);
 
         return datas;
-    }
-
-    private double fixTolerance(double tolerance) {
-        return tolerance == 0.0 ? 1.0 : Math.abs(tolerance);
-    }
-
-    private Pair<String[], CellProcessor[]> getArgumentsForCsv(int size) {
-        CellProcessor[] processors = new CellProcessor[size];
-        String[] headers = new String[size];
-        for (int i = 0; i < size; i++) {
-            headers[i] = format("%s%d", Data.prefixColumn, i);
-            processors[i] = new NotNull(new ParseDouble());
-        }
-        return new Pair<>(headers, processors);
     }
 }

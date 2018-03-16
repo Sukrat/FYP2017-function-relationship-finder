@@ -44,6 +44,9 @@
                 }
 
                 function deleteFile(filename) {
+                    if (!confirm("Are you sure you want to delete the file" + filename + "?")) {
+                        return;
+                    }
                     RootService.loading(true);
                     FileUploaderService.deleteFile(filename)
                         .then((data) => {

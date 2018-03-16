@@ -1,0 +1,41 @@
+<div class="row">
+    <div class="col">
+        <msg loading="$ctrl.loading" msg="$ctrl.msg"></msg>
+    </div>
+</div>
+<div class="row">
+    <div class="col">
+        <h6>Functional Check</h6>
+        <form>
+            <div class="form-group">
+                <input type="text" ng-model="$ctrl.radius" class="form-control"
+                       placeholder="Enter radius"
+                />
+                <br>
+                <input type="text" ng-model="$ctrl.outputTolerance" class="form-control"
+                       placeholder="Enter tolerance for the output column"
+                />
+            </div>
+            <button class="btn btn-secondary" type="button"
+                    ng-click="$ctrl.checkFunction($ctrl.radius, $ctrl.outputTolerance)">Check is
+                a function
+            </button>
+        </form>
+    </div>
+</div>
+<hr class="my-4">
+<div class="row">
+    <div class="col">
+        <h6>Analyse columns</h6>
+        <form>
+            <div class="form-group">
+                <input type="text" ng-model="$ctrl.columnNo" class="form-control"
+                       placeholder="Enter the column nos. or -1 for all columns"/>
+            </div>
+            <button class="btn btn-secondary" type="button" ng-click="$ctrl.analyseColumn($ctrl.columnNo)">Analyse
+                Column
+            </button>
+        </form>
+    </div>
+</div>
+<hr class="my-4">

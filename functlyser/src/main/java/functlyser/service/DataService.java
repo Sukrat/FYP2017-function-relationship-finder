@@ -30,7 +30,7 @@ import java.util.stream.Collectors;
 import static java.lang.String.format;
 
 @Component
-public class DataService extends Service {
+public class DataService {
 
     private ArangoOperation arangoOperation;
 
@@ -114,6 +114,7 @@ public class DataService extends Service {
     }
 
     public long deleteCsvFile(String filename) {
+        arangoOperation.ensureHashIndex(Data.class, Arrays.asList("fileName"));
         String query = "FOR r in @@collection FILTER r.fileName == @filename REMOVE r in @@collection RETURN r";
         Map<String, Object> bindVar = new HashMap<>();
         bindVar.put("@collection", arangoOperation.collectionName(Data.class));

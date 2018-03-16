@@ -222,6 +222,20 @@ public class ArangoOperation {
                 .collect(Collectors.toList());
     }
 
+    public <T extends Entity> IndexEntity ensureHashIndex(Class<T> type, Collection<String> fields) {
+        Assert.notNull(type, ERROR_TYPE_NULL);
+
+        return ensureHashIndex(name(type), fields);
+    }
+
+    public IndexEntity ensureHashIndex(String collectionName, Collection<String> fields) {
+        Assert.hasText(collectionName, ERROR_COLLECTION_STRING_EMPTY);
+        Assert.notEmpty(fields, "Fields to be indexed cannot be empty");
+
+        ArangoCollection collection = collection(collectionName);
+        return collection.ensureHashIndex(fields, null);
+    }
+
     private <T extends Entity> String name(Class<T> type) {
 
         return type.getSimpleName().toString().toLowerCase();
