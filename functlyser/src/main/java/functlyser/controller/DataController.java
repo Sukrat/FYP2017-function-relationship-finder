@@ -30,19 +30,21 @@ public class DataController {
     private DataGetCommand dataGetCommand;
 
     private NormalizeCommand normalizeCommand;
+
     private UnNormalizeCommand unNormalizeCommand;
 
     @Autowired
     public DataController(DataUploadCommand dataUploadCommand,
                           WebSocketProgressService webSocketProgressService,
                           ListFileNamesCommand listFileNamesCommand,
-                          DeleteDataCommand dataCommand, DataGetCommand dataGetCommand, NormalizeCommand normalizeCommand) {
+                          DeleteDataCommand dataCommand, DataGetCommand dataGetCommand, NormalizeCommand normalizeCommand, UnNormalizeCommand unNormalizeCommand) {
         this.dataUploadCommand = dataUploadCommand;
         this.webSocketProgressService = webSocketProgressService;
         this.listFileNamesCommand = listFileNamesCommand;
         this.deleteDataCommand = dataCommand;
         this.dataGetCommand = dataGetCommand;
         this.normalizeCommand = normalizeCommand;
+        this.unNormalizeCommand = unNormalizeCommand;
     }
 
     @RequestMapping(value = "/upload", method = RequestMethod.POST)

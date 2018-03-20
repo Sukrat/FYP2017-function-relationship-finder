@@ -8,95 +8,94 @@ import functlyser.command.CommandProgess;
 import functlyser.model.Data;
 import functlyser.model.GridData;
 import functlyser.repository.DataRepository;
+import functlyser.repository.GridDataRepository;
+import functlyser.service.CsvService;
+import javafx.util.Pair;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.Resource;
+import org.springframework.stereotype.Component;
+import org.supercsv.cellprocessor.ParseDouble;
+import org.supercsv.cellprocessor.constraint.NotNull;
+import org.supercsv.cellprocessor.ift.CellProcessor;
 
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 import static java.lang.String.format;
 
-public class GridFunctionCheckCommand implements Command<List<Double>, Long> {
+@Component
+public class GridFunctionCheckCommand implements Command<Double, Resource> {
 
 
     private ArangoOperations operations;
     private DataRepository dataRepository;
+    private GridDataRepository gridDataRepository;
+    private CsvService csvService;
 
     @Autowired
-    public ClusterDataCommand(ArangoOperations operations, DataRepository dataRepository) {
+    public GridFunctionCheckCommand(ArangoOperations operations, DataRepository dataRepository,
+                                    GridDataRepository gridDataRepository, CsvService csvService) {
         this.operations = operations;
         this.dataRepository = dataRepository;
+        this.gridDataRepository = gridDataRepository;
+        this.csvService = csvService;
     }
 
     @Override
-    public Long execute(CommandProgess progress, List<Double> paramTolerances) {
+    public Resource execute(CommandProgess progress, Double outputTolerances) {
         Data any = dataRepository.findFirstByWorkColumnsNotNull();
         if (any == null) {
             throw new CommandException("No data found in the database!");
         }
-        if (paramTolerances == null) {
-            throw new CommandException("Tolerance is required!");
+        if (gridDataRepository.count() == 0) {
+            throw new CommandException("Data has not been clustered!");
         }
+        progress.setTotalWork(1, "Going through each cluster to check its functional relation!");
+        String query = "LET result = FLATTEN(\n"
+                + "FOR r IN @@gridCol\n"
+                + "FILTER COUNT(r.members) > 1\n"
+                + "LET grouped_y = \n"
+                + "( FOR member IN r.members\n"
+                + "LET elem = FIRST(\n"
+                + "FOR d in @@dataCol FILTER d._id == member LIMIT 1 RETURN d\n"
+                + ")\n"
+                + "COLLECT y = FLOOR(elem.workColumns.col0 / @tolerance) INTO elems = elem\n"
+                + "RETURN elems )\n"
+                + "FILTER COUNT(grouped_y) > 1\n"
+                + "RETURN FLATTEN(grouped_y)\n"
+                + ")\n"
+                + "FOR r in result\n"
+                + "RETURN r\n";
 
-        int startIndex = 1;
-        int endIndex = any.getRawColumns().size();
-        int numParameterColumns = any.getWorkColumns().size() - 1;
-
-        List<Double> tolerances = new ArrayList<>(paramTolerances);
-        if (tolerances.size() == 1) {
-            double tolerance = tolerances.get(0);
-            // as one of the tolerances is already in the list
-            for (int i = startIndex + 1; i < endIndex; i++) {
-                tolerances.add(tolerance);
-            }
-        }
-        if (numParameterColumns != tolerances.size()) {
-            throw new CommandException(
-                    "Number of tolerance must be equal to the data columns or enter one tolerance for all (expected: %d actual: %d)",
-                    numParameterColumns, tolerances.size());
-        }
-
-        progress.setTotalWork(2);
-
-        progress.update("Deleting previous clustered data!");
-        // deleting all the records in grouped data
-        operations.collection(GridData.class).truncate();
-
-        progress.update(1, "Clustering data!");
-
-        String rawQuery = "FOR r IN @@col\n"
-                + "COLLECT boxIndex = [ %1$s ]\n"
-                + "INTO members = r._id\n"
-                + "INSERT {\n"
-                + "boxIndex: boxIndex, \n"
-                + "members: members \n"
-                + "} INTO @@gridCol\n"
-                + "COLLECT WITH COUNT INTO c\n"
-                + "RETURN c\n";
-
-        // ignoring first tolerance as that is for ouput column
-        String cols = "";
-        for (int i = startIndex; i < endIndex; i++) {
-            cols += format("FLOOR(r.workColumns.%1$s / @tolerance%2$d),\n", Data.colName(i), i);
-        }
-        cols = cols.substring(0, cols.length() - 2);
-
-        String query = format(rawQuery, cols);
         Map<String, Object> bindVar = new HashMap<>();
-        bindVar.put("@col", Data.class);
         bindVar.put("@gridCol", GridData.class);
-        // ignoring first tolerance as that is for ouput column
-        for (int i = startIndex; i < endIndex; i++) {
-            bindVar.put(format("tolerance%1$d", i), fixTolerance(tolerances.get(i - 1)));
-        }
+        bindVar.put("@dataCol", Data.class);
+        bindVar.put("tolerance", fixTolerance(outputTolerances));
+        ArangoCursor<Data> datas = operations.query(query, bindVar, null, Data.class);
 
-        ArangoCursor<Long> result = operations.query(query.toString(), bindVar, null, Long.class);
-        return result.asListRemaining().get(0);
+        Pair<String[], CellProcessor[]> params = getArgumentsForCsv(any.getRawColumns().size());
+        return csvService.convert(datas, false, params.getKey(), params.getValue(), (elem) -> {
+            return elem.getRawColumns()
+                    .entrySet()
+                    .stream()
+                    .collect(Collectors.toMap(m -> m.getKey(), m -> m.getValue()));
+        });
     }
 
     private double fixTolerance(double tolerance) {
 
         return tolerance == 0.0 ? 1.0 : Math.abs(tolerance);
     }
+
+    private Pair<String[], CellProcessor[]> getArgumentsForCsv(int size) {
+        CellProcessor[] processors = new CellProcessor[size];
+        String[] headers = new String[size];
+        for (int i = 0; i < size; i++) {
+            headers[i] = format("%s%d", Data.prefixColumn, i);
+            processors[i] = new NotNull(new ParseDouble());
+        }
+        return new Pair<>(headers, processors);
+    }
+
 }

@@ -18,11 +18,4 @@ public interface DataRepository extends ArangoRepository<Data> {
     Data findFirstByRawColumnsNotNull();
 
     Data findFirstByWorkColumnsNotNull();
-
-    @Query("FOR r IN @@col\n" +
-            "FILTER r.fileName == @fileName\n" +
-            "REMOVE r IN @@col\n" +
-            "COLLECT WITH COUNT INTO c\n" +
-            "RETURN [c]")
-    ArangoCursor<Long> removeByFileName(@Param(value = "fileName") String fileName, @Param(value = "@col") Object collection);
 }

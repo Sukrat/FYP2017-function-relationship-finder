@@ -2,11 +2,10 @@
     var app = angular.module('app');
     app.component('dbscanAnalysis', {
         templateUrl: './js/dbscan-analysis/dbscan-analysis.html',
-        controller: ['DbscanAnalysisService', 'RootService', 'FileSaver',
-            function (DbscanAnalysisService, RootService, FileSaver) {
+        controller: ['RootService', 'FileSaver', '$http', '_', 'BufferParser', 'ErrorMessageHandler',
+            function (RootService, FileSaver, $http, _, BufferParser, ErrorMessageHandler) {
                 var vm = this;
                 vm.checkFunction = checkFunction;
-                vm.analyseColumn = analyseColumn;
 
                 vm.radius = "";
                 vm.outputTolerance = "";
@@ -15,28 +14,39 @@
 
                 function checkFunction(radius, outputTolerance) {
                     RootService.loading(true);
-                    DbscanAnalysisService.checkFunction(radius, outputTolerance)
-                        .then((response) => {
+                    var radiusTol = _.toNumber(radius);
+                    var tolerance = _.toNumber(outputTolerance);
+                    if (_.isNaN(tolerance) || _.isNaN(radiusTol)) {
+                        return RootService.error('Please enter a valid double!');
+                    } else {
+                        $http.post('/analysis/dbscan/functioncheck', tolerance, {
+                            responseType: 'arraybuffer',
+                            params: {
+                                radius: radiusTol
+                            }
+                        }).then((response) => {
                             FileSaver.saveResponseAsFile(response);
-                            RootService.success(["File successfully downloading!"]);
+                            RootService.success("File successfully downloading!");
+                        }).catch((error) => {
+                            var err = BufferParser.parse(error.data);
+                            console.log(err);
+                            RootService.error(ErrorMessageHandler.getError(err));
                         })
-                        .catch((error) => {
-                            RootService.error(error)
-                        })
+                    }
                 }
 
 
-                function analyseColumn(radius, columnNo) {
-                    RootService.loading(true);
-                    return DbscanAnalysisService.analyseColumn(radius, columnNo)
-                        .then((response) => {
-                            FileSaver.saveResponseAsFile(response);
-                            RootService.success(["File successfully downloading!"]);
-                        })
-                        .catch((error) => {
-                            RootService.error(error)
-                        })
-                }
+                // function analyseColumn(radius, columnNo) {
+                //     RootService.loading(true);
+                //     return DbscanAnalysisService.analyseColumn(radius, columnNo)
+                //         .then((response) => {
+                //             FileSaver.saveResponseAsFile(response);
+                //             RootService.success(["File successfully downloading!"]);
+                //         })
+                //         .catch((error) => {
+                //             RootService.error(error)
+                //         })
+                // }
             }]
     })
 })();

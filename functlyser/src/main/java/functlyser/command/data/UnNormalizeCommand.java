@@ -8,12 +8,14 @@ import functlyser.command.CommandProgess;
 import functlyser.model.Data;
 import functlyser.repository.DataRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 
 import java.util.HashMap;
 import java.util.Map;
 
 import static java.lang.String.format;
 
+@Component
 public class UnNormalizeCommand implements Command<Void, Long> {
 
     private ArangoOperations operations;

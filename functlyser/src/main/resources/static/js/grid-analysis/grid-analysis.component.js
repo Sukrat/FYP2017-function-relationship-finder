@@ -2,10 +2,12 @@
     var app = angular.module('app');
     app.component('gridAnalysis', {
         templateUrl: './js/grid-analysis/grid-analysis.html',
-        controller: ['RootService', 'FileSaver', '$http', '_', 'ErrorMessageHandler',
-            function (RootService, FileSaver, $http, _, ErrorMessageHandler) {
+        controller: ['RootService', 'FileSaver', '$http', '_', 'ErrorMessageHandler', 'BufferParser',
+            function (RootService, FileSaver, $http, _, ErrorMessageHandler, BufferParser) {
                 var vm = this;
                 vm.cluster = cluster;
+                vm.checkFunction = checkFunction;
+                vm.analyseColumn = analyseColumn;
 
                 vm.tolerances = "";
                 vm.outputTolerance = "";
@@ -31,30 +33,44 @@
                     }
                 }
 
-                // function checkFunction(outputTolerance) {
-                //     RootService.loading(true);
-                //     GridAnalysisService.checkFunction(outputTolerance)
-                //         .then((response) => {
-                //             FileSaver.saveResponseAsFile(response);
-                //             RootService.success(["File successfully downloading!"]);
-                //         })
-                //         .catch((error) => {
-                //             RootService.error(error)
-                //         })
-                // }
-                //
-                //
-                // function analyseColumn(columnNo) {
-                //     RootService.loading(true);
-                //     return GridAnalysisService.analyseColumn(columnNo)
-                //         .then((response) => {
-                //             FileSaver.saveResponseAsFile(response);
-                //             RootService.success(["File successfully downloading!"]);
-                //         })
-                //         .catch((error) => {
-                //             RootService.error(error)
-                //         })
-                // }
+                function checkFunction(outputTolerance) {
+                    RootService.loading(true);
+                    var tolerance = _.toNumber(outputTolerance);
+                    if (_.isNaN(tolerance)) {
+                        return RootService.error('Please enter a valid double!');
+                    } else {
+                        $http.post('/analysis/grid/functioncheck', tolerance, {
+                            responseType: 'arraybuffer'
+                        }).then((response) => {
+                            FileSaver.saveResponseAsFile(response);
+                            RootService.success("File successfully downloading!");
+                        }).catch((error) => {
+                            var err = BufferParser.parse(error.data);
+                            console.error(err);
+                            RootService.error(ErrorMessageHandler.getError(err));
+                        });
+                    }
+                }
+
+                function analyseColumn(columnNo) {
+                    RootService.loading(true);
+                    var colNo = _.toInteger(columnNo);
+                    if (_.isNaN(colNo)) {
+                        RootService.error('Please enter a valid integer!');
+                    } else {
+                        $http.post('/analysis/grid/column', colNo, {
+                            responseType: 'arraybuffer'
+                        }).then((response) => {
+                            FileSaver.saveResponseAsFile(response);
+                            RootService.success("File successfully downloading!");
+                        }).catch((error) => {
+                            var err = BufferParser.parse(error.data);
+                            console.log(err);
+                            RootService.error(ErrorMessageHandler.getError(err));
+                        })
+
+                    }
+                }
             }]
     })
 })();
