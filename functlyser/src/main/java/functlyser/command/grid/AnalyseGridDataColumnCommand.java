@@ -93,13 +93,12 @@ public class AnalyseGridDataColumnCommand implements Command<Integer, Resource> 
     }
 
     private Resource analyseAll(CommandProgess progress, Data sample) {
-        int numOfCols = sample.getWorkColumns().size() - 1;
-        progress.setTotalWork(numOfCols, "Analysing all columns!");
         List<Integer> colNos = new ArrayList<>();
         for (int i = 1; i < sample.getWorkColumns().size(); i++) {
             colNos.add(i);
         }
 
+        progress.setTotalWork(colNos.size(), "Analysing all columns!");
         AtomicInteger done = new AtomicInteger(0);
         List<CompiledRegression> compiledRegressions = colNos.parallelStream()
                 .map(colNo -> {

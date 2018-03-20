@@ -1,6 +1,6 @@
 package functlyser.service;
 
-import functlyser.exception.ApiException;
+import functlyser.BaseTest;
 import javafx.util.Pair;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,7 +20,7 @@ import static org.hamcrest.MatcherAssert.*;
 import static org.hamcrest.Matchers.*;
 import static org.junit.Assert.assertTrue;
 
-public class CsvServiceTest extends BaseServiceTest {
+public class CsvServiceTest extends BaseTest {
 
 
     @Autowired
@@ -92,7 +92,7 @@ public class CsvServiceTest extends BaseServiceTest {
         assertTrue(result.stream().allMatch(m -> m.size() == 3));
     }
 
-    @Test(expected = ApiException.class)
+    @Test(expected = ServiceException.class)
     public void convert_emptyStringShouldThrow() {
         String csv = "";
         ByteArrayInputStream inputStream = new ByteArrayInputStream(csv.getBytes());

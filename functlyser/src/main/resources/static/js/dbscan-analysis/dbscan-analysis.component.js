@@ -6,6 +6,7 @@
             function (RootService, FileSaver, $http, _, BufferParser, ErrorMessageHandler) {
                 var vm = this;
                 vm.checkFunction = checkFunction;
+                vm.analyseColumn = analyseColumn;
 
                 vm.radius = "";
                 vm.outputTolerance = "";
@@ -36,17 +37,28 @@
                 }
 
 
-                // function analyseColumn(radius, columnNo) {
-                //     RootService.loading(true);
-                //     return DbscanAnalysisService.analyseColumn(radius, columnNo)
-                //         .then((response) => {
-                //             FileSaver.saveResponseAsFile(response);
-                //             RootService.success(["File successfully downloading!"]);
-                //         })
-                //         .catch((error) => {
-                //             RootService.error(error)
-                //         })
-                // }
+                function analyseColumn(radius, columnNo) {
+                    RootService.loading(true);
+                    var radiusTol = _.toNumber(radius);
+                    var colNo = _.toInteger(columnNo);
+                    if (_.isNaN(colNo) || _.isNaN(radiusTol)) {
+                        return RootService.error('Please enter a valid double for radius and integer for Col Number!');
+                    } else {
+                        $http.post('/analysis/dbscan/column', colNo, {
+                            responseType: 'arraybuffer',
+                            params: {
+                                radius: radiusTol
+                            }
+                        }).then((response) => {
+                            FileSaver.saveResponseAsFile(response);
+                            RootService.success("File successfully downloading!");
+                        }).catch((error) => {
+                            var err = BufferParser.parse(error.data);
+                            console.log(err);
+                            RootService.error(ErrorMessageHandler.getError(err));
+                        })
+                    }
+                }
             }]
     })
 })();

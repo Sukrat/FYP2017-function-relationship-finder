@@ -2,7 +2,7 @@ package functlyser.controller;
 
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import functlyser.BaseSpringTest;
+import functlyser.BaseTest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.http.MediaType;
@@ -13,7 +13,7 @@ import org.springframework.test.web.servlet.ResultActions;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 
 @AutoConfigureMockMvc
-public abstract class BaseControllerTest extends BaseSpringTest {
+public abstract class BaseControllerTest extends BaseTest {
 
     @Autowired
     protected MockMvc mockMvc;

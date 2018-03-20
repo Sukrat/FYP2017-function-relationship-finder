@@ -2,6 +2,7 @@ package functlyser.controller;
 
 import functlyser.Faker;
 import functlyser.model.Data;
+import org.assertj.core.util.Lists;
 import org.junit.Test;
 import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.test.web.servlet.ResultActions;
@@ -26,8 +27,8 @@ public class DataControllerTest extends BaseControllerTest {
         ResultActions result = mvcUpload(url, file);
 
         result.andExpect(status().isOk())
-                .andExpect(jsonPath("$.messages", not(isEmptyOrNullString())));
-        assertThat(arangoOperation.findAll(Data.class).asListRemaining().size(), is(4));
+                .andExpect(jsonPath("$.message", not(isEmptyOrNullString())));
+        assertThat(Lists.newArrayList(operations.findAll(Data.class)).size(), is(4));
     }
 
     @Test
@@ -39,7 +40,7 @@ public class DataControllerTest extends BaseControllerTest {
         ResultActions result = mvcUpload(url, file);
 
         result.andExpect(status().isBadRequest())
-                .andExpect(jsonPath("$.messages", not(isEmptyOrNullString())));
+                .andExpect(jsonPath("$.message", not(isEmptyOrNullString())));
     }
 
     @Test
@@ -55,9 +56,9 @@ public class DataControllerTest extends BaseControllerTest {
     @Test
     public void downloadCsv() throws Exception {
         List<Data> datas = Faker.nextData("test.csv", 3, 7);
-        arangoOperation.insert(datas, Data.class);
+        operations.insert(datas, Data.class);
 
-        ResultActions result = mvcGet("/data/download?filename=test.csv");
+        ResultActions result = mvcGet("/data/download?fileName=test.csv");
 
         result.andExpect(status().isOk())
                 .andExpect(content().string(not(isEmptyOrNullString())));
@@ -66,12 +67,12 @@ public class DataControllerTest extends BaseControllerTest {
     @Test
     public void delete() throws Exception {
         List<Data> datas = Faker.nextData("test.csv", 3, 7);
-        arangoOperation.insert(datas, Data.class);
+        operations.insert(datas, Data.class);
 
-        ResultActions result = mvcDelete("/data/delete?filename=test.csv");
+        ResultActions result = mvcDelete("/data/delete?fileName=test.csv");
 
         result.andExpect(status().isOk())
-                .andExpect(jsonPath("$.messages", not(isEmptyOrNullString())));
+                .andExpect(jsonPath("$.message", not(isEmptyOrNullString())));
     }
 
     private String testData() {

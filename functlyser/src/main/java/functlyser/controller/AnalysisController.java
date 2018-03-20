@@ -1,5 +1,6 @@
 package functlyser.controller;
 
+import functlyser.command.dbscan.DbScanAnalyseColumnCommand;
 import functlyser.command.dbscan.DbScanFunctionalCheckCommand;
 import functlyser.command.grid.AnalyseGridDataColumnCommand;
 import functlyser.command.grid.ClusterDataCommand;
@@ -32,13 +33,16 @@ public class AnalysisController {
 
     private DbScanFunctionalCheckCommand dbScanFunctionalCheckCommand;
 
+    private DbScanAnalyseColumnCommand dbScanAnalyseColumnCommand;
+
     @Autowired
-    public AnalysisController(WebSocketProgressService webSocketProgressService, ClusterDataCommand clusterDataCommand, GridFunctionCheckCommand gridFunctionCheckCommand, AnalyseGridDataColumnCommand analyseGridDataColumnCommand, DbScanFunctionalCheckCommand dbScanFunctionalCheckCommand) {
+    public AnalysisController(WebSocketProgressService webSocketProgressService, ClusterDataCommand clusterDataCommand, GridFunctionCheckCommand gridFunctionCheckCommand, AnalyseGridDataColumnCommand analyseGridDataColumnCommand, DbScanFunctionalCheckCommand dbScanFunctionalCheckCommand, DbScanAnalyseColumnCommand dbScanAnalyseColumnCommand) {
         this.webSocketProgressService = webSocketProgressService;
         this.clusterDataCommand = clusterDataCommand;
         this.gridFunctionCheckCommand = gridFunctionCheckCommand;
         this.analyseGridDataColumnCommand = analyseGridDataColumnCommand;
         this.dbScanFunctionalCheckCommand = dbScanFunctionalCheckCommand;
+        this.dbScanAnalyseColumnCommand = dbScanAnalyseColumnCommand;
     }
 
 
@@ -80,13 +84,16 @@ public class AnalysisController {
         return ResponseEntity.ok().header(HttpHeaders.CONTENT_DISPOSITION,
                 "attachment;filename=\"" + filename + "\"").body(file);
     }
-//
-//    @RequestMapping(value = "/analysis/dbscan/column", method = RequestMethod.POST)
-//    public ResponseEntity<Resource> dbscanAnalyseParameter(@RequestParam("radius") double radius,
-//                                                           @RequestBody int columnNo) {
-//        String filename = format("analysedColNo-%.1f-%d.csv", radius, columnNo);
-//        Resource file = scanService.analyseParameter(radius, columnNo);
-//        return ResponseEntity.ok().header(HttpHeaders.CONTENT_DISPOSITION,
-//                "attachment;filename=\"" + filename + "\"").body(file);
-//    }
+
+    @RequestMapping(value = "/dbscan/column", method = RequestMethod.POST)
+    public ResponseEntity<Resource> dbscanAnalyseParameter(@RequestParam("radius") double radius,
+                                                           @RequestBody int columnNo) {
+        String filename = format("analysedColNo-%.1f-%d.csv", radius, columnNo);
+
+        WebSocketProgress webSocketProgress = webSocketProgressService.create(REPLY);
+        Resource file = dbScanAnalyseColumnCommand.execute(webSocketProgress,
+                new DbScanAnalyseColumnCommand.Param(radius, columnNo));
+        return ResponseEntity.ok().header(HttpHeaders.CONTENT_DISPOSITION,
+                "attachment;filename=\"" + filename + "\"").body(file);
+    }
 }
