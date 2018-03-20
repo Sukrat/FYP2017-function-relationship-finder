@@ -5,7 +5,7 @@ import com.arangodb.entity.DocumentCreateEntity;
 import com.arangodb.entity.DocumentEntity;
 import com.arangodb.entity.IndexEntity;
 import com.arangodb.entity.MultiDocumentEntity;
-import functlyser.model.Entity;
+import com.arangodb.springframework.core.ArangoOperations;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.util.Assert;
@@ -22,11 +22,11 @@ public class ArangoOperation {
     private ArangoDatabase database;
 
     @Autowired
-    public ArangoOperation(ArangoDatabase arangoDatabase) {
-        this.database = arangoDatabase;
+    public ArangoOperation(ArangoOperations operation) {
+        this.database = null;
     }
 
-    public <T extends Entity> ArangoCollection collection(Class<T> type) {
+    public <T extends DocumentEntity> ArangoCollection collection(Class<T> type) {
         Assert.notNull(type, ERROR_TYPE_NULL);
 
         return collection(name(type));
@@ -42,7 +42,7 @@ public class ArangoOperation {
         return collection;
     }
 
-    public <T extends Entity> String collectionName(Class<T> type) {
+    public <T extends DocumentEntity> String collectionName(Class<T> type) {
         collection(type);
         return name(type);
     }
@@ -54,7 +54,7 @@ public class ArangoOperation {
                 .collect(Collectors.toSet());
     }
 
-    public <T extends Entity> boolean collectionExists(Class<T> type) {
+    public <T extends DocumentEntity> boolean collectionExists(Class<T> type) {
         Assert.notNull(type, ERROR_TYPE_NULL);
 
         return collectionExists(name(type));
@@ -66,7 +66,7 @@ public class ArangoOperation {
         return database.collection(collectionName).exists();
     }
 
-    public <T extends Entity> void dropCollection(Class<T> type) {
+    public <T extends DocumentEntity> void dropCollection(Class<T> type) {
         Assert.notNull(type, ERROR_TYPE_NULL);
 
         dropCollection(name(type));
@@ -81,7 +81,7 @@ public class ArangoOperation {
         }
     }
 
-    public <T extends Entity> T findAny(Class<T> type) {
+    public <T extends DocumentEntity> T findAny(Class<T> type) {
         Assert.notNull(type, ERROR_TYPE_NULL);
 
         collection(name(type));
@@ -97,7 +97,7 @@ public class ArangoOperation {
         return result;
     }
 
-    public <T extends Entity> ArangoCursor<T> findAll(Class<T> type) {
+    public <T extends DocumentEntity> ArangoCursor<T> findAll(Class<T> type) {
         Assert.notNull(type, ERROR_TYPE_NULL);
 
         return findAll(name(type), type);
@@ -114,7 +114,7 @@ public class ArangoOperation {
         return database.query(query, bindVar, null, entityClass);
     }
 
-    public <T extends Entity> long count(Class<T> type) {
+    public <T extends DocumentEntity> long count(Class<T> type) {
         Assert.notNull(type, ERROR_TYPE_NULL);
 
         return count(name(type));
@@ -131,13 +131,13 @@ public class ArangoOperation {
         return count;
     }
 
-    public <T extends Entity> T insert(T objectToSave) {
+    public <T extends DocumentEntity> T insert(T objectToSave) {
         Assert.notNull(objectToSave, "Object about to be saved cannot be null!");
 
         return insert(objectToSave, name(objectToSave.getClass()));
     }
 
-    public <T extends Entity> T insert(T objectToSave, String collectionName) {
+    public <T extends DocumentEntity> T insert(T objectToSave, String collectionName) {
         Assert.hasText(collectionName, ERROR_COLLECTION_STRING_EMPTY);
 
         ArangoCollection collection = collection(collectionName);
@@ -147,14 +147,14 @@ public class ArangoOperation {
         return objectToSave;
     }
 
-    public <T extends Entity> Collection<T> insert(Collection<T> batchToSave, Class<T> type) {
+    public <T extends DocumentEntity> Collection<T> insert(Collection<T> batchToSave, Class<T> type) {
         Assert.notNull(type, ERROR_TYPE_NULL);
 
         return insert(batchToSave, name(type));
     }
 
 
-    public <T extends Entity> Collection<T> insert(Collection<T> batchToSave, String collectionName) {
+    public <T extends DocumentEntity> Collection<T> insert(Collection<T> batchToSave, String collectionName) {
         Assert.notEmpty(batchToSave, "List of object about to be saved cannot be empty!");
         Assert.hasText(collectionName, ERROR_COLLECTION_STRING_EMPTY);
 
@@ -191,7 +191,7 @@ public class ArangoOperation {
         return database.query(query, bindVars, null, type);
     }
 
-    public <T extends Entity> IndexEntity ensureSkipListIndex(Class<T> type, Collection<String> fields) {
+    public <T extends DocumentEntity> IndexEntity ensureSkipListIndex(Class<T> type, Collection<String> fields) {
         Assert.notNull(type, ERROR_TYPE_NULL);
 
         return ensureSkipListIndex(name(type), fields);
@@ -205,7 +205,7 @@ public class ArangoOperation {
         return collection.ensureSkiplistIndex(fields, null);
     }
 
-    public <T extends Entity> List<IndexEntity> ensureSkipListIndexMulti(Class<T> type, Collection<String> fields) {
+    public <T extends DocumentEntity> List<IndexEntity> ensureSkipListIndexMulti(Class<T> type, Collection<String> fields) {
         Assert.notNull(type, ERROR_TYPE_NULL);
 
         return ensureSkipListIndexMulti(name(type), fields);
@@ -222,7 +222,7 @@ public class ArangoOperation {
                 .collect(Collectors.toList());
     }
 
-    public <T extends Entity> IndexEntity ensureHashIndex(Class<T> type, Collection<String> fields) {
+    public <T extends DocumentEntity> IndexEntity ensureHashIndex(Class<T> type, Collection<String> fields) {
         Assert.notNull(type, ERROR_TYPE_NULL);
 
         return ensureHashIndex(name(type), fields);
@@ -236,15 +236,13 @@ public class ArangoOperation {
         return collection.ensureHashIndex(fields, null);
     }
 
-    private <T extends Entity> String name(Class<T> type) {
+    private <T extends DocumentEntity> String name(Class<T> type) {
 
         return type.getSimpleName().toString().toLowerCase();
     }
 
-    private <T extends Entity> void updateFields(T object, DocumentEntity d) {
-        object.setId(d.getId());
-        object.setKey(d.getKey());
-        object.setRev(d.getRev());
+    private <T extends DocumentEntity> void updateFields(T object, DocumentEntity d) {
+
     }
 
 }

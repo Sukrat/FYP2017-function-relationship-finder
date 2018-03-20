@@ -4,7 +4,6 @@ import com.arangodb.ArangoCursor;
 import functlyser.exception.ApiException;
 import functlyser.model.CompiledRegression;
 import functlyser.model.Data;
-import functlyser.model.GridData;
 import functlyser.model.Regression;
 import functlyser.model.validator.DataValidator;
 import functlyser.model.validator.ValidatorRunner;
@@ -49,7 +48,7 @@ public class ScanService extends BaseSearchService {
         if (any == null) {
             throw new ApiException("No data found in the database!");
         }
-        List<String> columns = any.getColumns()
+        List<String> columns = any.getRawColumns()
                 .entrySet()
                 .stream()
                 .map(m -> format("columns.%s", m.getKey()))
@@ -57,7 +56,7 @@ public class ScanService extends BaseSearchService {
         arangoOperation.ensureSkipListIndexMulti(Data.class, columns);
 
         int startIndex = 1;
-        int endIndex = any.getColumns().size();
+        int endIndex = any.getRawColumns().size();
 
         StringBuilder builder = new StringBuilder();
 
@@ -92,9 +91,9 @@ public class ScanService extends BaseSearchService {
         bindVar.put("outputTolerance", Math.abs(outputTolerance));
         ArangoCursor<Data> datas = arangoOperation.query(builder.toString(), bindVar, Data.class);
 
-        Pair<String[], CellProcessor[]> params = getArgumentsForCsv(any.getColumns().size());
+        Pair<String[], CellProcessor[]> params = getArgumentsForCsv(any.getRawColumns().size());
         return csvService.convert(datas, false, params.getKey(), params.getValue(), (elem) -> {
-            return elem.getColumns()
+            return elem.getRawColumns()
                     .entrySet()
                     .stream()
                     .collect(Collectors.toMap(m -> m.getKey(), m -> m.getValue()));
@@ -111,7 +110,7 @@ public class ScanService extends BaseSearchService {
             throw new ApiException("Choose parameter column to be analysed cannot analyse output column!");
         }
 
-        List<String> columns = any.getColumns()
+        List<String> columns = any.getRawColumns()
                 .entrySet()
                 .stream()
                 .map(m -> format("columns.%s", m.getKey()))
@@ -119,15 +118,15 @@ public class ScanService extends BaseSearchService {
         arangoOperation.ensureSkipListIndexMulti(Data.class, columns);
 
         if (column == -1) {
-            return analyseAll(radius, any.getColumns().size());
+            return analyseAll(radius, any.getRawColumns().size());
         }
 
-        if (column < 0 || column >= any.getColumns().size()) {
+        if (column < 0 || column >= any.getRawColumns().size()) {
             throw new ApiException(format("Column number doesnot exist! (Expected: < %d and > 0 and got: )",
-                    any.getColumns().size(), column));
+                    any.getRawColumns().size(), column));
         }
 
-        ArangoCursor<Regression> regressions = analyseColumnByColNos(radius, column, any.getColumns().size());
+        ArangoCursor<Regression> regressions = analyseColumnByColNos(radius, column, any.getRawColumns().size());
 
         return csvService.convert(regressions, true,
                 new String[]{"colNo", "m1", "m2", "c1", "c2", "numOfDataPoints"},

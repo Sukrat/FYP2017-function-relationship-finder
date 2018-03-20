@@ -1,9 +1,9 @@
 package functlyser;
 
 
+import functlyser.command.CommandException;
 import functlyser.controller.messages.ErrorMessage;
-import functlyser.exception.ApiException;
-import functlyser.exception.ValidationException;
+import functlyser.service.ServiceException;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -19,19 +19,15 @@ public class GlobalControllerExceptionHandler {
         return returnErrorMessage(errorMessage);
     }
 
-    @ExceptionHandler(ApiException.class)
-    public ResponseEntity<ErrorMessage> handleApiException(HttpServletRequest req, Exception e) {
-        ApiException apiException = (ApiException) e;
-        ErrorMessage errorMessage = new ErrorMessage(apiException.getStatusCode(),
-                apiException.getClass().getSimpleName(), apiException.getMessages());
+    @ExceptionHandler(CommandException.class)
+    public ResponseEntity<ErrorMessage> handleCommandException(HttpServletRequest req, Exception e) {
+        ErrorMessage errorMessage = new ErrorMessage(400, e.getClass().getSimpleName(), e.getMessage());
         return returnErrorMessage(errorMessage);
     }
 
-    @ExceptionHandler(ValidationException.class)
-    public ResponseEntity<ErrorMessage> handleValidationException(HttpServletRequest req, Exception e) {
-        ValidationException apiException = (ValidationException) e;
-        ErrorMessage errorMessage = new ErrorMessage(400,
-                apiException.getClass().getSimpleName(), apiException.getMessages());
+    @ExceptionHandler(ServiceException.class)
+    public ResponseEntity<ErrorMessage> handleServiceException(HttpServletRequest req, Exception e) {
+        ErrorMessage errorMessage = new ErrorMessage(400, e.getClass().getSimpleName(), e.getMessage());
         return returnErrorMessage(errorMessage);
     }
 

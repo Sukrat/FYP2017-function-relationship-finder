@@ -1,7 +1,6 @@
 package functlyser;
 
 import functlyser.model.Data;
-import functlyser.model.GridData;
 import org.junit.Assert;
 
 import java.nio.charset.Charset;
@@ -36,9 +35,11 @@ public class Faker {
         for (int i = 0; i < num; i++) {
             Data data = new Data();
             data.setFileName(filename);
-            data.setColumns(new HashMap<>());
+            data.setRawColumns(new HashMap<>());
+            data.setWorkColumns(new HashMap<>());
             for (int j = 0; j < col; j++) {
-                data.getColumns().put(Data.colName(j), i + Faker.nextDouble());
+                data.getRawColumns().put(Data.colName(j), i + Faker.nextDouble());
+                data.getWorkColumns().put(Data.colName(j), i + Faker.nextDouble());
             }
             list.add(data);
         }
@@ -46,17 +47,7 @@ public class Faker {
     }
 
     public static List<Data> nextData(int num, int col) {
-        List<Data> list = new ArrayList<>();
-        for (int i = 0; i < num; i++) {
-            Data data = new Data();
-            data.setFileName("testcsv.csv");
-            data.setColumns(new HashMap<>());
-            for (int j = 0; j < col; j++) {
-                data.getColumns().put(Data.colName(i), Faker.nextDouble());
-            }
-            list.add(data);
-        }
-        return list;
+        return nextData("testcsv.csv", num, col);
     }
 
 //    public static List<Data> nextGridData(int num) {
@@ -66,9 +57,9 @@ public class Faker {
 //            gridData.setBoxIndex(Arrays.asList((long) i, (long) i + 1, (long) i + 2));
 //            gridData.
 //            data.setFileName("testcsv.csv");
-//            data.setColumns(new HashMap<>());
+//            data.setRawColumns(new HashMap<>());
 //            for (int j = 0; j < col; j++) {
-//                data.getColumns().put(Data.colName(i), Faker.nextDouble());
+//                data.getRawColumns().put(Data.colName(i), Faker.nextDouble());
 //            }
 //            list.add(data);
 //        }

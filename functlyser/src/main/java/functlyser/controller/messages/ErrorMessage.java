@@ -1,22 +1,15 @@
 package functlyser.controller.messages;
 
-import java.util.Arrays;
-import java.util.List;
-
 public class ErrorMessage {
 
     private int statusCode;
     private String type;
-    private List<String> messages;
-
-    public ErrorMessage(int statusCode, String type, List<String> messages) {
-        this.statusCode = statusCode;
-        this.type = type;
-        this.messages = messages;
-    }
+    private String message;
 
     public ErrorMessage(int statusCode, String type, String message) {
-        this(statusCode, type, Arrays.asList(message));
+        this.statusCode = statusCode;
+        this.type = type;
+        this.message = message;
     }
 
     public int getStatusCode() {
@@ -27,7 +20,7 @@ public class ErrorMessage {
         return type;
     }
 
-    public List<String> getMessages() {
-        return messages;
+    public String getMessage() {
+        return message;
     }
 }

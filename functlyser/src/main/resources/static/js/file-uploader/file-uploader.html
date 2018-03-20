@@ -21,14 +21,18 @@
                 <thead>
                 <tr>
                     <th scope="col">#</th>
-                    <th scope="col">Name</th>
+                    <th scope="col">Name
+                        <button class="btn btn-outline-primary btn-sm" type="button" ng-click="$ctrl.normalize()">
+                            Normalize
+                        </button>
+                    </th>
                     <th scope="col">Delete</th>
                 </tr>
                 </thead>
                 <tbody>
                 <tr ng-repeat="filename in $ctrl.data" ng-if="$ctrl.data.length > 0">
                     <td>
-                        <a ng-href="/data/download?filename={{filename}}">{{$index}}</a>
+                        <a ng-href="/data/download?fileName={{filename}}">{{$index}}</a>
                     </td>
                     <td>{{filename}}</td>
                     <td>

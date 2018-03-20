@@ -1,8 +1,8 @@
 package functlyser.controller;
 
+import functlyser.command.data.*;
 import functlyser.controller.messages.Message;
-import functlyser.model.Data;
-import functlyser.service.DataService;
+import functlyser.service.WebSocketProgressService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.Resource;
 import org.springframework.http.HttpHeaders;
@@ -10,51 +10,85 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.util.Arrays;
+import java.io.IOException;
 import java.util.Collection;
-import java.util.List;
-
-import static java.lang.String.format;
 
 @RestController
-public class DataController extends Controller {
+@RequestMapping("/data")
+public class DataController {
 
-    private DataService dataService;
+    public static String REPLY = "/reply/data";
+
+    private WebSocketProgressService webSocketProgressService;
+
+    private DataUploadCommand dataUploadCommand;
+
+    private ListFileNamesCommand listFileNamesCommand;
+
+    private DeleteDataCommand deleteDataCommand;
+
+    private DataGetCommand dataGetCommand;
+
+    private NormalizeCommand normalizeCommand;
+    private UnNormalizeCommand unNormalizeCommand;
 
     @Autowired
-    public DataController(DataService dataService) {
-        this.dataService = dataService;
+    public DataController(DataUploadCommand dataUploadCommand,
+                          WebSocketProgressService webSocketProgressService,
+                          ListFileNamesCommand listFileNamesCommand,
+                          DeleteDataCommand dataCommand, DataGetCommand dataGetCommand, NormalizeCommand normalizeCommand) {
+        this.dataUploadCommand = dataUploadCommand;
+        this.webSocketProgressService = webSocketProgressService;
+        this.listFileNamesCommand = listFileNamesCommand;
+        this.deleteDataCommand = dataCommand;
+        this.dataGetCommand = dataGetCommand;
+        this.normalizeCommand = normalizeCommand;
     }
 
-    @RequestMapping(value = "/data/upload", method = RequestMethod.POST)
-    public ResponseEntity<Message> uploadCsvFile(@RequestParam("file") MultipartFile file) {
-        Collection<Data> data = dataService.insertCsvFile(file);
-        Message message = new Message(Arrays.asList(format("%d records inserted!", data.stream().count()),
-                format("%s successfully uploaded!", file.getOriginalFilename())));
-        return ResponseEntity.ok(message);
+    @RequestMapping(value = "/upload", method = RequestMethod.POST)
+    public ResponseEntity upload(@RequestParam("file") MultipartFile file) throws IOException {
+        WebSocketProgress webSocketProgress = webSocketProgressService.create(REPLY);
+        DataUploadCommand.Param param = new DataUploadCommand.Param(file.getInputStream(), file.getOriginalFilename());
+
+        webSocketProgress.update("Uploading of the file '%s' has been added to the queue!", file.getOriginalFilename());
+        Long result = dataUploadCommand.execute(webSocketProgress, param);
+
+        return ResponseEntity.ok().body(new Message(result + "records added successfully!"));
     }
 
-    @RequestMapping(value = "/data/download", method = RequestMethod.GET)
-    public ResponseEntity<Resource> downloadCsv(@RequestParam("filename") String filename) {
+    @RequestMapping(value = "/filenames", method = RequestMethod.GET)
+    public ResponseEntity filenames() {
+        Collection<String> execute = listFileNamesCommand.execute(null);
+        return ResponseEntity.ok().body(execute);
+    }
 
-        Resource file = dataService.getCsvFile(filename);
+    @RequestMapping(value = "/delete", method = RequestMethod.DELETE)
+    public ResponseEntity delete(@RequestParam("fileName") String fileName) {
+        WebSocketProgress webSocketProgress = webSocketProgressService.create(REPLY);
+
+        Long result = deleteDataCommand.execute(webSocketProgress, fileName);
+
+        return ResponseEntity.ok().body(new Message(result + " records deleted successfully!"));
+    }
+
+    @RequestMapping(value = "/download", method = RequestMethod.GET)
+    public ResponseEntity download(@RequestParam("fileName") String fileName) {
+        Resource result = dataGetCommand.execute(fileName);
         return ResponseEntity.ok().header(HttpHeaders.CONTENT_DISPOSITION,
-                "attachment;filename=\"" + filename + "\"").body(file);
+                "attachment;filename=\"" + fileName + "\"").body(result);
     }
 
-
-    @RequestMapping(value = "/data/delete", method = RequestMethod.DELETE)
-    public ResponseEntity<Message> delete(@RequestParam("filename") String filename) {
-
-        long deleteCount = dataService.deleteCsvFile(filename);
-        Message message = new Message(Arrays.asList(format("%d records deleted!", deleteCount),
-                format("%s successfully deleted!", filename)));
-        return ResponseEntity.ok(message);
+    @RequestMapping(value = "/normalize", method = RequestMethod.POST)
+    public ResponseEntity normalize() {
+        WebSocketProgress webSocketProgress = webSocketProgressService.create(REPLY);
+        Long result = normalizeCommand.execute(webSocketProgress, null);
+        return ResponseEntity.ok().body(new Message(result + " records normalized successfully!"));
     }
 
-    @RequestMapping(value = "/data/filenames", method = RequestMethod.GET)
-    public ResponseEntity<List<String>> listFileNames() {
-        List<String> excelList = dataService.listCsvFileNames();
-        return ResponseEntity.ok(excelList);
+    @RequestMapping(value = "/normalize/undo", method = RequestMethod.POST)
+    public ResponseEntity unNormalize() {
+        WebSocketProgress webSocketProgress = webSocketProgressService.create(REPLY);
+        Long result = unNormalizeCommand.execute(webSocketProgress, null);
+        return ResponseEntity.ok().body(new Message(result + " records un-normalized successfully!"));
     }
 }

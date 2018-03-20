@@ -1,17 +1,22 @@
-<div class="loading" ng-if="$ctrl.loading">
-    Loading
+<div class="loader loader-default is-active" data-text="{{$ctrl.loadingText}}" ng-if="$ctrl.loading">
+</div>
+<div class="row">
+    <div class="col">
+        <div class="alert alert-success" role="alert" ng-if="$ctrl.connected">
+            Connected to the server!
+        </div>
+        <div class="alert alert-danger" role="alert" ng-if="!$ctrl.connected">
+            Not connected to the server! Please refresh the page!
+        </div>
+    </div>
 </div>
 <div class="row">
     <div class="col">
         <div class="alert alert-success" role="alert" ng-if="$ctrl.message.success">
-            <ul>
-                <li ng-repeat="message in $ctrl.message.success track by $index">{{message}}</li>
-            </ul>
+            {{$ctrl.message.success}}
         </div>
         <div class="alert alert-danger" role="alert" ng-if="$ctrl.message.error">
-            <ul>
-                <li ng-repeat="message in $ctrl.message.error track by $index">{{message}}</li>
-            </ul>
+            {{$ctrl.message.error}}
         </div>
     </div>
 </div>

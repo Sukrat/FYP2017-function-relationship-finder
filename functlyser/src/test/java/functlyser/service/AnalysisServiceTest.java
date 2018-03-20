@@ -38,12 +38,12 @@
 //    public void testDivideIntoGrids() {
 //        Profile profile = new Profile();
 //        profile.setName("test");
-//        profile.setColumns(new HashMap<>());
-//        profile.getColumns().put("col1", new ProfileInfo());
-//        profile.getColumns().put("col2", new ProfileInfo());
-//        profile.getColumns().get("col2").setIndex(1);
-//        profile.getColumns().put("col3", new ProfileInfo());
-//        profile.getColumns().get("col3").setIndex(2);
+//        profile.setRawColumns(new HashMap<>());
+//        profile.getRawColumns().put("col1", new ProfileInfo());
+//        profile.getRawColumns().put("col2", new ProfileInfo());
+//        profile.getRawColumns().get("col2").setIndex(1);
+//        profile.getRawColumns().put("col3", new ProfileInfo());
+//        profile.getRawColumns().get("col3").setIndex(2);
 //        mongoOperations.save(profile);
 //        List<Data> datas = getDataFor(profile.getId(), 10, "test.csc");
 //        mongoOperations.insert(datas, Data.class);
@@ -55,7 +55,7 @@
 //        assertThat(result, is(20));
 //        assertTrue(mongoOperations.findAll(Data.class)
 //                .stream()
-//                .allMatch(m -> m.getGridIndexes().size() == profile.getColumns().size()));
+//                .allMatch(m -> m.getGridIndexes().size() == profile.getRawColumns().size()));
 //    }
 //
 //    @Test(expected = ApiException.class)
@@ -78,10 +78,10 @@
 //            Data data = new Data();
 //            data.setProfileId(new ObjectId(profileId));
 //            data.setFileName(filename);
-//            data.setColumns(new HashMap<>());
-//            data.getColumns().put("col1", (double) i);
-//            data.getColumns().put("col2", i * Faker.nextDouble());
-//            data.getColumns().put("col3", i * Faker.nextDouble());
+//            data.setRawColumns(new HashMap<>());
+//            data.getRawColumns().put("col1", (double) i);
+//            data.getRawColumns().put("col2", i * Faker.nextDouble());
+//            data.getRawColumns().put("col3", i * Faker.nextDouble());
 //            list.add(data);
 //        }
 //        return list;

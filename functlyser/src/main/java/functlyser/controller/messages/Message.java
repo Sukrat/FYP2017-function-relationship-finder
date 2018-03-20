@@ -7,27 +7,24 @@ public class Message {
 
     private int statusCode;
 
-    private List<String> messages;
+    private String message;
 
 
     public Message(String message) {
-        this(200, Arrays.asList(message));
-    }
-
-    public Message(List<String> message) {
         this(200, message);
     }
 
-    public Message(int statusCode, List<String> messages) {
+    public Message(int statusCode, String message) {
         this.statusCode = statusCode;
-        this.messages = messages;
+        this.message = message;
     }
+
 
     public int getStatusCode() {
         return statusCode;
     }
 
-    public List<String> getMessages() {
-        return messages;
+    public String getMessage() {
+        return message;
     }
 }

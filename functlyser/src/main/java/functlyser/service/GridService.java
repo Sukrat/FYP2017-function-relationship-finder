@@ -46,8 +46,8 @@ public class GridService extends BaseSearchService {
             throw new ApiException("No data found in the database!");
         }
         int startIndex = 1;
-        int endIndex = any.getColumns().size();
-        int numParameterColumns = any.getColumns().size() - 1;
+        int endIndex = any.getRawColumns().size();
+        int numParameterColumns = any.getRawColumns().size() - 1;
 
         List<Double> paramTolerances = new ArrayList<>(tolerances);
         if (paramTolerances.size() == 1) {
@@ -129,9 +129,9 @@ public class GridService extends BaseSearchService {
         bindVar.put("tolerance", fixTolerance(tolerance));
         ArangoCursor<Data> datas = arangoOperation.query(builder.toString(), bindVar, Data.class);
 
-        Pair<String[], CellProcessor[]> params = getArgumentsForCsv(any.getColumns().size());
+        Pair<String[], CellProcessor[]> params = getArgumentsForCsv(any.getRawColumns().size());
         return csvService.convert(datas, false, params.getKey(), params.getValue(), (elem) -> {
-            return elem.getColumns()
+            return elem.getRawColumns()
                     .entrySet()
                     .stream()
                     .collect(Collectors.toMap(m -> m.getKey(), m -> m.getValue()));
@@ -155,9 +155,9 @@ public class GridService extends BaseSearchService {
             return analyseAll(any);
         }
 
-        if (column < 0 || column >= any.getColumns().size()) {
+        if (column < 0 || column >= any.getRawColumns().size()) {
             throw new ApiException(format("Column number doesnot exist! (Expected: < %d and > 0 and got: )",
-                    any.getColumns().size(), column));
+                    any.getRawColumns().size(), column));
         }
 
         ArangoCursor<Regression> regressions = analyseColumnByColNos(column);
@@ -184,7 +184,7 @@ public class GridService extends BaseSearchService {
 
     private Resource analyseAll(Data sample) {
         List<Integer> colNos = new ArrayList<>();
-        for (int i = 1; i < sample.getColumns().size(); i++) {
+        for (int i = 1; i < sample.getRawColumns().size(); i++) {
             colNos.add(i);
         }
 

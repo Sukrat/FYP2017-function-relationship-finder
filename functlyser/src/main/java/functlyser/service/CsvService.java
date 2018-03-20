@@ -1,6 +1,5 @@
 package functlyser.service;
 
-import functlyser.exception.ApiException;
 import javafx.util.Pair;
 import org.springframework.core.io.ByteArrayResource;
 import org.springframework.core.io.Resource;
@@ -8,15 +7,16 @@ import org.springframework.stereotype.Component;
 import org.supercsv.cellprocessor.ift.CellProcessor;
 import org.supercsv.exception.SuperCsvConstraintViolationException;
 import org.supercsv.exception.SuperCsvException;
-import org.supercsv.io.*;
+import org.supercsv.io.CsvMapReader;
+import org.supercsv.io.CsvMapWriter;
+import org.supercsv.io.ICsvMapReader;
+import org.supercsv.io.ICsvMapWriter;
 import org.supercsv.prefs.CsvPreference;
 import org.supercsv.util.Util;
 
 import java.io.*;
 import java.util.*;
 import java.util.function.Function;
-
-import static java.lang.String.format;
 
 @Component
 public class CsvService {
@@ -37,7 +37,7 @@ public class CsvService {
 
             String[] heading = mapReader.getHeader(true);
             if (heading == null) {
-                throw new ApiException("No records found!");
+                throw new ServiceException("No records found!");
             }
             Pair<String[], CellProcessor[]> params = headingPeeker.apply(heading);
 
@@ -58,11 +58,11 @@ public class CsvService {
                 list.add(converter.apply(map)); // adding to the list
             }
         } catch (IOException e) {
-            throw new ApiException("File could not be loaded! " + e.getMessage());
+            throw new ServiceException("File could not be loaded! " + e.getMessage());
         } catch (SuperCsvConstraintViolationException e) {
-            throw new ApiException(e.getMessage());
+            throw new ServiceException(e.getMessage());
         } catch (SuperCsvException e) {
-            throw new ApiException(e.getMessage());
+            throw new ServiceException(e.getMessage());
         } finally {
             if (mapReader != null) {
                 try {
@@ -93,11 +93,11 @@ public class CsvService {
                 mapWriter.write(row, header, processors);
             }
         } catch (IOException e) {
-            throw new ApiException("Writing on file failed! " + e.getMessage());
+            throw new ServiceException("Writing on file failed! " + e.getMessage());
         } catch (SuperCsvConstraintViolationException e) {
-            throw new ApiException(e.getMessage());
+            throw new ServiceException(e.getMessage());
         } catch (SuperCsvException e) {
-            throw new ApiException(e.getMessage());
+            throw new ServiceException(e.getMessage());
         } finally {
             if (mapWriter != null) {
                 try {

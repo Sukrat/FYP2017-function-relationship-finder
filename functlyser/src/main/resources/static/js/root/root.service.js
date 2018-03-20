@@ -18,20 +18,20 @@
             return vm.loadingSubject.subscribe({next: onNext});
         }
 
-        function error(errors) {
+        function error(error) {
             vm.loading(false);
             _.forEach(vm.messageSubject.observers, function (observer) {
                 observer.next({
-                    error: errors
+                    error: error
                 });
             });
         }
 
-        function success(messages) {
+        function success(message) {
             vm.loading(false);
             _.forEach(vm.messageSubject.observers, function (observer) {
                 observer.next({
-                    success: messages
+                    success: message
                 });
             });
         }

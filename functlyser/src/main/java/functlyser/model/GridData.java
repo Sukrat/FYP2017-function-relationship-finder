@@ -1,8 +1,12 @@
 package functlyser.model;
 
+import com.arangodb.entity.DocumentEntity;
+import com.arangodb.springframework.annotation.Document;
+
 import java.util.List;
 
-public class GridData extends Entity {
+@Document
+public class GridData extends DocumentEntity {
 
     private List<Long> boxIndex;
 

@@ -2,44 +2,49 @@
     var app = angular.module('app');
     app.component('fileUploader', {
         templateUrl: './js/file-uploader/file-uploader.html',
-        controller: ['FileUploaderService', 'RootService',
-            function (FileUploaderService, RootService) {
+        controller: ['RootService', '$http', 'ErrorMessageHandler', 'Upload',
+            function (RootService, $http, ErrorMessageHandler, Upload) {
                 var vm = this;
                 vm.upload = upload;
+                vm.listFileNames = listFileNames;
                 vm.deleteFile = deleteFile;
-                vm.list = list;
-                list();
+                vm.normalize = normalize;
+                vm.unNormalize = unNormalize;
 
-                vm.percentage = 0;
                 vm.data = [];
 
+                listFileNames();
+
                 function upload() {
-                    RootService.loading(true);
                     var file = document.getElementById('fileInput').files[0];
                     if (file == undefined) {
-                        RootService.error(['Please select a file to be uploaded!']);
+                        RootService.error('Please select a file to be uploaded!');
                         return;
                     }
-
-                    FileUploaderService.uploadFile(file)
-                        .then((data) => {
-                            RootService.success(data.messages);
-                            list();
-                        }, (error) => {
-                            RootService.error(error);
-                        }, (progressPercentage) => {
-                            vm.percentage = progressPercentage
-                        });
+                    RootService.loading(true);
+                    Upload.upload({
+                        url: '/data/upload',
+                        file: file
+                    }).then(function (response) {
+                        RootService.success(response.data.message);
+                        vm.listFileNames();
+                    }, function (error) {
+                        console.error(error);
+                        RootService.error(ErrorMessageHandler.getError(error.data));
+                    }, function (notify) {
+                        vm.percentage = parseInt(100.0 * notify.loaded / notify.total);
+                    });
                 }
 
-                function list() {
+                function listFileNames() {
                     RootService.loading(true);
-                    FileUploaderService.getFileNames()
-                        .then((data) => {
+                    $http.get("/data/filenames")
+                        .then(function (response) {
+                            vm.data = response.data;
                             RootService.loading(false);
-                            vm.data = data;
-                        }).catch((error) => {
-                        RootService.error(error);
+                        }).catch(function (error) {
+                        console.error(error);
+                        RootService.error(ErrorMessageHandler.getError(error.data));
                     });
                 }
 
@@ -48,12 +53,37 @@
                         return;
                     }
                     RootService.loading(true);
-                    FileUploaderService.deleteFile(filename)
-                        .then((data) => {
-                            RootService.success(data.messages);
-                            list();
+                    $http.delete('/data/delete?fileName=' + filename)
+                        .then((response) => {
+                            RootService.success(response.data.message);
+                            vm.listFileNames();
                         }).catch((error) => {
-                        RootService.error(error);
+                        console.error(error);
+                        RootService.error(ErrorMessageHandler.getError(error.data));
+                    })
+                }
+
+                function normalize() {
+                    RootService.loading(true);
+                    $http.post('/data/normalize')
+                        .then((response) => {
+                            RootService.success(response.data.message);
+                            vm.listFileNames();
+                        }).catch((error) => {
+                        console.error(error);
+                        RootService.error(ErrorMessageHandler.getError(error.data));
+                    })
+                }
+
+                function unNormalize() {
+                    RootService.loading(true);
+                    $http.post('/data/normalize/undo')
+                        .then((response) => {
+                            RootService.success(response.data.message);
+                            vm.listFileNames();
+                        }).catch((error) => {
+                        console.error(error);
+                        RootService.error(ErrorMessageHandler.getError(error.data));
                     })
                 }
             }]

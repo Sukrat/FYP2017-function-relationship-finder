@@ -2,12 +2,10 @@
     var app = angular.module('app');
     app.component('gridAnalysis', {
         templateUrl: './js/grid-analysis/grid-analysis.html',
-        controller: ['GridAnalysisService', 'RootService', 'FileSaver',
-            function (GridAnalysisService, RootService, FileSaver) {
+        controller: ['RootService', 'FileSaver', '$http', '_', 'ErrorMessageHandler',
+            function (RootService, FileSaver, $http, _, ErrorMessageHandler) {
                 var vm = this;
                 vm.cluster = cluster;
-                vm.checkFunction = checkFunction;
-                vm.analyseColumn = analyseColumn;
 
                 vm.tolerances = "";
                 vm.outputTolerance = "";
@@ -15,39 +13,48 @@
 
                 function cluster(tolerances) {
                     RootService.loading(true);
-
-                    GridAnalysisService.cluster(tolerances)
-                        .then((data) => {
-                            RootService.success(data.messages);
-                        }).catch((error) => {
-                        RootService.error(error)
-                    })
+                    let tolArr = _.split(tolerances, ',');
+                    tolArr = _.map(tolArr, _.toNumber);
+                    if (_.findIndex(tolArr, _.isNaN) >= 0) {
+                        RootService.error("Please enter valid integers!");
+                    } else if (_.size(_.trim(tolerances)) == 0) {
+                        RootService.error("Please enter tolerance!");
+                    } else {
+                        $http.post('/analysis/grid/cluster', tolArr)
+                            .then((response) => {
+                                RootService.success(response.data.message);
+                            })
+                            .catch((error) => {
+                                console.error(error)
+                                RootService.error(ErrorMessageHandler.getError(error.data));
+                            })
+                    }
                 }
 
-                function checkFunction(outputTolerance) {
-                    RootService.loading(true);
-                    GridAnalysisService.checkFunction(outputTolerance)
-                        .then((response) => {
-                            FileSaver.saveResponseAsFile(response);
-                            RootService.success(["File successfully downloading!"]);
-                        })
-                        .catch((error) => {
-                            RootService.error(error)
-                        })
-                }
-
-
-                function analyseColumn(columnNo) {
-                    RootService.loading(true);
-                    return GridAnalysisService.analyseColumn(columnNo)
-                        .then((response) => {
-                            FileSaver.saveResponseAsFile(response);
-                            RootService.success(["File successfully downloading!"]);
-                        })
-                        .catch((error) => {
-                            RootService.error(error)
-                        })
-                }
+                // function checkFunction(outputTolerance) {
+                //     RootService.loading(true);
+                //     GridAnalysisService.checkFunction(outputTolerance)
+                //         .then((response) => {
+                //             FileSaver.saveResponseAsFile(response);
+                //             RootService.success(["File successfully downloading!"]);
+                //         })
+                //         .catch((error) => {
+                //             RootService.error(error)
+                //         })
+                // }
+                //
+                //
+                // function analyseColumn(columnNo) {
+                //     RootService.loading(true);
+                //     return GridAnalysisService.analyseColumn(columnNo)
+                //         .then((response) => {
+                //             FileSaver.saveResponseAsFile(response);
+                //             RootService.success(["File successfully downloading!"]);
+                //         })
+                //         .catch((error) => {
+                //             RootService.error(error)
+                //         })
+                // }
             }]
     })
 })();

@@ -10,6 +10,7 @@ buildscript {
 apply plugin: 'java'
 apply plugin: 'idea'
 apply plugin: 'org.springframework.boot'
+apply plugin: 'io.spring.dependency-management'
 
 jar {
     baseName = 'functlyser'
@@ -18,6 +19,9 @@ jar {
 
 repositories {
     mavenCentral()
+    maven {
+        url "https://oss.sonatype.org/content/groups/staging"
+    }
 }
 
 sourceCompatibility = 1.8
@@ -33,12 +37,15 @@ idea {
 dependencies {
     compile group: 'org.springframework.boot', name: 'spring-boot-starter-web', version: '1.5.10.RELEASE'
     compile group: 'org.springframework.boot', name: 'spring-boot-devtools', version: '1.5.10.RELEASE'
-    compile group: 'net.sf.supercsv', name: 'super-csv', version: '2.4.0'
-    compile group: 'com.arangodb', name: 'arangodb-java-driver', version: '4.3.3'
+    compile group: 'org.springframework.boot', name: 'spring-boot-starter-websocket', version: '1.5.10.RELEASE'
     compile group: 'org.springframework.boot', name: 'spring-boot-configuration-processor', version: '1.5.10.RELEASE'
+    compile group: 'net.sf.supercsv', name: 'super-csv', version: '2.4.0'
+    compile group: 'com.arangodb', name: 'arangodb-spring-data', version: '1.0.2-SNAPSHOT'
 
 //    webjars
     compile group: 'org.webjars', name: 'webjars-locator', version: '0.33'
+    compile("org.webjars:sockjs-client:1.0.2")
+    compile("org.webjars:stomp-websocket:2.3.3")
     compile 'org.webjars:jquery:3.3.1-1'
     compile 'org.webjars:bootstrap:4.0.0-2'
     compile 'org.webjars:popper.js:1.12.9-1'

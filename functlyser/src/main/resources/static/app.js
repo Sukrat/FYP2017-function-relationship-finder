@@ -25,15 +25,19 @@
     app.constant('ErrorMessageHandler', new (function () {
         var vm = this;
         vm.getError = function (data) {
-            if (data.messages) {
-                return data.messages;
-            } else if (data.message) {
-                return [data.message];
+            if (data.message) {
+                return data.message;
             } else {
-                return [data];
+                return data;
             }
         }
     })());
+
+    app.constant('StompClient', (function () {
+        var socket = new SockJS('/functlyser-websocket');
+        return Stomp.over(socket);
+    })());
+
 
     app.config(($locationProvider, $routeProvider) => {
         $locationProvider.hashPrefix('!');

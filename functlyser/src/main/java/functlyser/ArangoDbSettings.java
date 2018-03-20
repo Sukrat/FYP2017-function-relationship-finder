@@ -5,26 +5,26 @@ import org.springframework.context.annotation.Configuration;
 
 @Configuration
 @ConfigurationProperties(prefix = "arangodb")
-public class ArangoDbConfig {
-
-    private String dbname = "test";
+public class ArangoDbSettings {
 
     private String host = "127.0.0.1";
 
     private int port = 8529;
 
-    private String username = "root";
+    private String user = "root";
 
-    private String password;
+    private String password = null;
 
-    private int noOfConnections = 8;
+    private int maxConnections = 8;
 
-    public String getDbname() {
-        return dbname;
+    private String databaseName = "test";
+
+    public String getDatabaseName() {
+        return databaseName;
     }
 
-    public void setDbname(String dbname) {
-        this.dbname = dbname;
+    public void setDatabaseName(String databaseName) {
+        this.databaseName = databaseName;
     }
 
     public String getHost() {
@@ -43,12 +43,12 @@ public class ArangoDbConfig {
         this.port = port;
     }
 
-    public String getUsername() {
-        return username;
+    public String getUser() {
+        return user;
     }
 
-    public void setUsername(String username) {
-        this.username = username;
+    public void setUser(String user) {
+        this.user = user;
     }
 
     public String getPassword() {
@@ -59,11 +59,11 @@ public class ArangoDbConfig {
         this.password = password;
     }
 
-    public int getNoOfConnections() {
-        return noOfConnections;
+    public int getMaxConnections() {
+        return maxConnections;
     }
 
-    public void setNoOfConnections(int noOfConnections) {
-        this.noOfConnections = noOfConnections;
+    public void setMaxConnections(int maxConnections) {
+        this.maxConnections = maxConnections;
     }
 }
