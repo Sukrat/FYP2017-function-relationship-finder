@@ -8,12 +8,14 @@
         <h6>Functional Check</h6>
         <form>
             <div class="form-group">
+                <label>Radius</label>
                 <input type="text" ng-model="$ctrl.radius" class="form-control"
                        placeholder="Enter radius"
                 />
                 <br>
+                <label>Output tolerance</label>
                 <input type="text" ng-model="$ctrl.outputTolerance" class="form-control"
-                       placeholder="Enter columnNo for the output column"
+                       placeholder="Enter output tolerance"
                 />
             </div>
             <button class="btn btn-secondary" type="button"
@@ -28,10 +30,12 @@
     <div class="col">
         <h6>Analyse columns</h6>
         <form>
-            <div class="form-group"><input type="text" ng-model="$ctrl.analyseRadius" class="form-control"
-                                           placeholder="Enter radius"
-            />
+            <div class="form-group">
+                <label>Radius</label>
+                <input type="text" ng-model="$ctrl.analyseRadius" class="form-control"
+                                           placeholder="Enter radius"/>
                 <br>
+                <label>Column no</label>
                 <input type="text" ng-model="$ctrl.columnNo" class="form-control"
                        placeholder="Enter the column nos. or -1 for all columns"/>
             </div>

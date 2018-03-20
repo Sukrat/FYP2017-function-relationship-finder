@@ -55,7 +55,7 @@ public class DataController {
         webSocketProgress.update("Uploading of the file '%s' has been added to the queue!", file.getOriginalFilename());
         Long result = dataUploadCommand.execute(webSocketProgress, param);
 
-        return ResponseEntity.ok().body(new Message(result + "records added successfully!"));
+        return ResponseEntity.ok().body(new Message(result + " records added successfully!"));
     }
 
     @RequestMapping(value = "/filenames", method = RequestMethod.GET)

@@ -3,6 +3,7 @@
         <h6>Grid Clustering</h6>
         <form>
             <div class="form-group">
+                <label>Tolerances</label>
                 <textarea ng-model="$ctrl.tolerances" class="form-control"
                           placeholder="Enter tolerances for the parameters (comma separated) or one for all"></textarea>
             </div>
@@ -17,8 +18,9 @@
         <h6>Functional Check</h6>
         <form>
             <div class="form-group">
+                <label>Output Tolerance</label>
                 <input type="text" ng-model="$ctrl.outputTolerance" class="form-control"
-                       placeholder="Enter columnNo for the output column"
+                       placeholder="Enter tolerance for the output column"
                 />
             </div>
             <button class="btn btn-secondary" type="button" ng-click="$ctrl.checkFunction($ctrl.outputTolerance)">Check is
@@ -33,6 +35,7 @@
         <h6>Analyse columns</h6>
         <form>
             <div class="form-group">
+                <label>Column Nos</label>
                 <input type="text" ng-model="$ctrl.columnNo" class="form-control"
                        placeholder="Enter the column nos. or -1 for all columns"/>
             </div>

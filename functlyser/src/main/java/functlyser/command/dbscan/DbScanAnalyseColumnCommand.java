@@ -157,10 +157,10 @@ public class DbScanAnalyseColumnCommand implements Command<DbScanAnalyseColumnCo
                 + "LET dist = SQRT( %2$s )\n"
                 + "FILTER dist <= @radius\n"
                 + "COLLECT AGGREGATE\n"
-                + format("sX = SUM(ng.columns.%s),\n", Data.colName(column))
-                + format("sY = SUM(ng.columns.%s),\n", Data.colName(0)) + //output column
-                format("sXX = SUM(POW(ng.columns.%s, 2)),\n", Data.colName(column))
-                + format("sXY = SUM(ng.columns.%s * ng.columns.%s),\n", Data.colName(column), Data.colName(0))
+                + format("sX = SUM(ng.workColumns.%s),\n", Data.colName(column))
+                + format("sY = SUM(ng.workColumns.%s),\n", Data.colName(0)) + //output column
+                format("sXX = SUM(POW(ng.workColumns.%s, 2)),\n", Data.colName(column))
+                + format("sXY = SUM(ng.workColumns.%s * ng.workColumns.%s),\n", Data.colName(column), Data.colName(0))
                 + "n = LENGTH(ng)\n"
                 + "return { sX: sX, sY: sY, sXX: sXX, sXY: sXY, n: n })[0]\n"
                 + "FILTER v.n > 1\n"
