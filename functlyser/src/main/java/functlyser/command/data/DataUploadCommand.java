@@ -1,5 +1,6 @@
 package functlyser.command.data;
 
+import com.arangodb.springframework.core.ArangoOperations;
 import functlyser.command.Command;
 import functlyser.command.CommandException;
 import functlyser.command.CommandProgess;
@@ -16,6 +17,7 @@ import org.supercsv.cellprocessor.ift.CellProcessor;
 import java.io.InputStream;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
@@ -25,6 +27,8 @@ import static java.lang.String.format;
 public class DataUploadCommand implements Command<DataUploadCommand.Param, Long> {
 
     private DataRepository dataRepository;
+
+    private ArangoOperations operations;
 
     private CsvService csvService;
 
@@ -77,7 +81,13 @@ public class DataUploadCommand implements Command<DataUploadCommand.Param, Long>
                     }, converter);
         }
         progress.update(1, "'%s' parsed successfully!", fileName);
-        dataRepository.save(datas);
+        progress.setTotalWork(datas.size(), "Entering data into database!");
+        AtomicInteger done = new AtomicInteger(0);
+        datas.parallelStream()
+                .forEach(m -> {
+                    operations.insert(m);
+                    progress.update(done.incrementAndGet());
+                });
         progress.update(2, "'%s' saved successfully!", fileName);
         return datas.stream().count();
     }

@@ -19,6 +19,11 @@ ax.set_xlabel('Parameter 1')
 ax.set_ylabel('Parameter 2')
 ax.set_zlabel('Output')
 
+
+ax.set_xlim([0, 10])
+ax.set_ylim([0, 10])
+ax.set_zlim([0, 10])
+
 ax.grid(True)
 
 plt.show()
