@@ -1,0 +1,36 @@
+\textbf{General Information:}
+
+A energy model representing a relationship between dynamic energy consumption and performance events (PMCs) is constructed experimentally and the experimental dataset has the following format typically (k events, n records):
+
+\(E_1,\ x_{11},\ x_{12},\ x_{13} \ldots x_{1k}\)\\
+\(E_1,\ x_{21},\ x_{22},\ x_{23} \ldots x_{2k}\)\\
+\ldots \\
+\(E_n,\ x_{n1},\ x_{n2},\ x_{n3} \ldots x_{nk}\)
+
+where \(E_i\) is the experimentally obtained dynamic energy consumption of i-th record and xij are the experimentally obtained performance events (PMCs).
+
+Given such an experimental dataset as an input, the goal is to determine/understand the functional relationship between the dynamic energy consumption and performance events (PMCs).
+
+Two real-life datasets will be provided to the student.\\
+\textbf{Core:}
+
+The goal is to write automated software that will detect the following:
+\begin{enumerate}
+    \item Existence of records where the dynamic energy consumption is the same (within an input tolerance) but all PMCs (with the exception of one) have same values. Then the relationship between energy and the one PMC is visualized to see the nature of the functional relationship.
+    \item Having accomplished step (1), understand the monotonicity of the relationship between dynamic energy consumption and performance events (PMCs).
+    \item Existence of records where the dynamic energy consumptions are different (within an input tolerance) but all PMCs have same values (within an input tolerance) suggesting the non-existence of a functional relationship.
+\end{enumerate}
+
+The software must be written using any one mainstream language but preferably one of the following:
+C, C++, Python
+
+The software must be well documented and tested.
+
+\textbf{Advanced:}
+
+Given an experimental energy model dataset as an input, the goal is to write software that performs intelligent but computationally feasible simulations where combinations of inputs are generated to study the existence/non-existence of a functional relationship between dynamic energy consumption and PMCs.
+
+The software must be written using any one mainstream language but preferably one of the following:
+C, C++, Python.
+
+The software must be well documented and tested.

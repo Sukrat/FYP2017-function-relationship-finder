@@ -1,0 +1,61 @@
+\documentclass[]{UCD_CS_FYP_Report}
+	\usepackage{graphicx}
+	\usepackage{hyperref}
+	\usepackage{cite}
+	\usepackage{float}
+	
+	%%%%%%%%%%%%%%%%%%%%%%
+	%%% Input project details
+
+	\def\studentname{Sukrat Kashyap} % Edit with your name
+	\def\projecttitle{Automated Software to Understand Functional Relationship Between Dynamic Energy and Performance Events} % Edit with you project title
+	\def\supervisorname{Ravindranath Reddy Manumachu}
+
+\begin{document}
+\maketitle
+
+%%%%%%%%%%%%%%%%%%%%%%
+%%% Your Project Specification
+
+\chapter*{Project Specification}
+\input{01_project_specification}
+
+%%%%%%%%%%%%%%%%%%%%%%
+%%% Your Abstract here
+
+\begin{abstract}
+	\input{02_abstract}	
+\end{abstract}
+\newpage
+
+%%%%%%%%%%%%%%%%%%%%%%
+%%% Acknowledgments
+
+\chapter*{Acknowledgments}
+\input{03_acknowledgements}
+
+%%%%%%%%%%%%%%%%%%%%%%
+%%% Table of Content
+
+\tableofcontents\pdfbookmark[0]{Table of Contents}{toc}\newpage
+\newpage
+
+%%%%%%%%%%%%%%%%%%%%%%
+%%% Introduction
+
+\chapter{Introduction}
+\input{04_introduction}
+
+%%%%%%%%%%%%%%%%%%%%%%
+%%% Background Research
+
+\chapter{Background Research}
+\input{05_background_research}
+
+%%%% ADD YOUR BIBLIOGRAPHY HERE
+\newpage
+
+\bibliography{references}
+\bibliographystyle{plain}\label{endpage}
+
+\end{document}

@@ -243,6 +243,6 @@
         "*.el": true,
         "*-tags.tex": true,
         "*.sta": true,
-        "Interim_report_sukrat_kashyap.pdf": true
+        "Final_report_sukrat_kashyap.pdf": true        
     }
 }
