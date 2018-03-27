@@ -12,24 +12,23 @@ import java.util.Properties;
 
 public abstract class BaseTest {
 
-    protected ArangoDB arangoDB;
+    public static String dbName = "test";
+    public static String propertiesFileName = "test.properties";
 
+    protected static ArangoDB arangoDB;
     protected ArangoDatabase database;
-
-    protected static Properties properties = new Properties();
 
     @BeforeClass
     public static void beforeClass() throws Exception {
         InputStream input = null;
         try {
-            String filename = "test.properties";
-            input = BaseTest.class.getClassLoader().getResourceAsStream(filename);
+            input = BaseTest.class.getClassLoader().getResourceAsStream(propertiesFileName);
             if (input == null) {
                 throw new Exception("Could not load properties file for testing.");
             }
-
-            //load a properties file from class path, inside static method
-            properties.load(input);
+            arangoDB = new ArangoDB.Builder()
+                    .loadProperties(input)
+                    .build();
         } finally {
             if (input != null) {
                 try {
@@ -43,12 +42,6 @@ public abstract class BaseTest {
 
     @Before
     public void before() {
-        ArangoDB.Builder builder = new ArangoDB.Builder();
-        builder.user(properties.getProperty("user", "root"));
-        builder.password(properties.getProperty("password", null));
-        arangoDB = builder.build();
-
-        String dbName = properties.getProperty("database", "test");
         database = arangoDB.db(dbName);
         if (database.exists()) {
             database.drop();
