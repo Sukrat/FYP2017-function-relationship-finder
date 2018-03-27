@@ -1,15 +1,16 @@
 package webapp.controller;
 
+import core.command.data.*;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.core.io.Resource;
+import org.springframework.core.io.ByteArrayResource;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
-import webapp.command.data.*;
 import webapp.controller.messages.Message;
 import webapp.service.WebSocketProgressService;
 
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.util.Collection;
 
@@ -37,7 +38,10 @@ public class DataController {
     public DataController(DataUploadCommand dataUploadCommand,
                           WebSocketProgressService webSocketProgressService,
                           ListFileNamesCommand listFileNamesCommand,
-                          DeleteDataCommand dataCommand, DataGetCommand dataGetCommand, NormalizeCommand normalizeCommand, UnNormalizeCommand unNormalizeCommand) {
+                          DeleteDataCommand dataCommand,
+                          DataGetCommand dataGetCommand,
+                          NormalizeCommand normalizeCommand,
+                          UnNormalizeCommand unNormalizeCommand) {
         this.dataUploadCommand = dataUploadCommand;
         this.webSocketProgressService = webSocketProgressService;
         this.listFileNamesCommand = listFileNamesCommand;
@@ -60,7 +64,10 @@ public class DataController {
 
     @RequestMapping(value = "/filenames", method = RequestMethod.GET)
     public ResponseEntity filenames() {
-        Collection<String> execute = listFileNamesCommand.execute(null);
+        WebSocketProgress webSocketProgress = webSocketProgressService.create(REPLY);
+
+        Collection<String> execute = listFileNamesCommand.execute(webSocketProgress, null);
+
         return ResponseEntity.ok().body(execute);
     }
 
@@ -75,9 +82,13 @@ public class DataController {
 
     @RequestMapping(value = "/download", method = RequestMethod.GET)
     public ResponseEntity download(@RequestParam("fileName") String fileName) {
-        Resource result = dataGetCommand.execute(fileName);
+        WebSocketProgress webSocketProgress = webSocketProgressService.create(REPLY);
+
+        ByteArrayOutputStream file = dataGetCommand.execute(webSocketProgress, fileName);
+
         return ResponseEntity.ok().header(HttpHeaders.CONTENT_DISPOSITION,
-                "attachment;filename=\"" + fileName + "\"").body(result);
+                "attachment;filename=\"" + fileName + "\"")
+                .body(new ByteArrayResource(file.toByteArray()));
     }
 
     @RequestMapping(value = "/normalize", method = RequestMethod.POST)

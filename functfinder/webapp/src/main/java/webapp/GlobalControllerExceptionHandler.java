@@ -1,12 +1,12 @@
 package webapp;
 
 
+import core.command.CommandException;
+import core.service.ServiceException;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
-import webapp.command.CommandException;
 import webapp.controller.messages.ErrorMessage;
-import webapp.service.ServiceException;
 
 import javax.servlet.http.HttpServletRequest;
 

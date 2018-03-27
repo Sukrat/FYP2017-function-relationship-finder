@@ -1,19 +1,19 @@
 package webapp.controller;
 
+import core.command.dbscan.DbScanAnalyseColumnCommand;
+import core.command.dbscan.DbScanFunctionalCheckCommand;
+import core.command.grid.AnalyseGridDataColumnCommand;
+import core.command.grid.GridFunctionCheckCommand;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.ByteArrayResource;
 import org.springframework.core.io.Resource;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import webapp.command.dbscan.DbScanAnalyseColumnCommand;
-import webapp.command.dbscan.DbScanFunctionalCheckCommand;
-import webapp.command.grid.AnalyseGridDataColumnCommand;
-import webapp.command.grid.ClusterDataCommand;
-import webapp.command.grid.GridFunctionCheckCommand;
-import webapp.controller.messages.Message;
 import webapp.service.WebSocketProgressService;
 
-import java.util.ArrayList;
+import java.io.ByteArrayOutputStream;
+import java.util.Arrays;
 
 import static java.lang.String.format;
 
@@ -25,8 +25,6 @@ public class AnalysisController {
 
     private WebSocketProgressService webSocketProgressService;
 
-    private ClusterDataCommand clusterDataCommand;
-
     private GridFunctionCheckCommand gridFunctionCheckCommand;
 
     private AnalyseGridDataColumnCommand analyseGridDataColumnCommand;
@@ -36,21 +34,16 @@ public class AnalysisController {
     private DbScanAnalyseColumnCommand dbScanAnalyseColumnCommand;
 
     @Autowired
-    public AnalysisController(WebSocketProgressService webSocketProgressService, ClusterDataCommand clusterDataCommand, GridFunctionCheckCommand gridFunctionCheckCommand, AnalyseGridDataColumnCommand analyseGridDataColumnCommand, DbScanFunctionalCheckCommand dbScanFunctionalCheckCommand, DbScanAnalyseColumnCommand dbScanAnalyseColumnCommand) {
+    public AnalysisController(WebSocketProgressService webSocketProgressService,
+                              GridFunctionCheckCommand gridFunctionCheckCommand,
+                              AnalyseGridDataColumnCommand analyseGridDataColumnCommand,
+                              DbScanFunctionalCheckCommand dbScanFunctionalCheckCommand,
+                              DbScanAnalyseColumnCommand dbScanAnalyseColumnCommand) {
         this.webSocketProgressService = webSocketProgressService;
-        this.clusterDataCommand = clusterDataCommand;
         this.gridFunctionCheckCommand = gridFunctionCheckCommand;
         this.analyseGridDataColumnCommand = analyseGridDataColumnCommand;
         this.dbScanFunctionalCheckCommand = dbScanFunctionalCheckCommand;
         this.dbScanAnalyseColumnCommand = dbScanAnalyseColumnCommand;
-    }
-
-
-    @RequestMapping(value = "/grid/cluster", method = RequestMethod.POST)
-    public ResponseEntity gridCluster(@RequestBody ArrayList<Double> tolerances) {
-        WebSocketProgress webSocketProgress = webSocketProgressService.create(REPLY);
-        long count = clusterDataCommand.execute(webSocketProgress, tolerances);
-        return ResponseEntity.ok(new Message(format("%d groups created!", count)));
     }
 
     @RequestMapping(value = "/grid/functioncheck", method = RequestMethod.POST)
@@ -58,9 +51,13 @@ public class AnalysisController {
         String filename = format("functioncheck-(%f).csv", tolerance);
 
         WebSocketProgress webSocketProgress = webSocketProgressService.create(REPLY);
-        Resource file = gridFunctionCheckCommand.execute(webSocketProgress, tolerance);
+
+        ByteArrayOutputStream file = gridFunctionCheckCommand.execute(webSocketProgress,
+                new GridFunctionCheckCommand.Param(tolerance, Arrays.asList(1555555555.0)));
+
         return ResponseEntity.ok().header(HttpHeaders.CONTENT_DISPOSITION,
-                "attachment;filename=\"" + filename + "\"").body(file);
+                "attachment;filename=\"" + filename + "\"")
+                .body(new ByteArrayResource(file.toByteArray()));
     }
 
     @RequestMapping(value = "/grid/column", method = RequestMethod.POST)
@@ -68,9 +65,13 @@ public class AnalysisController {
         String filename = format("analysedColNo-(%d).csv", columnNo);
 
         WebSocketProgress webSocketProgress = webSocketProgressService.create(REPLY);
-        Resource file = analyseGridDataColumnCommand.execute(webSocketProgress, columnNo);
+
+        ByteArrayOutputStream file = analyseGridDataColumnCommand.execute(webSocketProgress,
+                new AnalyseGridDataColumnCommand.Param(columnNo, Arrays.asList(1555555555.0)));
+
         return ResponseEntity.ok().header(HttpHeaders.CONTENT_DISPOSITION,
-                "attachment;filename=\"" + filename + "\"").body(file);
+                "attachment;filename=\"" + filename + "\"")
+                .body(new ByteArrayResource(file.toByteArray()));
     }
 
     @RequestMapping(value = "/dbscan/functioncheck", method = RequestMethod.POST)
@@ -79,10 +80,13 @@ public class AnalysisController {
         String filename = format("scan-functioncheck-(%f)-(%f).csv", radius, outputTolerance);
 
         WebSocketProgress webSocketProgress = webSocketProgressService.create(REPLY);
-        Resource file = dbScanFunctionalCheckCommand.execute(webSocketProgress,
+
+        ByteArrayOutputStream file = dbScanFunctionalCheckCommand.execute(webSocketProgress,
                 new DbScanFunctionalCheckCommand.Param(radius, outputTolerance));
+
         return ResponseEntity.ok().header(HttpHeaders.CONTENT_DISPOSITION,
-                "attachment;filename=\"" + filename + "\"").body(file);
+                "attachment;filename=\"" + filename + "\"")
+                .body(new ByteArrayResource(file.toByteArray()));
     }
 
     @RequestMapping(value = "/dbscan/column", method = RequestMethod.POST)
@@ -91,9 +95,12 @@ public class AnalysisController {
         String filename = format("analysedColNo-(%f)-(%d).csv", radius, columnNo);
 
         WebSocketProgress webSocketProgress = webSocketProgressService.create(REPLY);
-        Resource file = dbScanAnalyseColumnCommand.execute(webSocketProgress,
+
+        ByteArrayOutputStream file = dbScanAnalyseColumnCommand.execute(webSocketProgress,
                 new DbScanAnalyseColumnCommand.Param(radius, columnNo));
+
         return ResponseEntity.ok().header(HttpHeaders.CONTENT_DISPOSITION,
-                "attachment;filename=\"" + filename + "\"").body(file);
+                "attachment;filename=\"" + filename + "\"")
+                .body(new ByteArrayResource(file.toByteArray()));
     }
 }

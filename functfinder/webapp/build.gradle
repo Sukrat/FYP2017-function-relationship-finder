@@ -34,8 +34,7 @@ dependencies {
     compile group: 'org.springframework.boot', name: 'spring-boot-devtools', version: '1.5.10.RELEASE'
     compile group: 'org.springframework.boot', name: 'spring-boot-starter-websocket', version: '1.5.10.RELEASE'
     compile group: 'org.springframework.boot', name: 'spring-boot-configuration-processor', version: '1.5.10.RELEASE'
-    compile group: 'net.sf.supercsv', name: 'super-csv', version: '2.4.0'
-    compile group: 'com.arangodb', name: 'arangodb-spring-data', version: '1.0.2-SNAPSHOT'
+    compile project(':core')
 
 //    webjars
     compile group: 'org.webjars', name: 'webjars-locator', version: '0.33'

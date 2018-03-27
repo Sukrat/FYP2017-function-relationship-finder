@@ -1,13 +1,13 @@
 package webapp.controller;
 
+import core.command.CommandProgess;
 import org.springframework.messaging.simp.SimpMessageSendingOperations;
-import webapp.command.CommandProgess;
 import webapp.controller.messages.WebSocketMessage;
 
 public class WebSocketProgress implements CommandProgess {
 
     private String id;
-    private int totalWork = 0;
+    private int outOf = 0;
     private int done = 0;
     private String message = "Process Started";
     private String topic;
@@ -22,59 +22,35 @@ public class WebSocketProgress implements CommandProgess {
     }
 
     @Override
-    public void setTotalWork(int totalWork) {
-        sendTotalWorkDone(totalWork, message);
-    }
-
-    @Override
-    public void setTotalWork(int totalWork, String message) {
-        sendTotalWorkDone(totalWork, message);
-    }
-
-    @Override
-    public void setTotalWork(int totalWork, String format, Object... args) {
-        sendTotalWorkDone(totalWork, String.format(format, args));
-    }
-
-    @Override
-    public void update(int done) {
-        sendUpdates(done, message);
+    public void update(int done, int outOf) {
+        send(done, outOf, message);
     }
 
     @Override
     public void update(String message) {
-        sendUpdates(done, message);
+        send(done, outOf, message);
     }
 
     @Override
     public void update(String format, Object... args) {
-        sendUpdates(done, String.format(format, args));
+        send(done, outOf, String.format(format, args));
     }
 
     @Override
-    public void update(int done, String message) {
-        sendUpdates(done, message);
+    public void update(int done, int outOf, String message) {
+        send(done, outOf, message);
     }
 
     @Override
-    public void update(int done, String format, Object... args) {
-        sendUpdates(done, String.format(format, args));
+    public void update(int done, int outOf, String format, Object... args) {
+        send(done, outOf, String.format(format, args));
     }
 
-    private void sendTotalWorkDone(int totalWork, String message) {
-        this.totalWork = totalWork;
-        this.message = message;
-        send();
-    }
-
-    private void sendUpdates(int done, String message) {
+    private void send(int done, int outOf, String message) {
         this.done = done;
+        this.outOf = outOf;
         this.message = message;
-        send();
-    }
-
-    private void send() {
         messageSendingOperations
-                .convertAndSend(topic, new WebSocketMessage(id, totalWork, done, message));
+                .convertAndSend(topic, new WebSocketMessage(id, outOf, done, message));
     }
 }
