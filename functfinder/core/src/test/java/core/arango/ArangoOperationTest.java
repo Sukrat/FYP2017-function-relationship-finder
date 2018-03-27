@@ -3,7 +3,7 @@ package core.arango;
 import com.arangodb.ArangoCollection;
 import com.arangodb.ArangoCursor;
 import com.arangodb.entity.IndexEntity;
-import core.BaseTest;
+import core.DbTest;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -11,10 +11,10 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.Set;
 
-import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.MatcherAssert.*;
 import static org.hamcrest.Matchers.*;
 
-public class ArangoOperationTest extends BaseTest {
+public class ArangoOperationTest extends DbTest {
 
     private Operations sut;
 

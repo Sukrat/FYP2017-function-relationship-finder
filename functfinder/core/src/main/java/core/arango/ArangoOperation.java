@@ -157,7 +157,7 @@ public class ArangoOperation implements Operations {
 
     @Override
     public <T extends Entity> String name(Class<T> type) {
-        return type.getSimpleName().toString().toLowerCase();
+        return type.getSimpleName();
     }
 
     private <T extends Entity> void updateFields(T object, DocumentEntity d) {

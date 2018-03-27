@@ -8,9 +8,8 @@ import org.junit.BeforeClass;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.Properties;
 
-public abstract class BaseTest {
+public abstract class DbTest {
 
     public static String dbName = "test";
     public static String propertiesFileName = "test.properties";
@@ -22,7 +21,7 @@ public abstract class BaseTest {
     public static void beforeClass() throws Exception {
         InputStream input = null;
         try {
-            input = BaseTest.class.getClassLoader().getResourceAsStream(propertiesFileName);
+            input = DbTest.class.getClassLoader().getResourceAsStream(propertiesFileName);
             if (input == null) {
                 throw new Exception("Could not load properties file for testing.");
             }
