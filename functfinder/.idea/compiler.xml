@@ -4,6 +4,8 @@
     <bytecodeTargetLevel>
       <module name="core_main" target="1.8" />
       <module name="core_test" target="1.8" />
+      <module name="webapp_main" target="1.8" />
+      <module name="webapp_test" target="1.8" />
     </bytecodeTargetLevel>
   </component>
 </project>
