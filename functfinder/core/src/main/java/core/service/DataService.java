@@ -9,6 +9,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import static java.lang.String.format;
+
 public class DataService {
 
     private Operations operations;
@@ -86,6 +88,10 @@ public class DataService {
             put("@col", collectionName());
         }}, entity);
         return result;
+    }
+
+    public void ensureSkipListIndex(Collection<String> fields) {
+        operations.ensureSkipListIndex(collectionName(), fields, null);
     }
 
     public String collectionName() {
