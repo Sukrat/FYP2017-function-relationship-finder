@@ -20,9 +20,15 @@
 
         function error(error) {
             vm.loading(false);
+            var errorMsg = "";
+            if (error && error.message) {
+                errorMsg = error.message;
+            } else {
+                errorMsg = error;
+            }
             _.forEach(vm.messageSubject.observers, function (observer) {
                 observer.next({
-                    error: error
+                    error: errorMsg
                 });
             });
         }

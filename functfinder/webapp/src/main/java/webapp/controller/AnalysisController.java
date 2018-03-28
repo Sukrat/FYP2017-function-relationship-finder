@@ -14,6 +14,7 @@ import webapp.service.WebSocketProgressService;
 
 import java.io.ByteArrayOutputStream;
 import java.util.Arrays;
+import java.util.List;
 
 import static java.lang.String.format;
 
@@ -47,13 +48,15 @@ public class AnalysisController {
     }
 
     @RequestMapping(value = "/grid/functioncheck", method = RequestMethod.POST)
-    public ResponseEntity<Resource> functionCheck(@RequestBody double tolerance) {
-        String filename = format("functioncheck-(%f).csv", tolerance);
+    public ResponseEntity<Resource> functionCheck(
+            @RequestParam("outputTolerance") double outputTolerance,
+            @RequestBody List<Double> tolerances) {
+        String filename = format("functioncheck-(%f).csv", outputTolerance);
 
         WebSocketProgress webSocketProgress = webSocketProgressService.create(REPLY);
 
         ByteArrayOutputStream file = gridFunctionCheckCommand.execute(webSocketProgress,
-                new GridFunctionCheckCommand.Param(tolerance, Arrays.asList(1555555555.0)));
+                new GridFunctionCheckCommand.Param(outputTolerance, tolerances));
 
         return ResponseEntity.ok().header(HttpHeaders.CONTENT_DISPOSITION,
                 "attachment;filename=\"" + filename + "\"")
@@ -61,13 +64,15 @@ public class AnalysisController {
     }
 
     @RequestMapping(value = "/grid/column", method = RequestMethod.POST)
-    public ResponseEntity<Resource> analyseParameter(@RequestBody int columnNo) {
+    public ResponseEntity<Resource> analyseParameter(
+            @RequestParam("columnNo") int columnNo,
+            @RequestBody List<Double> tolerances) {
         String filename = format("analysedColNo-(%d).csv", columnNo);
 
         WebSocketProgress webSocketProgress = webSocketProgressService.create(REPLY);
 
         ByteArrayOutputStream file = analyseGridDataColumnCommand.execute(webSocketProgress,
-                new AnalyseGridDataColumnCommand.Param(columnNo, Arrays.asList(1555555555.0)));
+                new AnalyseGridDataColumnCommand.Param(columnNo, tolerances));
 
         return ResponseEntity.ok().header(HttpHeaders.CONTENT_DISPOSITION,
                 "attachment;filename=\"" + filename + "\"")

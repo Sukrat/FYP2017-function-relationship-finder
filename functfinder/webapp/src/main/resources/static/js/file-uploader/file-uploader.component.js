@@ -2,8 +2,8 @@
     var app = angular.module('app');
     app.component('fileUploader', {
         templateUrl: './js/file-uploader/file-uploader.html',
-        controller: ['RootService', '$http', 'ErrorMessageHandler', 'Upload',
-            function (RootService, $http, ErrorMessageHandler, Upload) {
+        controller: ['RootService', '$http', 'Upload',
+            function (RootService, $http, Upload) {
                 var vm = this;
                 vm.upload = upload;
                 vm.listFileNames = listFileNames;
@@ -30,7 +30,7 @@
                         vm.listFileNames();
                     }, function (error) {
                         console.error(error);
-                        RootService.error(ErrorMessageHandler.getError(error.data));
+                        RootService.error(error.data);
                     }, function (notify) {
                         vm.percentage = parseInt(100.0 * notify.loaded / notify.total);
                     });
@@ -44,7 +44,7 @@
                             RootService.loading(false);
                         }).catch(function (error) {
                         console.error(error);
-                        RootService.error(ErrorMessageHandler.getError(error.data));
+                        RootService.error(error.data);
                     });
                 }
 
@@ -54,36 +54,36 @@
                     }
                     RootService.loading(true);
                     $http.delete('/data/delete?fileName=' + filename)
-                        .then((response) => {
+                        .then(function (response) {
                             RootService.success(response.data.message);
                             vm.listFileNames();
-                        }).catch((error) => {
+                        }).catch(function (error) {
                         console.error(error);
-                        RootService.error(ErrorMessageHandler.getError(error.data));
+                        RootService.error(error.data);
                     })
                 }
 
                 function normalize() {
                     RootService.loading(true);
                     $http.post('/data/normalize')
-                        .then((response) => {
+                        .then(function (response) {
                             RootService.success(response.data.message);
                             vm.listFileNames();
-                        }).catch((error) => {
+                        }).catch(function (error) {
                         console.error(error);
-                        RootService.error(ErrorMessageHandler.getError(error.data));
+                        RootService.error(error.data);
                     })
                 }
 
                 function unNormalize() {
                     RootService.loading(true);
                     $http.post('/data/normalize/undo')
-                        .then((response) => {
+                        .then(function (response) {
                             RootService.success(response.data.message);
                             vm.listFileNames();
-                        }).catch((error) => {
+                        }).catch(function (error) {
                         console.error(error);
-                        RootService.error(ErrorMessageHandler.getError(error.data));
+                        RootService.error(error.data);
                     })
                 }
             }]

@@ -2,8 +2,8 @@
     var app = angular.module('app');
     app.component('dbscanAnalysis', {
         templateUrl: './js/dbscan-analysis/dbscan-analysis.html',
-        controller: ['RootService', 'FileSaver', '$http', '_', 'BufferParser', 'ErrorMessageHandler',
-            function (RootService, FileSaver, $http, _, BufferParser, ErrorMessageHandler) {
+        controller: ['RootService', 'FileSaver', '$http', '_', 'BufferParser',
+            function (RootService, FileSaver, $http, _, BufferParser) {
                 var vm = this;
                 vm.checkFunction = checkFunction;
                 vm.analyseColumn = analyseColumn;
@@ -25,13 +25,13 @@
                             params: {
                                 radius: radiusTol
                             }
-                        }).then((response) => {
+                        }).then(function (response) {
                             FileSaver.saveResponseAsFile(response);
                             RootService.success("File successfully downloading!");
-                        }).catch((error) => {
+                        }).catch(function (error) {
                             var err = BufferParser.parse(error.data);
                             console.log(err);
-                            RootService.error(ErrorMessageHandler.getError(err));
+                            RootService.error(err);
                         })
                     }
                 }
@@ -49,13 +49,13 @@
                             params: {
                                 radius: radiusTol
                             }
-                        }).then((response) => {
+                        }).then(function (response) {
                             FileSaver.saveResponseAsFile(response);
                             RootService.success("File successfully downloading!");
-                        }).catch((error) => {
+                        }).catch(function (error) {
                             var err = BufferParser.parse(error.data);
                             console.log(err);
-                            RootService.error(ErrorMessageHandler.getError(err));
+                            RootService.error(err);
                         })
                     }
                 }

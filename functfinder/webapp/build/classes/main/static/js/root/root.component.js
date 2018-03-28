@@ -16,7 +16,6 @@
                     });
                     StompClient.subscribe('/reply/data', function (reply) {
                         var msg = JSON.parse(reply.body);
-                        console.log(msg);
                         $scope.$apply(function () {
                             vm.loadingText = "".concat(msg.done, '/', msg.totalWork, ': ', msg.message);
                         });

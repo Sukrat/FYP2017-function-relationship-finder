@@ -22,24 +22,13 @@
         }
     })());
 
-    app.constant('ErrorMessageHandler', new (function () {
-        var vm = this;
-        vm.getError = function (data) {
-            if (data.message) {
-                return data.message;
-            } else {
-                return data;
-            }
-        }
-    })());
-
     app.constant('StompClient', (function () {
         var socket = new SockJS('/functlyser-websocket');
         return Stomp.over(socket);
     })());
 
 
-    app.config(($locationProvider, $routeProvider) => {
+    app.config(function ($locationProvider, $routeProvider) {
         $locationProvider.hashPrefix('!');
         $routeProvider
             .when('/root', {

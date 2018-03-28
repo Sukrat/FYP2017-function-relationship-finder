@@ -1,2 +1,2 @@
 rootProject.name = 'functfinder'
-include ':core', ':webapp'
+include ':core', ':webapp', ':cmdapp'
