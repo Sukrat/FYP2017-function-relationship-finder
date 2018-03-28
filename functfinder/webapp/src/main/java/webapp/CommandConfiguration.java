@@ -30,7 +30,7 @@ public class CommandConfiguration {
 
     @Bean
     public ArangoDatabase arangoDatabase(ArangoDB arangoDB, ArangoDbSettings settings) {
-        String databaseName = settings.getDatabaseName();
+        String databaseName = settings.getDbname();
         ArangoDatabase database = arangoDB.db(databaseName);
         try {
             database.getInfo();

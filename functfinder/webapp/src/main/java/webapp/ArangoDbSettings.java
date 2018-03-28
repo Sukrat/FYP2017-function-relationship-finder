@@ -17,14 +17,14 @@ public class ArangoDbSettings {
 
     private int maxConnections = 8;
 
-    private String databaseName = "test";
+    private String dbname = "test";
 
-    public String getDatabaseName() {
-        return databaseName;
+    public String getDbname() {
+        return dbname;
     }
 
-    public void setDatabaseName(String databaseName) {
-        this.databaseName = databaseName;
+    public void setDbname(String dbname) {
+        this.dbname = dbname;
     }
 
     public String getHost() {

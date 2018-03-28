@@ -5,6 +5,7 @@
     <content url="file://$MODULE_DIR$/../../../cmdapp">
       <excludeFolder url="file://$MODULE_DIR$/../../../cmdapp/.gradle" />
       <excludeFolder url="file://$MODULE_DIR$/../../../cmdapp/build" />
+      <excludeFolder url="file://$MODULE_DIR$/../../../cmdapp/out" />
     </content>
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />
