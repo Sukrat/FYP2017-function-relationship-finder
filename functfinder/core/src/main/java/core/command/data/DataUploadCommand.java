@@ -7,6 +7,8 @@ import core.model.Data;
 import core.service.CsvService;
 import core.service.DataService;
 import javafx.util.Pair;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 import org.supercsv.cellprocessor.ParseDouble;
 import org.supercsv.cellprocessor.constraint.NotNull;
 import org.supercsv.cellprocessor.ift.CellProcessor;
@@ -19,11 +21,13 @@ import java.util.stream.Collectors;
 
 import static java.lang.String.format;
 
+@Component
 public class DataUploadCommand implements Command<DataUploadCommand.Param, Long> {
 
     private CsvService csvService;
     private DataService dataService;
 
+    @Autowired
     public DataUploadCommand(CsvService csvService, DataService dataService) {
         this.csvService = csvService;
         this.dataService = dataService;

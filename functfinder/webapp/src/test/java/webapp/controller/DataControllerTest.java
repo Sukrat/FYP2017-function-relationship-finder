@@ -44,13 +44,13 @@ public class DataControllerTest extends BaseControllerTest {
                 .andExpect(content().string(not(isEmptyOrNullString())));
     }
 
-    @Test
-    public void downloadCsv() throws Exception {
-        ResultActions result = mvcGet("/data/download?fileName=test.csv");
-
-        result.andExpect(status().isOk())
-                .andExpect(content().string(not(isEmptyOrNullString())));
-    }
+//    @Test
+//    public void downloadCsv() throws Exception {
+//        ResultActions result = mvcGet("/data/download?fileName=test.csv");
+//
+//        result.andExpect(status().isOk())
+//                .andExpect(content().string(not(isEmptyOrNullString())));
+//    }
 
     @Test
     public void delete() throws Exception {

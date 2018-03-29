@@ -1,6 +1,7 @@
 package core.service;
 
 import javafx.util.Pair;
+import org.springframework.stereotype.Component;
 import org.supercsv.cellprocessor.ift.CellProcessor;
 import org.supercsv.exception.SuperCsvConstraintViolationException;
 import org.supercsv.exception.SuperCsvException;
@@ -15,6 +16,7 @@ import java.io.*;
 import java.util.*;
 import java.util.function.Function;
 
+@Component
 public class CsvService {
 
     public <T> List<T> parse(InputStream inputStream, String[] header, CellProcessor[] processors,

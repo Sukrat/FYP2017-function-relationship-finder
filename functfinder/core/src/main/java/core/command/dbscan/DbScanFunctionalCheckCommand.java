@@ -9,6 +9,8 @@ import core.model.Data;
 import core.service.CsvService;
 import core.service.DataService;
 import javafx.util.Pair;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 import org.supercsv.cellprocessor.ParseDouble;
 import org.supercsv.cellprocessor.constraint.NotNull;
 import org.supercsv.cellprocessor.ift.CellProcessor;
@@ -21,11 +23,13 @@ import java.util.stream.Collectors;
 
 import static java.lang.String.format;
 
+@Component
 public class DbScanFunctionalCheckCommand implements Command<DbScanFunctionalCheckCommand.Param, ByteArrayOutputStream> {
 
     private DataService dataService;
     private CsvService csvService;
 
+    @Autowired
     public DbScanFunctionalCheckCommand(DataService dataService, CsvService csvService) {
         this.dataService = dataService;
         this.csvService = csvService;

@@ -7,6 +7,7 @@ import core.arango.ArangoOperation;
 import core.arango.Operations;
 import core.model.Data;
 import org.junit.Test;
+import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.Collection;
 import java.util.List;
@@ -16,14 +17,12 @@ import static org.hamcrest.Matchers.*;
 
 public class DataServiceTest extends DbTest {
 
-    private Operations operations;
     private DataService sut;
     public static String collectionName = "Data";
 
     @Override
     public void before() {
         super.before();
-        operations = new ArangoOperation(database);
         sut = new DataService(operations);
     }
 

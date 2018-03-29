@@ -48,10 +48,10 @@
     <orderEntry type="library" name="Gradle: org.springframework:spring-messaging:4.3.14.RELEASE" level="project" />
     <orderEntry type="library" name="Gradle: net.sf.supercsv:super-csv:2.4.0" level="project" />
     <orderEntry type="library" name="Gradle: com.arangodb:arangodb-java-driver:4.3.4" level="project" />
+    <orderEntry type="library" name="Gradle: org.springframework:spring-context:4.3.14.RELEASE" level="project" />
     <orderEntry type="library" name="Gradle: org.webjars:webjars-locator-core:0.35" level="project" />
     <orderEntry type="library" name="Gradle: org.webjars.npm:rx:4.1.0" level="project" />
     <orderEntry type="library" name="Gradle: org.springframework.boot:spring-boot-starter-logging:1.5.10.RELEASE" level="project" />
-    <orderEntry type="library" name="Gradle: org.springframework:spring-context:4.3.14.RELEASE" level="project" />
     <orderEntry type="library" name="Gradle: org.springframework:spring-aop:4.3.14.RELEASE" level="project" />
     <orderEntry type="library" name="Gradle: org.springframework:spring-beans:4.3.14.RELEASE" level="project" />
     <orderEntry type="library" name="Gradle: org.springframework:spring-expression:4.3.14.RELEASE" level="project" />

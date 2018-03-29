@@ -3,6 +3,8 @@ package core.service;
 import com.arangodb.ArangoCursor;
 import core.arango.Operations;
 import core.model.Data;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 
 import java.util.Collection;
 import java.util.HashMap;
@@ -11,10 +13,12 @@ import java.util.Map;
 
 import static java.lang.String.format;
 
+@Component
 public class DataService {
 
     private Operations operations;
 
+    @Autowired
     public DataService(Operations operations) {
         this.operations = operations;
         operations.collection(collectionName());

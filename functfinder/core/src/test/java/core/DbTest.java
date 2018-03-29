@@ -1,55 +1,39 @@
 package core;
 
-import com.arangodb.ArangoDB;
 import com.arangodb.ArangoDatabase;
+import core.arango.ArangoOperation;
+import core.arango.Operations;
 import org.junit.After;
 import org.junit.Before;
-import org.junit.BeforeClass;
+import org.junit.runner.RunWith;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
-import java.io.IOException;
-import java.io.InputStream;
-
+@RunWith(SpringJUnit4ClassRunner.class)
+@ContextConfiguration(classes = CoreArangoTestConfiguration.class)
 public abstract class DbTest {
 
-    public static String dbName = "test";
-    public static String propertiesFileName = "test.properties";
-
-    protected static ArangoDB arangoDB;
+    @Autowired
     protected ArangoDatabase database;
 
-    @BeforeClass
-    public static void beforeClass() throws Exception {
-        InputStream input = null;
-        try {
-            input = DbTest.class.getClassLoader().getResourceAsStream(propertiesFileName);
-            if (input == null) {
-                throw new Exception("Could not load properties file for testing.");
-            }
-            arangoDB = new ArangoDB.Builder()
-                    .loadProperties(input)
-                    .build();
-        } finally {
-            if (input != null) {
-                try {
-                    input.close();
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-            }
-        }
-    }
+    @Autowired
+    protected Operations operations;
 
     @Before
     public void before() {
-        database = arangoDB.db(dbName);
-        if (database.exists()) {
-            database.drop();
-        }
-        arangoDB.createDatabase(dbName);
+        resetDb();
     }
 
     @After
     public void after() {
-        database.drop();
+        resetDb();
+    }
+
+    private void resetDb() {
+        database.getCollections()
+                .stream()
+                .filter(m -> !m.getIsSystem())
+                .forEach(m -> database.collection(m.getName()).drop());
     }
 }

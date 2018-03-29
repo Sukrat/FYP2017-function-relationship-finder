@@ -10,6 +10,8 @@ import core.model.Data;
 import core.model.Regression;
 import core.service.CsvService;
 import core.service.DataService;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 import org.supercsv.cellprocessor.Optional;
 import org.supercsv.cellprocessor.ParseDouble;
 import org.supercsv.cellprocessor.ParseInt;
@@ -26,12 +28,14 @@ import java.util.stream.Collectors;
 
 import static java.lang.String.format;
 
+@Component
 public class AnalyseGridDataColumnCommand implements Command<AnalyseGridDataColumnCommand.Param, ByteArrayOutputStream> {
 
     private DataService dataService;
 
     private CsvService csvService;
 
+    @Autowired
     public AnalyseGridDataColumnCommand(DataService dataService, CsvService csvService) {
         this.dataService = dataService;
         this.csvService = csvService;

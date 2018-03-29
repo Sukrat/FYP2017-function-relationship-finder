@@ -5,14 +5,19 @@ import core.command.Command;
 import core.command.CommandProgess;
 import core.model.Data;
 import core.service.DataService;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 
 import java.util.HashMap;
 import java.util.Map;
 
+@Component
 public class DeleteDataCommand implements Command<String, Long> {
 
     private DataService dataService;
 
+
+    @Autowired
     public DeleteDataCommand(DataService dataService) {
         this.dataService = dataService;
     }
