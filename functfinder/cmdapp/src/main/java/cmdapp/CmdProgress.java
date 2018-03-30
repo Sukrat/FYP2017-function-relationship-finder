@@ -9,6 +9,10 @@ public class CmdProgress implements CommandProgess {
     private int outOf = 0;
     private String message = "working on...";
 
+    public CmdProgress() {
+        System.out.println();
+    }
+
     @Override
     public void update(int done, int outOf) {
         send(done, outOf, message);
@@ -38,6 +42,6 @@ public class CmdProgress implements CommandProgess {
         this.done = done;
         this.outOf = outOf;
         this.message = message;
-        System.out.println(String.format("%d / %d : %s", this.done, this.outOf, this.message));
+        System.out.print(String.format("%d / %d : %s\r", this.done, this.outOf, this.message));
     }
 }

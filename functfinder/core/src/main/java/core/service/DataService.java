@@ -99,6 +99,7 @@ public class DataService {
     }
 
     public String collectionName() {
+
         return Data.class.getSimpleName();
     }
 

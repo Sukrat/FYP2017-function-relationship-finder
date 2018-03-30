@@ -24,11 +24,13 @@
     <orderEntry type="library" name="Gradle: net.sf.supercsv:super-csv:2.4.0" level="project" />
     <orderEntry type="library" name="Gradle: com.arangodb:arangodb-java-driver:4.3.4" level="project" />
     <orderEntry type="library" name="Gradle: org.springframework:spring-context:4.3.14.RELEASE" level="project" />
+    <orderEntry type="library" name="Gradle: org.slf4j:slf4j-simple:1.7.25" level="project" />
     <orderEntry type="library" name="Gradle: org.hamcrest:hamcrest-junit:2.0.0.0" level="project" />
     <orderEntry type="library" name="Gradle: junit:junit:4.12" level="project" />
     <orderEntry type="library" name="Gradle: org.mockito:mockito-core:1.10.19" level="project" />
+    <orderEntry type="library" name="Gradle: org.springframework:spring-test:4.3.14.RELEASE" level="project" />
     <orderEntry type="library" name="Gradle: com.arangodb:velocypack:1.0.14" level="project" />
-    <orderEntry type="library" name="Gradle: org.slf4j:slf4j-api:1.7.13" level="project" />
+    <orderEntry type="library" name="Gradle: org.slf4j:slf4j-api:1.7.25" level="project" />
     <orderEntry type="library" name="Gradle: org.springframework:spring-aop:4.3.14.RELEASE" level="project" />
     <orderEntry type="library" name="Gradle: org.springframework:spring-beans:4.3.14.RELEASE" level="project" />
     <orderEntry type="library" name="Gradle: org.springframework:spring-expression:4.3.14.RELEASE" level="project" />
@@ -38,7 +40,6 @@
     <orderEntry type="library" name="Gradle: org.objenesis:objenesis:2.1" level="project" />
     <orderEntry type="library" name="Gradle: com.googlecode.json-simple:json-simple:1.1.1" level="project" />
     <orderEntry type="library" name="Gradle: commons-logging:commons-logging:1.2" level="project" />
-    <orderEntry type="library" scope="TEST" name="Gradle: org.springframework:spring-test:4.3.14.RELEASE" level="project" />
   </component>
   <component name="TestModuleProperties" production-module="core_main" />
 </module>

@@ -2,17 +2,16 @@ package cmdapp.argument;
 
 import com.beust.jcommander.Parameter;
 import com.beust.jcommander.Parameters;
+import org.springframework.stereotype.Component;
 
-import java.util.ArrayList;
-import java.util.List;
-
+@Component
 @Parameters(commandDescription = "dbscan clustering method arguments")
-public class DbScanArguments extends ExcecutionArguments {
+public class DbScanArguments extends ExecutionArguments {
 
-    @Parameter(names = {"--pradius"},description = "radius for the input parameters",  order = 3)
+    @Parameter(names = {"--pradius"}, description = "Radius tolerance for the input parameters", order = 3)
     private Double radius = 0.0;
 
-    @Parameter(names = {"--oradius"},description = "radius of the output parameters",  order = 4)
+    @Parameter(names = {"--oradius"}, description = "Radius tolerance of the output parameters", order = 4)
     private Double outputRadius = 0.0;
 
     public Double getRadius() {
