@@ -26,7 +26,11 @@ public class DataService implements IDataService {
 
     public DataService(Operations operations, String prefix) {
         this.operations = operations;
-        colName = prefix + Data.class.getSimpleName();
+        if (prefix == null || prefix.trim().isEmpty()) {
+            colName = Data.class.getSimpleName();
+        } else {
+            colName = String.format("%s-%s", prefix, Data.class.getSimpleName());
+        }
         operations.collection(collectionName());
     }
 

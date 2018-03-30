@@ -8,12 +8,12 @@ import org.springframework.context.annotation.Configuration;
 
 @Configuration
 @ComponentScan(basePackages = {"core"})
-public class CoreCoreArangoConfiguration extends AbstractCoreArangoConfiguration {
+public class CoreArangoConfiguration extends AbstractCoreArangoConfiguration {
 
     private AppSettings settings;
 
     @Autowired
-    public CoreCoreArangoConfiguration(AppSettings settings) {
+    public CoreArangoConfiguration(AppSettings settings) {
         this.settings = settings;
     }
 

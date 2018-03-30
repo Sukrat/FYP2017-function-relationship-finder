@@ -9,7 +9,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 public abstract class ICommandTest extends DbTest {
 
     protected IProgress progress;
-    protected String profileName = "test";
     protected String collectionName = "Data";
 
     protected IDataService dataService;
