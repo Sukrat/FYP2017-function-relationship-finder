@@ -21,9 +21,7 @@ public class DataService implements IDataService {
 
     @Autowired
     public DataService(Operations operations) {
-        this.operations = operations;
-        colName = Data.class.getSimpleName();
-        operations.collection(collectionName());
+        this(operations, "");
     }
 
     public DataService(Operations operations, String prefix) {
