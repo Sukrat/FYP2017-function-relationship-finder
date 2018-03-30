@@ -5,15 +5,16 @@ import core.command.ICommand;
 import core.command.IProgress;
 import core.model.Data;
 import core.service.DataService;
+import core.service.IDataService;
 
 import java.util.Collection;
 
 public class DataInsertCommand implements ICommand<Long> {
 
-    private DataService dataService;
+    private IDataService dataService;
     private Collection<Data> datas;
 
-    public DataInsertCommand(DataService dataService, Collection<Data> datas) {
+    public DataInsertCommand(IDataService dataService, Collection<Data> datas) {
         this.dataService = dataService;
         this.datas = datas;
     }

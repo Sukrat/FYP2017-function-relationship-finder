@@ -2,6 +2,7 @@ package core.command;
 
 import core.DbTest;
 import core.service.DataService;
+import core.service.IDataService;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -11,7 +12,7 @@ public abstract class ICommandTest extends DbTest {
     protected String profileName = "test";
     protected String collectionName = "Data";
 
-    protected DataService dataService;
+    protected IDataService dataService;
 
     @Override
     public void before() {

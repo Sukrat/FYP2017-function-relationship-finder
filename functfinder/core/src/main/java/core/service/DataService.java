@@ -14,20 +14,30 @@ import java.util.Map;
 import static java.lang.String.format;
 
 @Component
-public class DataService {
+public class DataService implements IDataService {
 
+    private final String colName;
     private Operations operations;
 
     @Autowired
     public DataService(Operations operations) {
         this.operations = operations;
+        colName = Data.class.getSimpleName();
         operations.collection(collectionName());
     }
 
+    public DataService(Operations operations, String prefix) {
+        this.operations = operations;
+        colName = prefix + Data.class.getSimpleName();
+        operations.collection(collectionName());
+    }
+
+    @Override
     public Data findAny() {
         return operations.findAny(collectionName(), Data.class);
     }
 
+    @Override
     public Data findAnyByFileName(String fileName) {
         String query = join(
                 "FOR r in @@col",
@@ -47,6 +57,7 @@ public class DataService {
         return data;
     }
 
+    @Override
     public ArangoCursor<Data> findAllByFileName(String fileName) {
         String query = join(
                 "FOR r in @@col",
@@ -59,10 +70,12 @@ public class DataService {
         return queryResult;
     }
 
+    @Override
     public Collection<Data> insert(Collection<Data> datas) {
         return operations.insert(datas, collectionName());
     }
 
+    @Override
     public long removeByFileName(String fileName) {
         String query = join(
                 "FOR r IN @@col",
@@ -77,6 +90,7 @@ public class DataService {
         return result.asListRemaining().get(0);
     }
 
+    @Override
     public ArangoCursor<String> findAllFileNames() {
         String query = join(
                 "FOR r IN @@col",
@@ -87,6 +101,7 @@ public class DataService {
         return result;
     }
 
+    @Override
     public <T> ArangoCursor<T> query(String query, Map<String, Object> bindVars, Class<T> entity) {
         ArangoCursor<T> result = operations.query(query, new HashMap<String, Object>(bindVars) {{
             put("@col", collectionName());
@@ -94,15 +109,17 @@ public class DataService {
         return result;
     }
 
+    @Override
     public void ensureSkipListIndex(Collection<String> fields) {
         operations.ensureSkipListIndex(collectionName(), fields, null);
     }
 
+    @Override
     public String collectionName() {
-
-        return Data.class.getSimpleName();
+        return colName;
     }
 
+    @Override
     public String join(String... s) {
         return String.join("\n", s) + "\n";
     }

@@ -6,6 +6,7 @@ import core.command.ICommand;
 import core.command.IProgress;
 import core.model.Data;
 import core.service.DataService;
+import core.service.IDataService;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -14,9 +15,9 @@ import static java.lang.String.format;
 
 public class DataNormalizeCommand implements ICommand<Long> {
 
-    private DataService dataService;
+    private IDataService dataService;
 
-    public DataNormalizeCommand(DataService dataService) {
+    public DataNormalizeCommand(IDataService dataService) {
         this.dataService = dataService;
     }
 

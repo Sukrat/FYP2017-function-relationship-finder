@@ -5,13 +5,14 @@ import core.command.ICommand;
 import core.command.IProgress;
 import core.model.Data;
 import core.service.DataService;
+import core.service.IDataService;
 
 public class DataDeleteByFileNameCommand implements ICommand<Long> {
 
-    private DataService dataService;
+    private IDataService dataService;
     private String fileName;
 
-    public DataDeleteByFileNameCommand(DataService dataService, String fileName) {
+    public DataDeleteByFileNameCommand(IDataService dataService, String fileName) {
         this.dataService = dataService;
         this.fileName = fileName;
     }

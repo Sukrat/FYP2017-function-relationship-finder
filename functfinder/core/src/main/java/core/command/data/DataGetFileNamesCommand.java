@@ -3,14 +3,15 @@ package core.command.data;
 import core.command.ICommand;
 import core.command.IProgress;
 import core.service.DataService;
+import core.service.IDataService;
 
 import java.util.Collection;
 
 public class DataGetFileNamesCommand implements ICommand<Collection<String>> {
 
-    private DataService dataService;
+    private IDataService dataService;
 
-    public DataGetFileNamesCommand(DataService dataService) {
+    public DataGetFileNamesCommand(IDataService dataService) {
         this.dataService = dataService;
     }
 

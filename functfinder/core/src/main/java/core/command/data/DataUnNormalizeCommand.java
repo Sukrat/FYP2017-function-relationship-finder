@@ -6,14 +6,15 @@ import core.command.ICommand;
 import core.command.IProgress;
 import core.model.Data;
 import core.service.DataService;
+import core.service.IDataService;
 
 import java.util.HashMap;
 
 public class DataUnNormalizeCommand implements ICommand<Long> {
 
-    private DataService dataService;
+    private IDataService dataService;
 
-    public DataUnNormalizeCommand(DataService dataService) {
+    public DataUnNormalizeCommand(IDataService dataService) {
         this.dataService = dataService;
     }
 
