@@ -5,7 +5,7 @@ import core.service.DataService;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 
-public class ICommandTest extends DbTest {
+public abstract class ICommandTest extends DbTest {
 
     protected IProgress progress;
     protected String profileName = "test";
