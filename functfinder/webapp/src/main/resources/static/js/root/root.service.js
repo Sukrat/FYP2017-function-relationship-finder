@@ -11,6 +11,7 @@
             vm.success = success;
             vm.loading = loading;
             vm.profile = profile;
+            vm.textDecoder = new TextDecoder();
 
             function subscribeMessage(onNext) {
                 return vm.messageSubject.subscribe({next: onNext});
@@ -23,6 +24,10 @@
             function error(error) {
                 vm.loading(false);
                 var errorMsg = "";
+                if (error && (error.data instanceof ArrayBuffer)) {
+                    var decoded = vm.textDecoder.decode(error.data);
+                    error = JSON.parse(decoded);
+                }
                 if (error && error.data && error.data.message) {
                     errorMsg = error.data.message;
                 } else if (error && error.message) {

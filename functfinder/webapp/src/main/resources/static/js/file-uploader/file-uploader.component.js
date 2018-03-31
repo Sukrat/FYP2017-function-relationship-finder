@@ -5,7 +5,6 @@
         controller: ['RootService', '$http', 'Upload',
             function (RootService, $http, Upload) {
                 var vm = this;
-                vm.profile = RootService.profile();
                 vm.upload = upload;
                 vm.listFileNames = listFileNames;
                 vm.deleteFile = deleteFile;
@@ -74,8 +73,9 @@
                 }
 
                 function url(task) {
-                    return '/data/' + vm.profile + task;
+                    return '/data/' + RootService.profile() + task;
                 }
-            }]
+            }
+        ]
     })
 })();

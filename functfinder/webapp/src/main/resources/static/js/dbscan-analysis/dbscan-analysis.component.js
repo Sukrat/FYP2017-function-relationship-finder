@@ -20,7 +20,7 @@
                     if (_.isNaN(tolerance) || _.isNaN(radiusTol)) {
                         return RootService.error('Please enter a valid double!');
                     } else {
-                        $http.post('/analysis/dbscan/functioncheck', tolerance, {
+                        $http.post(url('/dbscan/functioncheck'), tolerance, {
                             responseType: 'arraybuffer',
                             params: {
                                 radius: radiusTol
@@ -28,11 +28,7 @@
                         }).then(function (response) {
                             FileSaver.saveResponseAsFile(response);
                             RootService.success("File successfully downloading!");
-                        }).catch(function (error) {
-                            var err = BufferParser.parse(error.data);
-                            console.log(err);
-                            RootService.error(err);
-                        })
+                        }).catch(RootService.error)
                     }
                 }
 
@@ -44,7 +40,7 @@
                     if (_.isNaN(colNo) || _.isNaN(radiusTol)) {
                         return RootService.error('Please enter a valid double for radius and integer for Col Number!');
                     } else {
-                        $http.post('/analysis/dbscan/column', colNo, {
+                        $http.post(url('/dbscan/column'), colNo, {
                             responseType: 'arraybuffer',
                             params: {
                                 radius: radiusTol
@@ -52,13 +48,14 @@
                         }).then(function (response) {
                             FileSaver.saveResponseAsFile(response);
                             RootService.success("File successfully downloading!");
-                        }).catch(function (error) {
-                            var err = BufferParser.parse(error.data);
-                            console.log(err);
-                            RootService.error(err);
-                        })
+                        }).catch(RootService.error)
                     }
                 }
-            }]
+
+                function url(task) {
+                    return '/analysis/' + RootService.profile() + task;
+                }
+            }
+        ]
     })
 })();

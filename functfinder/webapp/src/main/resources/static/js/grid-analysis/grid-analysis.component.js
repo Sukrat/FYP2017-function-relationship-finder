@@ -23,7 +23,7 @@
                     } else if (_.size(_.trim(tolerances)) == 0) {
                         RootService.error("Please enter tolerance for tolerances!");
                     } else {
-                        $http.post('/analysis/grid/functioncheck', tolArr, {
+                        $http.post(url('/grid/functioncheck'), tolArr, {
                             responseType: 'arraybuffer',
                             params: {
                                 outputTolerance: tolerance
@@ -31,12 +31,7 @@
                         }).then(function (response) {
                             FileSaver.saveResponseAsFile(response);
                             RootService.success("File successfully downloading!");
-                        }).catch(function (error) {
-                            var err = BufferParser.parse(error.data);
-                            console.error(err);
-                            RootService.error(err);
-                        })
-                        ;
+                        }).catch(RootService.error);
                     }
                 }
 
@@ -51,7 +46,7 @@
                     } else if (_.size(_.trim(tolerances)) == 0) {
                         RootService.error("Please enter tolerance for tolerances!");
                     } else {
-                        $http.post('/analysis/grid/column', tolArr, {
+                        $http.post(url('/grid/column'), tolArr, {
                             responseType: 'arraybuffer',
                             params: {
                                 columnNo: colNo
@@ -59,13 +54,14 @@
                         }).then(function (response) {
                             FileSaver.saveResponseAsFile(response);
                             RootService.success("File successfully downloading!");
-                        }).catch(function (error) {
-                            var err = BufferParser.parse(error.data);
-                            console.log(err);
-                            RootService.error(err);
-                        })
+                        }).catch(RootService.error)
                     }
                 }
-            }]
+
+                function url(task) {
+                    return '/analysis/' + RootService.profile() + task;
+                }
+            }
+        ]
     })
 })();
