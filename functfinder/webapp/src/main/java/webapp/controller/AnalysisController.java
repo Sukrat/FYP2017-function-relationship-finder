@@ -49,7 +49,7 @@ public class AnalysisController {
             @PathVariable("profile") String profile,
             @RequestParam("outputTolerance") double oTolerance,
             @RequestBody List<Double> ntolerances) {
-        String filename = format("functioncheck-(%f).csv", oTolerance);
+        String filename = format("grid-fc-(%f).csv", oTolerance);
 
         ArangoCursor<Data> datas = syncCommandExecutor.execute(new GridFunctionCommand(
                 dataServiceCreator.create(profile),
@@ -69,7 +69,7 @@ public class AnalysisController {
             @PathVariable("profile") String profile,
             @RequestParam("columnNo") int columnNo,
             @RequestBody List<Double> n1tolerances) {
-        String filename = format("analysedColNo-(%d).csv", columnNo);
+        String filename = format("grid-analyse-(%d).csv", columnNo);
 
         Collection<CompiledRegression> compiledRegressions = syncCommandExecutor.execute(new GridAnalyseColumnsCommand(
                 dataServiceCreator.create(profile),
@@ -89,7 +89,7 @@ public class AnalysisController {
             @PathVariable("profile") String profile,
             @RequestParam("radius") double nRadius,
             @RequestBody double oRadius) {
-        String filename = format("scan-functioncheck-(%f)-(%f).csv", nRadius, oRadius);
+        String filename = format("dbscan-fc-(%f)-(%f).csv", nRadius, oRadius);
 
         ArangoCursor<Data> datas = syncCommandExecutor.execute(new DbScanFunctionalCommand(
                 dataServiceCreator.create(profile),
@@ -109,7 +109,7 @@ public class AnalysisController {
             @PathVariable("profile") String profile,
             @RequestParam("radius") double n1radius,
             @RequestBody int columnNo) {
-        String filename = format("analysedColNo-(%f)-(%d).csv", n1radius, columnNo);
+        String filename = format("dbscan-analyse-(%f)-(%d).csv", n1radius, columnNo);
 
         Collection<CompiledRegression> compiledRegressions = syncCommandExecutor.execute(new DbScanAnalyseColumnsCommand(
                 dataServiceCreator.create(profile),

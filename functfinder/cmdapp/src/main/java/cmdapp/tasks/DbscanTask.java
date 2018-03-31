@@ -31,6 +31,7 @@ public class DbscanTask extends Task {
 
     @Override
     public void run() {
+        cleanup();
         // inserting files
         insert(dbScanArguments);
 
@@ -44,7 +45,7 @@ public class DbscanTask extends Task {
                     csvService,
                     datas.asListRemaining()
             ));
-            save(execute, "dbscan-function-check.csv");
+            save(execute, "dbscan-fc.csv");
         }
 
         dbScanArguments.getAnalyseColumns()
@@ -59,7 +60,7 @@ public class DbscanTask extends Task {
                             csvService,
                             compiledRegressions
                     ));
-                    save(execute, String.format("dbscan-analyse-%d.csv", columNo));
+                    save(execute, String.format("dbscan-analyse-(%d).csv", columNo));
                 });
 
         cleanup();

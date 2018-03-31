@@ -30,6 +30,7 @@ public class GridTask extends Task {
 
     @Override
     public void run() {
+        cleanup();
         // inserting files
         insert(gridArguments);
 
@@ -43,7 +44,7 @@ public class GridTask extends Task {
                     csvService,
                     datas.asListRemaining()
             ));
-            save(execute, "grid-function-check.csv");
+            save(execute, "grid-fc.csv");
         }
 
         gridArguments.getAnalyseColumns()
@@ -58,7 +59,7 @@ public class GridTask extends Task {
                             csvService,
                             compiledRegressions
                     ));
-                    save(execute, String.format("grid-analyse-%d.csv", columNo));
+                    save(execute, String.format("grid-analyse-(%d).csv", columNo));
                 });
         cleanup();
     }

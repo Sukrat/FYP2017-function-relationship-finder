@@ -73,8 +73,10 @@ public abstract class Task implements Runnable {
         Collection<String> fileNames = executor.execute(new DataGetFileNamesCommand(
                 dataService
         ));
-        fileNames.stream().forEach(filename -> new DataDeleteByFileNameCommand(
-                dataService, filename
-        ));
+        fileNames.stream().forEach(filename -> {
+            executor.execute(new DataDeleteByFileNameCommand(
+                    dataService, filename
+            ));
+        });
     }
 }
