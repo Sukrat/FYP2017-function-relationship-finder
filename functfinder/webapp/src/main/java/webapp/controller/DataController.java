@@ -23,8 +23,6 @@ import java.util.Collection;
 @RequestMapping("/data/{profile}")
 public class DataController {
 
-    public static String REPLY = "/reply/data";
-
     private WebSocketProgressService webSocketProgressService;
     private SyncCommandExecutor syncCommandExecutor;
     private DataServiceCreator dataServiceCreator;
