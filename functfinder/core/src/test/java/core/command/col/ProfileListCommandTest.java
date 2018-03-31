@@ -1,7 +1,7 @@
 package core.command.col;
 
-import core.DbTest;
 import core.command.ICommandTest;
+import core.command.profile.ProfileListCommand;
 import org.junit.Test;
 
 import java.util.Collection;
@@ -9,16 +9,16 @@ import java.util.Collection;
 import static org.hamcrest.MatcherAssert.*;
 import static org.hamcrest.Matchers.*;
 
-public class ColListOfDataCommandTest extends ICommandTest {
+public class ProfileListCommandTest extends ICommandTest {
 
-    private ColListOfDataCommand sut;
+    private ProfileListCommand sut;
 
     @Test
     public void execute() {
         operations.collection("hello");
         operations.collection("hello-Data");
         operations.collection("hello-data");
-        sut = new ColListOfDataCommand(operations);
+        sut = new ProfileListCommand(operations);
 
         Collection<String> result = execute(sut);
 
@@ -28,7 +28,7 @@ public class ColListOfDataCommandTest extends ICommandTest {
 
     @Test
     public void execute_whenEmpty() {
-        sut = new ColListOfDataCommand(operations);
+        sut = new ProfileListCommand(operations);
 
         Collection<String> result = execute(sut);
 

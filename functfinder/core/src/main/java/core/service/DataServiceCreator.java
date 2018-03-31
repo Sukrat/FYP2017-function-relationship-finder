@@ -1,6 +1,7 @@
 package core.service;
 
 import com.arangodb.ArangoDBException;
+import core.Util;
 import core.arango.Operations;
 import core.model.Data;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,13 +17,13 @@ public class DataServiceCreator {
         this.operations = operations;
     }
 
-    public IDataService create(String prefix) {
+    public IDataService create(String profile) {
         try {
-            DataService dataService = new DataService(operations, prefix);
+            DataService dataService = new DataService(operations, Util.dataCollectionName(profile));
             return dataService;
         } catch (ArangoDBException ex) {
             if (ex.getErrorNum() == 1208) {
-                throw new ServiceException("'%s' is not allowed! Valid character are [a-zA-Z0-9_-]", prefix);
+                throw new ServiceException("'%s' is not allowed! Valid character are [a-zA-Z0-9_-]", profile);
             }
             throw ex;
         }

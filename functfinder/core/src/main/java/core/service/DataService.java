@@ -16,21 +16,17 @@ import static java.lang.String.format;
 @Component
 public class DataService implements IDataService {
 
-    private final String colName;
+    private final String collctnName;
     private Operations operations;
 
     @Autowired
     public DataService(Operations operations) {
-        this(operations, "");
+        this(operations, Data.class.getSimpleName());
     }
 
-    public DataService(Operations operations, String prefix) {
+    public DataService(Operations operations, String collectionName) {
         this.operations = operations;
-        if (prefix == null || prefix.trim().isEmpty()) {
-            colName = Data.class.getSimpleName();
-        } else {
-            colName = String.format("%s-%s", prefix, Data.class.getSimpleName());
-        }
+        this.collctnName = collectionName;
         operations.collection(collectionName());
     }
 
@@ -118,7 +114,7 @@ public class DataService implements IDataService {
 
     @Override
     public String collectionName() {
-        return colName;
+        return collctnName;
     }
 
     @Override

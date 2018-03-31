@@ -1,4 +1,4 @@
-package core.command.col;
+package core.command.profile;
 
 import core.arango.Operations;
 import core.command.ICommand;
@@ -8,11 +8,11 @@ import core.model.Data;
 import java.util.Collection;
 import java.util.stream.Collectors;
 
-public class ColListOfDataCommand implements ICommand<Collection<String>> {
+public class ProfileListCommand implements ICommand<Collection<String>> {
 
     private Operations operations;
 
-    public ColListOfDataCommand(Operations operations) {
+    public ProfileListCommand(Operations operations) {
         this.operations = operations;
     }
 
