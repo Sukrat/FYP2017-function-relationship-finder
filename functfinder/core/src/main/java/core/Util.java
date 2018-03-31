@@ -20,6 +20,17 @@ public class Util {
         if (i > 0) {
             profile = collectionName.substring(0, i);
         } else {
+            profile = "";
+        }
+        return profile;
+    }
+
+    public static String getCollection(String collectionName) {
+        int i = collectionName.lastIndexOf('-');
+        String profile;
+        if (i > 0) {
+            profile = collectionName.substring(i + 1);
+        } else {
             profile = collectionName;
         }
         return profile;

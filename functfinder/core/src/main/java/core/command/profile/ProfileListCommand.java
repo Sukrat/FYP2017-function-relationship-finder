@@ -1,5 +1,6 @@
 package core.command.profile;
 
+import core.Util;
 import core.arango.Operations;
 import core.command.ICommand;
 import core.command.IProgress;
@@ -20,7 +21,9 @@ public class ProfileListCommand implements ICommand<Collection<String>> {
     public Collection<String> execute(IProgress progress) {
         return operations.getCollectionNames()
                 .stream()
-                .filter(m -> m.contains("-" + Data.class.getSimpleName()))
+                .filter(m -> Util.getCollection(m).equals(Data.class.getSimpleName()))
+                .filter(m -> !Util.getProfile(m).isEmpty())
+                .map(m -> Util.getProfile(m))
                 .collect(Collectors.toList());
     }
 }

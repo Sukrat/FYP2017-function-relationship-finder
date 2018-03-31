@@ -23,7 +23,7 @@ public class ProfileListCommandTest extends ICommandTest {
         Collection<String> result = execute(sut);
 
         assertThat(result.size(), is(1));
-        assertThat(result, contains("hello-Data"));
+        assertThat(result, contains("hello"));
     }
 
     @Test
