@@ -2,8 +2,8 @@
     var app = angular.module('app');
     app.component('dbscanAnalysis', {
         templateUrl: './js/dbscan-analysis/dbscan-analysis.html',
-        controller: ['RootService', 'FileSaver', '$http', '_', 'BufferParser',
-            function (RootService, FileSaver, $http, _, BufferParser) {
+        controller: ['RootService', 'FileSaver', '$http', '_',
+            function (RootService, FileSaver, $http, _) {
                 var vm = this;
                 vm.checkFunction = checkFunction;
                 vm.analyseColumn = analyseColumn;

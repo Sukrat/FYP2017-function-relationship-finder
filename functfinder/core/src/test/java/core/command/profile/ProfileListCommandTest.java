@@ -15,6 +15,9 @@ public class ProfileListCommandTest extends ICommandTest {
 
     @Test
     public void execute() {
+        operations.getCollectionNames()
+                .stream()
+                .forEach(m -> operations.dropCollection(m));
         operations.collection("hello");
         operations.collection("hello-Data");
         operations.collection("hello-data");
@@ -28,6 +31,9 @@ public class ProfileListCommandTest extends ICommandTest {
 
     @Test
     public void execute_whenEmpty() {
+        operations.getCollectionNames()
+                .stream()
+                .forEach(m -> operations.dropCollection(m));
         sut = new ProfileListCommand(operations);
 
         Collection<String> result = execute(sut);

@@ -3,7 +3,7 @@ package core.command.csv;
 import core.command.ICommand;
 import core.command.IProgress;
 import core.model.Data;
-import core.service.CsvService;
+import core.service.ICsvService;
 import javafx.util.Pair;
 import org.supercsv.cellprocessor.ParseDouble;
 import org.supercsv.cellprocessor.constraint.NotNull;
@@ -17,10 +17,10 @@ import static java.lang.String.format;
 
 public class DataToCsvCommand implements ICommand<ByteArrayOutputStream> {
 
-    private CsvService csvService;
+    private ICsvService csvService;
     private Collection<Data> datas;
 
-    public DataToCsvCommand(CsvService csvService, Collection<Data> datas) {
+    public DataToCsvCommand(ICsvService csvService, Collection<Data> datas) {
         this.csvService = csvService;
         this.datas = datas;
     }

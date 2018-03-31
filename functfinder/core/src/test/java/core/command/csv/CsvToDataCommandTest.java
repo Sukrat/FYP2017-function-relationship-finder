@@ -1,6 +1,5 @@
 package core.command.csv;
 
-import core.command.CommandTest;
 import core.command.ICommandTest;
 import core.model.Data;
 import core.service.CsvService;
@@ -10,8 +9,8 @@ import org.junit.Test;
 import java.io.ByteArrayInputStream;
 import java.util.Collection;
 
-import static org.hamcrest.MatcherAssert.*;
-import static org.hamcrest.Matchers.*;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.is;
 
 public class CsvToDataCommandTest extends ICommandTest {
 
@@ -22,7 +21,7 @@ public class CsvToDataCommandTest extends ICommandTest {
         String csv = "50,20,10\n" +
                 "100,5,5";
         String fileName = "testcsv.csv";
-        sut = new CsvToDataCommand(new CsvService(),
+        sut = new CsvToDataCommand(csvService,
                 new ByteArrayInputStream(csv.getBytes()),
                 fileName);
 

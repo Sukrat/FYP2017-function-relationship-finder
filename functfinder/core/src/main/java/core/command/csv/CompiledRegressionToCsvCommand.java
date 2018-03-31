@@ -3,7 +3,7 @@ package core.command.csv;
 import core.command.ICommand;
 import core.command.IProgress;
 import core.model.CompiledRegression;
-import core.service.CsvService;
+import core.service.ICsvService;
 import org.supercsv.cellprocessor.Optional;
 import org.supercsv.cellprocessor.ParseDouble;
 import org.supercsv.cellprocessor.ParseInt;
@@ -16,10 +16,10 @@ import java.util.HashMap;
 
 public class CompiledRegressionToCsvCommand implements ICommand<ByteArrayOutputStream> {
 
-    private CsvService csvService;
+    private ICsvService csvService;
     private Collection<CompiledRegression> compiledRegressions;
 
-    public CompiledRegressionToCsvCommand(CsvService csvService, Collection<CompiledRegression> compiledRegressions) {
+    public CompiledRegressionToCsvCommand(ICsvService csvService, Collection<CompiledRegression> compiledRegressions) {
         this.csvService = csvService;
         this.compiledRegressions = compiledRegressions;
     }

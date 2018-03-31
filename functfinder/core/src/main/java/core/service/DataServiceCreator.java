@@ -3,7 +3,6 @@ package core.service;
 import com.arangodb.ArangoDBException;
 import core.Util;
 import core.arango.Operations;
-import core.model.Data;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -18,9 +17,12 @@ public class DataServiceCreator {
     }
 
     public IDataService create(String profile) {
+        if (profile == null || profile.trim().isEmpty()) {
+            throw new ServiceException("Profile name cannot be null or empty!");
+        }
         try {
-            DataService dataService = new DataService(operations, Util.dataCollectionName(profile));
-            return dataService;
+            IDataService IDataService = new DataService(operations, Util.dataCollectionName(profile));
+            return IDataService;
         } catch (ArangoDBException ex) {
             if (ex.getErrorNum() == 1208) {
                 throw new ServiceException("'%s' is not allowed! Valid character are [a-zA-Z0-9_-]", profile);

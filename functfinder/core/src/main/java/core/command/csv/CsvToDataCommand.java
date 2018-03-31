@@ -1,10 +1,9 @@
 package core.command.csv;
 
-import core.command.CommandException;
 import core.command.ICommand;
 import core.command.IProgress;
 import core.model.Data;
-import core.service.CsvService;
+import core.service.ICsvService;
 import javafx.util.Pair;
 import org.supercsv.cellprocessor.ParseDouble;
 import org.supercsv.cellprocessor.constraint.NotNull;
@@ -21,12 +20,12 @@ import static java.lang.String.format;
 
 public class CsvToDataCommand implements ICommand<Collection<Data>> {
 
-    private CsvService csvService;
+    private ICsvService ICsvService;
     private InputStream csv;
     private String fileName;
 
-    public CsvToDataCommand(CsvService csvService, InputStream csv, String fileName) {
-        this.csvService = csvService;
+    public CsvToDataCommand(ICsvService csvService, InputStream csv, String fileName) {
+        this.ICsvService = csvService;
         this.csv = csv;
         this.fileName = fileName;
     }
@@ -44,7 +43,7 @@ public class CsvToDataCommand implements ICommand<Collection<Data>> {
             data.setWorkColumns(collect);
             return data;
         };
-        List<Data> datas = csvService.parse(csv, false,
+        List<Data> datas = ICsvService.parse(csv, false,
                 header -> getArgumentsForCsv(header.length), converter);
         return datas;
     }

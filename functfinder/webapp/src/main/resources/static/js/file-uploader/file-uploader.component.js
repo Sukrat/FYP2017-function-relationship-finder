@@ -11,6 +11,7 @@
                 vm.normalize = normalize;
                 vm.unNormalize = unNormalize;
 
+                vm.profile = RootService.profile();
                 vm.data = [];
 
                 listFileNames();

@@ -4,11 +4,11 @@ import core.arango.Operations;
 import core.command.profile.ProfileCreateCommand;
 import core.command.profile.ProfileDeleteCommand;
 import core.command.profile.ProfileListCommand;
-import core.service.DataServiceCreator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import webapp.controller.messages.Message;
+import webapp.websocket.SyncCommandExecutor;
 
 import java.util.Collection;
 

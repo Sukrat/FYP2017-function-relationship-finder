@@ -1,6 +1,5 @@
 package cmdapp;
 
-import core.command.CommandProgess;
 import core.command.IProgress;
 
 

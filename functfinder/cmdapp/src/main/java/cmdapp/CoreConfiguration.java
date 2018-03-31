@@ -2,13 +2,16 @@ package cmdapp;
 
 import cmdapp.argument.DatabaseArguments;
 import com.arangodb.ArangoDB;
-import core.AbstractCoreArangoConfiguration;
+import core.AbstractCoreConfiguration;
+import core.service.DataServiceCreator;
+import core.service.IDataService;
+import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 
 @Configuration
 @ComponentScan(basePackages = {"core", "cmdapp"})
-public class CoreConfiguration extends AbstractCoreArangoConfiguration {
+public class CoreConfiguration extends AbstractCoreConfiguration {
 
     private DatabaseArguments args;
 
@@ -28,5 +31,10 @@ public class CoreConfiguration extends AbstractCoreArangoConfiguration {
                 .password(args.getPassword())
                 .host(args.getHost(), args.getPort())
                 .maxConnections(args.getMaxConnections());
+    }
+
+    @Bean
+    public IDataService dataService(DataServiceCreator creator) {
+        return creator.create(args.getProfileName());
     }
 }

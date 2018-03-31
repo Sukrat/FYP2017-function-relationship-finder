@@ -13,16 +13,10 @@ import java.util.Map;
 
 import static java.lang.String.format;
 
-@Component
 public class DataService implements IDataService {
 
     private final String collctnName;
     private Operations operations;
-
-    @Autowired
-    public DataService(Operations operations) {
-        this(operations, Data.class.getSimpleName());
-    }
 
     public DataService(Operations operations, String collectionName) {
         this.operations = operations;

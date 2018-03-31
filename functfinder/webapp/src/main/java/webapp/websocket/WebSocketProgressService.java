@@ -1,9 +1,8 @@
-package webapp.service;
+package webapp.websocket;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.messaging.simp.SimpMessageSendingOperations;
 import org.springframework.stereotype.Component;
-import webapp.controller.WebSocketProgress;
 
 import java.util.UUID;
 

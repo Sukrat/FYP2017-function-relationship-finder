@@ -1,20 +1,17 @@
 package cmdapp.tasks;
 
-import cmdapp.CmdCommandExecutor;
-import cmdapp.CmdProgress;
-import cmdapp.argument.DbScanArguments;
+import cmdapp.CommandExecutor;
 import cmdapp.argument.GridArguments;
 import com.arangodb.ArangoCursor;
+import core.command.ICommandExecutor;
 import core.command.csv.CompiledRegressionToCsvCommand;
 import core.command.csv.DataToCsvCommand;
-import core.command.grid.AnalyseGridDataColumnCommand;
 import core.command.grid.GridAnalyseColumnsCommand;
-import core.command.grid.GridFunctionCheckCommand;
 import core.command.grid.GridFunctionCommand;
 import core.model.CompiledRegression;
 import core.model.Data;
-import core.service.CsvService;
-import core.service.DataService;
+import core.service.ICsvService;
+import core.service.IDataService;
 import org.springframework.stereotype.Component;
 
 import java.io.*;
@@ -25,9 +22,9 @@ public class GridTask extends Task {
 
     private GridArguments gridArguments;
 
-    public GridTask(CmdCommandExecutor cmdCommandExecutor, DataService dataService, CsvService csvService,
+    public GridTask(ICommandExecutor commandExecutor, IDataService dataService, ICsvService csvService,
                     GridArguments gridArguments) {
-        super(cmdCommandExecutor, dataService, csvService);
+        super(commandExecutor, dataService, csvService);
         this.gridArguments = gridArguments;
     }
 
@@ -37,12 +34,12 @@ public class GridTask extends Task {
         insert(gridArguments);
 
         if (gridArguments.isFunctionCheck()) {
-            ArangoCursor<Data> datas = cmdCommandExecutor.execute(new GridFunctionCommand(
+            ArangoCursor<Data> datas = executor.execute(new GridFunctionCommand(
                     dataService,
                     gridArguments.getParameterTolerances(),
                     gridArguments.getOutputTolerances()
             ));
-            ByteArrayOutputStream execute = cmdCommandExecutor.execute(new DataToCsvCommand(
+            ByteArrayOutputStream execute = executor.execute(new DataToCsvCommand(
                     csvService,
                     datas.asListRemaining()
             ));
@@ -52,12 +49,12 @@ public class GridTask extends Task {
         gridArguments.getAnalyseColumns()
                 .stream()
                 .forEach(columNo -> {
-                    Collection<CompiledRegression> compiledRegressions = cmdCommandExecutor.execute(new GridAnalyseColumnsCommand(
+                    Collection<CompiledRegression> compiledRegressions = executor.execute(new GridAnalyseColumnsCommand(
                             dataService,
                             gridArguments.getParameterTolerances(),
                             columNo
                     ));
-                    ByteArrayOutputStream execute = cmdCommandExecutor.execute(new CompiledRegressionToCsvCommand(
+                    ByteArrayOutputStream execute = executor.execute(new CompiledRegressionToCsvCommand(
                             csvService,
                             compiledRegressions
                     ));

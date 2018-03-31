@@ -6,7 +6,7 @@ import org.springframework.context.annotation.Configuration;
 
 @Configuration
 @ComponentScan(basePackages = {"core"})
-public class CoreArangoTestConfiguration extends AbstractCoreArangoConfiguration {
+public class CoreTestConfiguration extends AbstractCoreConfiguration {
 
     @Override
     public String dbName() {

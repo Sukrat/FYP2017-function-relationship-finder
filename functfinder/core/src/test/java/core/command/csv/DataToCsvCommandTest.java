@@ -22,7 +22,7 @@ public class DataToCsvCommandTest extends ICommandTest {
     @Test
     public void execute_ShouldWork() {
         Collection<Data> datas = Faker.nextData(10, 3);
-        sut = new DataToCsvCommand(new CsvService(),
+        sut = new DataToCsvCommand(csvService,
                 datas);
 
         ByteArrayOutputStream result = execute(sut);

@@ -1,4 +1,4 @@
-package webapp.controller;
+package webapp.websocket;
 
 public class EmptyProgress implements core.command.IProgress {
     @Override

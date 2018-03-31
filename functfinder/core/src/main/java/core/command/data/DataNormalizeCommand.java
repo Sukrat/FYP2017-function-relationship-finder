@@ -30,7 +30,7 @@ public class DataNormalizeCommand implements ICommand<Long> {
         int colSize = sample.getRawColumns().size();
 
         progress.update(0, 2, "Getting the max and min values of each columns!");
-        NormalizeCommand.MaxMinCol maxMinCol = run(colSize);
+        MaxMinCol maxMinCol = run(colSize);
         progress.update(1, 2, "Updating normalized values!");
 
         String rawQuery = dataService.join(
@@ -59,7 +59,7 @@ public class DataNormalizeCommand implements ICommand<Long> {
         return result.asListRemaining().get(0);
     }
 
-    private NormalizeCommand.MaxMinCol run(int colSize) {
+    private MaxMinCol run(int colSize) {
         String rawQuery = dataService.join(
                 "FOR r IN @@col",
                 "COLLECT AGGREGATE",
@@ -82,18 +82,18 @@ public class DataNormalizeCommand implements ICommand<Long> {
         returnValue = returnValue.substring(0, returnValue.length() - 2);
 
         String query = format(rawQuery, maxMin, returnValue);
-        ArangoCursor<NormalizeCommand.MaxMinCol> result = dataService.query(query, new HashMap<>(), NormalizeCommand.MaxMinCol.class);
+        ArangoCursor<MaxMinCol> result = dataService.query(query, new HashMap<>(), MaxMinCol.class);
         return result.asListRemaining().get(0);
     }
 
     public static class MaxMinCol {
-        private Map<String, NormalizeCommand.MaxMin> columns;
+        private Map<String, MaxMin> columns;
 
-        public Map<String, NormalizeCommand.MaxMin> getColumns() {
+        public Map<String, MaxMin> getColumns() {
             return columns;
         }
 
-        public void setColumns(Map<String, NormalizeCommand.MaxMin> columns) {
+        public void setColumns(Map<String, MaxMin> columns) {
             this.columns = columns;
         }
     }

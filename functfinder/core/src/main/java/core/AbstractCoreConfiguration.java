@@ -9,7 +9,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 @Configuration
-public abstract class AbstractCoreArangoConfiguration {
+public abstract class AbstractCoreConfiguration {
 
     @Bean
     public abstract String dbName();

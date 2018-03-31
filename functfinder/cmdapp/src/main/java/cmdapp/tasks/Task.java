@@ -1,27 +1,26 @@
 package cmdapp.tasks;
 
-import cmdapp.CmdCommandExecutor;
 import cmdapp.CmdException;
-import cmdapp.CmdProgress;
 import cmdapp.argument.ExecutionArguments;
 import core.command.CommandException;
+import core.command.ICommandExecutor;
 import core.command.csv.CsvToDataCommand;
 import core.command.data.*;
 import core.model.Data;
-import core.service.CsvService;
-import core.service.DataService;
+import core.service.ICsvService;
+import core.service.IDataService;
 
 import java.io.*;
 import java.util.Collection;
 
 public abstract class Task implements Runnable {
 
-    protected CmdCommandExecutor cmdCommandExecutor;
-    protected DataService dataService;
-    protected CsvService csvService;
+    protected ICommandExecutor executor;
+    protected IDataService dataService;
+    protected ICsvService csvService;
 
-    public Task(CmdCommandExecutor cmdCommandExecutor, DataService dataService, CsvService csvService) {
-        this.cmdCommandExecutor = cmdCommandExecutor;
+    public Task(ICommandExecutor executor, IDataService dataService, ICsvService csvService) {
+        this.executor = executor;
         this.dataService = dataService;
         this.csvService = csvService;
     }
@@ -54,24 +53,24 @@ public abstract class Task implements Runnable {
                     } catch (FileNotFoundException e) {
                         throw new CmdException(e.getMessage());
                     }
-                    Collection<Data> datas = cmdCommandExecutor.execute(
+                    Collection<Data> datas = executor.execute(
                             new CsvToDataCommand(
                                     csvService,
                                     in, file.getName()));
-                    cmdCommandExecutor.execute(new DataInsertCommand(
+                    executor.execute(new DataInsertCommand(
                             dataService,
                             datas
                     ));
                 });
         if (args.isNormalise()) {
-            cmdCommandExecutor.execute(new DataNormalizeCommand(
+            executor.execute(new DataNormalizeCommand(
                     dataService
             ));
         }
     }
 
     protected void cleanup() {
-        Collection<String> fileNames = cmdCommandExecutor.execute(new DataGetFileNamesCommand(
+        Collection<String> fileNames = executor.execute(new DataGetFileNamesCommand(
                 dataService
         ));
         fileNames.stream().forEach(filename -> new DataDeleteByFileNameCommand(

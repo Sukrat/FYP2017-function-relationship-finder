@@ -20,12 +20,9 @@ public class DataServiceCreatorTest extends DbTest {
         assertThat(operations.collectionExists("test-Data"), is(true));
     }
 
-    @Test
+    @Test(expected = ServiceException.class)
     public void create_withEmptyPrefix() {
         IDataService dataService = sut.create("  ");
-
-        assertThat(dataService.collectionName(), is("Data"));
-        assertThat(operations.collectionExists("Data"), is(true));
     }
 
     @Test

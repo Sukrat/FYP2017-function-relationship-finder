@@ -1,0 +1,1 @@
+gradle build -p=../ && java -jar ..\build\libs\functfinder-2.0.jar 

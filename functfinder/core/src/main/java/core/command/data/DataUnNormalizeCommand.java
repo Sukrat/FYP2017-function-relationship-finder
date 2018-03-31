@@ -22,7 +22,7 @@ public class DataUnNormalizeCommand implements ICommand<Long> {
     public Long execute(IProgress progress) {
         Data sample = dataService.findAny();
         if (sample == null) {
-            throw new CommandException("No data found! Nothing to normalize!");
+            throw new CommandException("No data found! Nothing to un-normalize!");
         }
 
         progress.update(0, 1, "Updating data with csv values!");

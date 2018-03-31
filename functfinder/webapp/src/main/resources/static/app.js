@@ -13,17 +13,9 @@
             window.saveAs(blob, fileName);
         }
     });
-    app.constant('BufferParser', new (function () {
-        var vm = this;
-        var textDecoder = new TextDecoder();
-        vm.parse = function (buffer) {
-            var decoded = textDecoder.decode(buffer);
-            return JSON.parse(decoded);
-        }
-    })());
 
     app.constant('StompClient', (function () {
-        var socket = new SockJS('/functlyser-websocket');
+        var socket = new SockJS('/functfinder-websocket');
         return Stomp.over(socket);
     })());
 

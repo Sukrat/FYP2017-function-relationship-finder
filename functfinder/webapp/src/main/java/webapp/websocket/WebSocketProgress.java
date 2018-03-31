@@ -1,10 +1,10 @@
-package webapp.controller;
+package webapp.websocket;
 
-import core.command.CommandProgess;
+import core.command.IProgress;
 import org.springframework.messaging.simp.SimpMessageSendingOperations;
 import webapp.controller.messages.WebSocketMessage;
 
-public class WebSocketProgress implements CommandProgess {
+public class WebSocketProgress implements IProgress {
 
     private String id;
     private int outOf = 0;

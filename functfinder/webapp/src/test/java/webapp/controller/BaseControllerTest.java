@@ -21,6 +21,11 @@ public abstract class BaseControllerTest extends BaseTest {
     @Autowired
     ObjectMapper objectMapper;
 
+    @Override
+    public void before() {
+        super.before();
+    }
+
     protected MediaType contentType = MediaType.APPLICATION_JSON;
 
     public ResultActions mvcPost(String url, Object body) {
@@ -49,9 +54,11 @@ public abstract class BaseControllerTest extends BaseTest {
         }
     }
 
-    public ResultActions mvcDelete(String url) {
+    public ResultActions mvcDelete(String url, Object body) {
         try {
-            return mockMvc.perform(delete(url));
+            return mockMvc.perform(delete(url)
+                    .contentType(contentType)
+                    .content(objectMapper.writeValueAsString(body)));
         } catch (Exception e) {
             throw new RuntimeException(e);
         }

@@ -19,7 +19,7 @@ import static org.hamcrest.Matchers.*;
 
 public class CsvServiceTest {
 
-    private CsvService sut;
+    private ICsvService sut;
 
     @Before
     public void before() {

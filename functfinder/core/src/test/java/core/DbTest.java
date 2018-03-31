@@ -1,7 +1,6 @@
 package core;
 
 import com.arangodb.ArangoDatabase;
-import core.arango.ArangoOperation;
 import core.arango.Operations;
 import org.junit.After;
 import org.junit.Before;
@@ -11,7 +10,7 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 @RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration(classes = CoreArangoTestConfiguration.class)
+@ContextConfiguration(classes = CoreTestConfiguration.class)
 public abstract class DbTest {
 
     @Autowired

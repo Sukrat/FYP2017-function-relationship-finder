@@ -5,15 +5,16 @@ import core.command.csv.CsvToDataCommand;
 import core.command.csv.DataToCsvCommand;
 import core.command.data.*;
 import core.model.Data;
-import core.service.CsvService;
 import core.service.DataServiceCreator;
+import core.service.ICsvService;
 import org.springframework.core.io.ByteArrayResource;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import webapp.controller.messages.Message;
-import webapp.service.WebSocketProgressService;
+import webapp.websocket.SyncCommandExecutor;
+import webapp.websocket.WebSocketProgressService;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -26,11 +27,11 @@ public class DataController {
     private WebSocketProgressService webSocketProgressService;
     private SyncCommandExecutor syncCommandExecutor;
     private DataServiceCreator dataServiceCreator;
-    private CsvService csvService;
+    private ICsvService csvService;
 
     public DataController(WebSocketProgressService webSocketProgressService, SyncCommandExecutor syncCommandExecutor,
                           DataServiceCreator dataServiceCreator,
-                          CsvService csvService) {
+                          ICsvService csvService) {
         this.webSocketProgressService = webSocketProgressService;
         this.syncCommandExecutor = syncCommandExecutor;
         this.dataServiceCreator = dataServiceCreator;
@@ -50,7 +51,6 @@ public class DataController {
                 dataServiceCreator.create(profile),
                 datas
         ));
-        DataUploadCommand.Param param = new DataUploadCommand.Param(file.getInputStream(), file.getOriginalFilename());
         return ResponseEntity.ok().body(new Message(result + " records added successfully!"));
     }
 

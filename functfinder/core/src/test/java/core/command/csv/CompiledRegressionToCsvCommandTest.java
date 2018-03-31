@@ -19,7 +19,7 @@ public class CompiledRegressionToCsvCommandTest extends ICommandTest {
     @Test
     public void execute() {
         Collection<CompiledRegression> regressions = Arrays.asList(new CompiledRegression());
-        sut = new CompiledRegressionToCsvCommand(new CsvService(),
+        sut = new CompiledRegressionToCsvCommand(csvService,
                 regressions);
 
         ByteArrayOutputStream result = execute(sut);

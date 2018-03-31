@@ -17,13 +17,15 @@ import java.util.*;
 import java.util.function.Function;
 
 @Component
-public class CsvService {
+public class CsvService implements ICsvService {
 
+    @Override
     public <T> List<T> parse(InputStream inputStream, String[] header, CellProcessor[] processors,
                              Function<Map<String, Object>, T> converter) {
         return parse(inputStream, false, (heading) -> new Pair<>(header, processors), converter);
     }
 
+    @Override
     public <T> List<T> parse(InputStream inputStream, boolean hasHeader,
                              Function<String[], Pair<String[], CellProcessor[]>> headingPeeker,
                              Function<Map<String, Object>, T> converter) {
@@ -73,6 +75,7 @@ public class CsvService {
         return list;
     }
 
+    @Override
     public <T> ByteArrayOutputStream toCsv(Iterable<T> from,
                                            boolean writeHeader,
                                            String[] header,

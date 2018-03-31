@@ -1,13 +1,9 @@
 package core.service;
 
-import com.arangodb.ArangoCursor;
 import core.DbTest;
 import core.Faker;
-import core.arango.ArangoOperation;
-import core.arango.Operations;
 import core.model.Data;
 import org.junit.Test;
-import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.Collection;
 import java.util.List;
@@ -17,13 +13,13 @@ import static org.hamcrest.Matchers.*;
 
 public class DataServiceTest extends DbTest {
 
-    private DataService sut;
+    private IDataService sut;
     public static String collectionName = "Data";
 
     @Override
     public void before() {
         super.before();
-        sut = new DataService(operations);
+        sut = new DataService(operations, collectionName);
     }
 
     @Test

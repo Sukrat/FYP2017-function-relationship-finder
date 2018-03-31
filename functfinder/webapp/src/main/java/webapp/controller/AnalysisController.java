@@ -9,15 +9,16 @@ import core.command.grid.GridAnalyseColumnsCommand;
 import core.command.grid.GridFunctionCommand;
 import core.model.CompiledRegression;
 import core.model.Data;
-import core.service.CsvService;
 import core.service.DataServiceCreator;
+import core.service.ICsvService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.ByteArrayResource;
 import org.springframework.core.io.Resource;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import webapp.service.WebSocketProgressService;
+import webapp.websocket.SyncCommandExecutor;
+import webapp.websocket.WebSocketProgressService;
 
 import java.io.ByteArrayOutputStream;
 import java.util.Collection;
@@ -31,12 +32,12 @@ public class AnalysisController {
 
     private WebSocketProgressService webSocketProgressService;
     private DataServiceCreator dataServiceCreator;
-    private CsvService csvService;
+    private ICsvService csvService;
     private SyncCommandExecutor syncCommandExecutor;
 
     @Autowired
     public AnalysisController(WebSocketProgressService webSocketProgressService, DataServiceCreator dataServiceCreator,
-                              CsvService csvService, SyncCommandExecutor syncCommandExecutor) {
+                              ICsvService csvService, SyncCommandExecutor syncCommandExecutor) {
         this.webSocketProgressService = webSocketProgressService;
         this.dataServiceCreator = dataServiceCreator;
         this.csvService = csvService;
