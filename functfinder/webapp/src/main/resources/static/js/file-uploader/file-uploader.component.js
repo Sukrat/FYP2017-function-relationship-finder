@@ -5,6 +5,7 @@
         controller: ['RootService', '$http', 'Upload',
             function (RootService, $http, Upload) {
                 var vm = this;
+                vm.profile = RootService.profile();
                 vm.upload = upload;
                 vm.listFileNames = listFileNames;
                 vm.deleteFile = deleteFile;
@@ -23,29 +24,23 @@
                     }
                     RootService.loading(true);
                     Upload.upload({
-                        url: '/data/upload',
+                        url: url('/upload'),
                         file: file
                     }).then(function (response) {
                         RootService.success(response.data.message);
                         vm.listFileNames();
-                    }, function (error) {
-                        console.error(error);
-                        RootService.error(error.data);
-                    }, function (notify) {
+                    }, RootService.error, function (notify) {
                         vm.percentage = parseInt(100.0 * notify.loaded / notify.total);
                     });
                 }
 
                 function listFileNames() {
                     RootService.loading(true);
-                    $http.get("/data/filenames")
+                    $http.get(url("/filenames"))
                         .then(function (response) {
                             vm.data = response.data;
                             RootService.loading(false);
-                        }).catch(function (error) {
-                        console.error(error);
-                        RootService.error(error.data);
-                    });
+                        }).catch(RootService.error);
                 }
 
                 function deleteFile(filename) {
@@ -53,38 +48,33 @@
                         return;
                     }
                     RootService.loading(true);
-                    $http.delete('/data/delete?fileName=' + filename)
+                    $http.delete(url('/delete?fileName=' + filename))
                         .then(function (response) {
                             RootService.success(response.data.message);
                             vm.listFileNames();
-                        }).catch(function (error) {
-                        console.error(error);
-                        RootService.error(error.data);
-                    })
+                        }).catch(RootService.error)
                 }
 
                 function normalize() {
                     RootService.loading(true);
-                    $http.post('/data/normalize')
+                    $http.post(url('/normalize'))
                         .then(function (response) {
                             RootService.success(response.data.message);
                             vm.listFileNames();
-                        }).catch(function (error) {
-                        console.error(error);
-                        RootService.error(error.data);
-                    })
+                        }).catch(RootService.error)
                 }
 
                 function unNormalize() {
                     RootService.loading(true);
-                    $http.post('/data/normalize/undo')
+                    $http.post(url('/normalize/undo'))
                         .then(function (response) {
                             RootService.success(response.data.message);
                             vm.listFileNames();
-                        }).catch(function (error) {
-                        console.error(error);
-                        RootService.error(error.data);
-                    })
+                        }).catch(RootService.error)
+                }
+
+                function url(task) {
+                    return '/data/' + vm.profile + task;
                 }
             }]
     })

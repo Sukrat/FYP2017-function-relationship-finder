@@ -34,6 +34,8 @@
             .when('/profile', {
                 template: '<profile></profile>'
             })
-            .otherwise('/profile');
+            .when('/work/:profile', {
+                template: '<work></work>'
+            }).otherwise('/profile');
     });
 })();
