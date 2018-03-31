@@ -1,6 +1,23 @@
 package webapp.websocket;
 
-public class EmptyProgress implements core.command.IProgress {
+import core.command.IProgress;
+
+public class EmptyProgress implements IProgress {
+    @Override
+    public void setWork(int outOf, String message) {
+
+    }
+
+    @Override
+    public void setWork(int outOf, String message, Object... args) {
+
+    }
+
+    @Override
+    public void increment() {
+
+    }
+
     @Override
     public void update(int done, int outOf) {
 

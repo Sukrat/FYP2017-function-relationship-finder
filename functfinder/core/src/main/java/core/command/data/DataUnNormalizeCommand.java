@@ -25,7 +25,8 @@ public class DataUnNormalizeCommand implements ICommand<Long> {
             throw new CommandException("No data found! Nothing to un-normalize!");
         }
 
-        progress.update(0, 1, "Updating data with csv values!");
+        progress.setWork(1, "Un-normalising values!");
+
         String query = dataService.join(
                 "FOR r IN @@col",
                 "UPDATE { _key: r._key, workColumns: r.rawColumns }",
@@ -34,7 +35,9 @@ public class DataUnNormalizeCommand implements ICommand<Long> {
                 "RETURN c");
 
         ArangoCursor<Long> result = dataService.query(query, new HashMap<>(), Long.class);
-        progress.update(1, 1, "Un-normalising values finished!");
+
+        progress.increment();
+        
         return result.asListRemaining().get(0);
     }
 }

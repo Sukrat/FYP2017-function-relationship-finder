@@ -33,12 +33,16 @@ public class DataInsertCommand implements ICommand<Long> {
         Data sample = dataService.findAny();
         if (sample != null) {
             if (any.getWorkColumns().size() != sample.getWorkColumns().size()) {
-                throw new CommandException("Number of columns donot match! (expected: %d, actual: %d)",
+                throw new CommandException("Number of columns donot match in file '%s'! (expected: %d, actual: %d)",
+                        any.getFileName(),
                         sample.getWorkColumns().size(), any.getWorkColumns().size());
             }
         }
+        progress.setWork(1, "Inserting data form file: '%s'", any.getFileName());
 
         Collection<Data> insert = dataService.insert(datas);
+
+        progress.increment();
         return insert.stream().count();
     }
 }

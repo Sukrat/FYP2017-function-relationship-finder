@@ -30,15 +30,19 @@ public class DataToCsvCommand implements ICommand<ByteArrayOutputStream> {
         if (datas == null || datas.isEmpty()) {
             return new ByteArrayOutputStream();
         }
+        progress.setWork(datas.size(), "Converting csv to data!");
 
         Data sample = datas.stream().findFirst().get();
         Pair<String[], CellProcessor[]> params = getArgumentsForCsv(sample.getRawColumns().size());
         ByteArrayOutputStream outputStream = csvService.toCsv(datas, false,
                 params.getKey(), params.getValue(),
-                (elem) -> elem.getRawColumns()
-                        .entrySet()
-                        .stream()
-                        .collect(Collectors.toMap(m -> m.getKey(), m -> m.getValue())));
+                (elem) -> {
+                    progress.increment();
+                    return elem.getRawColumns()
+                            .entrySet()
+                            .stream()
+                            .collect(Collectors.toMap(m -> m.getKey(), m -> m.getValue()));
+                });
         return outputStream;
     }
 

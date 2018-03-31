@@ -13,6 +13,7 @@ import org.supercsv.cellprocessor.ift.CellProcessor;
 import java.io.ByteArrayOutputStream;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.concurrent.atomic.AtomicInteger;
 
 public class CompiledRegressionToCsvCommand implements ICommand<ByteArrayOutputStream> {
 
@@ -29,8 +30,9 @@ public class CompiledRegressionToCsvCommand implements ICommand<ByteArrayOutputS
         if (compiledRegressions == null || compiledRegressions.isEmpty()) {
             return new ByteArrayOutputStream();
         }
+        progress.setWork(compiledRegressions.size(), "Converting regressions to csv!");
 
-        return csvService.toCsv(compiledRegressions, true,
+        ByteArrayOutputStream outputStream = csvService.toCsv(compiledRegressions, true,
                 new String[]{"colNo", "meanM", "stdDevM", "weightedMeanM", "weightedStdDevM",
                         "meanC", "stdDevC", "weightedMeanC", "weightedStdDevC"},
                 new CellProcessor[]{new NotNull(new ParseInt()),
@@ -43,6 +45,7 @@ public class CompiledRegressionToCsvCommand implements ICommand<ByteArrayOutputS
                         new Optional(new ParseDouble()),
                         new Optional(new ParseDouble())},
                 (elem) -> {
+                    progress.increment();
                     HashMap<String, Object> map = new HashMap<>();
                     map.put("colNo", elem.getColNo());
                     map.put("meanM", elem.getMeanM());
@@ -57,5 +60,6 @@ public class CompiledRegressionToCsvCommand implements ICommand<ByteArrayOutputS
 
                     return map;
                 });
+        return outputStream;
     }
 }

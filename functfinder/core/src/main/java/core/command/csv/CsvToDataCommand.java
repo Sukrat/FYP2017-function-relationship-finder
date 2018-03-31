@@ -20,12 +20,12 @@ import static java.lang.String.format;
 
 public class CsvToDataCommand implements ICommand<Collection<Data>> {
 
-    private ICsvService ICsvService;
+    private ICsvService csvService;
     private InputStream csv;
     private String fileName;
 
     public CsvToDataCommand(ICsvService csvService, InputStream csv, String fileName) {
-        this.ICsvService = csvService;
+        this.csvService = csvService;
         this.csv = csv;
         this.fileName = fileName;
     }
@@ -43,8 +43,12 @@ public class CsvToDataCommand implements ICommand<Collection<Data>> {
             data.setWorkColumns(collect);
             return data;
         };
-        List<Data> datas = ICsvService.parse(csv, false,
+        progress.setWork(1, "Parsing csv file '%s'!", fileName);
+
+        List<Data> datas = csvService.parse(csv, false,
                 header -> getArgumentsForCsv(header.length), converter);
+
+        progress.increment();
         return datas;
     }
 

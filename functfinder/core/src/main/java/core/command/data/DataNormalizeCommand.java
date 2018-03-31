@@ -30,7 +30,9 @@ public class DataNormalizeCommand implements ICommand<Long> {
         int colSize = sample.getRawColumns().size();
 
         progress.update(0, 2, "Getting the max and min values of each columns!");
+
         MaxMinCol maxMinCol = run(colSize);
+
         progress.update(1, 2, "Updating normalized values!");
 
         String rawQuery = dataService.join(
@@ -56,6 +58,8 @@ public class DataNormalizeCommand implements ICommand<Long> {
             bindVar.put(format("maxMinusMin%s", Data.colName(i)), maxMinusMin == 0.0 ? 1.0 : maxMinusMin);
         }
         ArangoCursor<Long> result = dataService.query(query, bindVar, Long.class);
+
+        progress.increment();
         return result.asListRemaining().get(0);
     }
 

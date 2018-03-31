@@ -23,8 +23,11 @@ public class DataDeleteByFileNameCommand implements ICommand<Long> {
         if (anyByFileName == null) {
             throw new CommandException("No data found with filename '%s'", fileName);
         }
+        progress.setWork(1, "removing data from %s", fileName);
 
         Long count = dataService.removeByFileName(fileName);
+
+        progress.increment();
         return count;
     }
 }

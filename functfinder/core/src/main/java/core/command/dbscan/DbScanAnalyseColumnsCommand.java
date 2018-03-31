@@ -52,6 +52,7 @@ public class DbScanAnalyseColumnsCommand implements ICommand<Collection<Compiled
             for (int i = 1; i < any.getRawColumns().size(); i++) {
                 colNos.add(i);
             }
+            progress.setWork(colNos.size(), "Analysing columns via dbscan!");
             return analyseAll(progress, n1Radius, colNos, any.getRawColumns().size());
         }
 
@@ -62,16 +63,15 @@ public class DbScanAnalyseColumnsCommand implements ICommand<Collection<Compiled
                     any.getRawColumns().size(), columnNo);
         }
 
+        progress.setWork(1, "Analysing columns via dbscan!");
         return analyseAll(progress, n1Radius, Arrays.asList(columnNo), any.getRawColumns().size());
     }
 
     private List<CompiledRegression> analyseAll(IProgress progress, double radius, List<Integer> colNos, int size) {
-        progress.update(0, colNos.size(), "Analysing all columns!");
-        AtomicInteger done = new AtomicInteger(0);
         List<CompiledRegression> compiledRegressions = colNos.parallelStream()
                 .map(colNo -> {
                     ArangoCursor<Regression> regressions = analyseColumnByColNos(radius, colNo, size);
-                    progress.update(done.incrementAndGet(), colNos.size(), "%s col nos has been analysed!", colNo);
+                    progress.increment();
                     return CompiledRegression.compiledRegression(colNo, regressions);
                 })
                 .collect(Collectors.toList());

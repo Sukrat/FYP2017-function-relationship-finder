@@ -53,22 +53,22 @@ public class GridAnalyseColumnsCommand implements ICommand<Collection<CompiledRe
             for (int i = 1; i < any.getWorkColumns().size(); i++) {
                 colNos.add(i);
             }
+            progress.setWork(colNos.size(), "Analysing columns via grid!");
             return analyseAll(progress, any, tolerances, colNos);
         } else if (columnNo < 0 || columnNo >= any.getRawColumns().size()) {
             throw new CommandException(format("Column number doesnot exist! (Expected: < %d and > 0 and got: )",
                     any.getRawColumns().size(), columnNo));
         }
-
+        progress.setWork(1, "Analysing column nos %d via grid!", columnNo);
         return analyseAll(progress, any, tolerances, Arrays.asList(columnNo));
     }
 
     private List<CompiledRegression> analyseAll(IProgress progress, Data sample, List<Double> tolerances, List<Integer> colNos) {
         progress.update(0, colNos.size(), "Analysing all columns!");
-        AtomicInteger done = new AtomicInteger(0);
         List<CompiledRegression> compiledRegressions = colNos.parallelStream()
                 .map(colNo -> {
                     ArangoCursor<Regression> regressions = analyseColumnByColNos(sample, tolerances, colNo);
-                    progress.update(done.incrementAndGet(), colNos.size(), "%s col nos has been analysed!", colNo);
+                    progress.increment();
                     return CompiledRegression.compiledRegression(colNo, regressions);
                 })
                 .collect(Collectors.toList());

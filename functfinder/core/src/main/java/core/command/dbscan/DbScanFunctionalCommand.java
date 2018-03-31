@@ -33,6 +33,9 @@ public class DbScanFunctionalCommand implements ICommand<ArangoCursor<Data>> {
         if (any == null) {
             throw new CommandException("No data found in the database!");
         }
+
+        progress.setWork(1, "Scanning for non functional points via dbscan!");
+
         List<String> columns = any.getWorkColumns()
                 .entrySet()
                 .stream()
@@ -75,6 +78,7 @@ public class DbScanFunctionalCommand implements ICommand<ArangoCursor<Data>> {
             put("radius", Math.abs(nRadius));
             put("outputTolerance", Math.abs(oRadius));
         }}, Data.class);
+        progress.increment();
         return datas;
     }
 }

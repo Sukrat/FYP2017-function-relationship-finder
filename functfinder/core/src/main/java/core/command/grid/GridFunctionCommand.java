@@ -48,7 +48,7 @@ public class GridFunctionCommand implements ICommand<ArangoCursor<Data>> {
                     any.getWorkColumns().size() - 1, tolerances.size());
         }
 
-        progress.update(0, 1, "Going through each cluster to check its functional relation!");
+        progress.setWork(1, "Scanning for non functional points via grid!");
         String rawQuery = dataService.join(
                 "LET result = FLATTEN(",
                 "FOR r IN @@col",
@@ -79,6 +79,7 @@ public class GridFunctionCommand implements ICommand<ArangoCursor<Data>> {
             }
             put("outputTol", fixTolerance(oTolerance));
         }}, Data.class);
+        progress.increment();
         return datas;
     }
 

@@ -22,6 +22,21 @@ public class WebSocketProgress implements IProgress {
     }
 
     @Override
+    public void setWork(int outOf, String message) {
+
+    }
+
+    @Override
+    public void setWork(int outOf, String message, Object... args) {
+
+    }
+
+    @Override
+    public void increment() {
+
+    }
+
+    @Override
     public void update(int done, int outOf) {
         send(done, outOf, message);
     }
