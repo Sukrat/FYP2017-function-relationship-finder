@@ -31,9 +31,9 @@
     app.config(function ($locationProvider, $routeProvider) {
         $locationProvider.hashPrefix('!');
         $routeProvider
-            .when('/root', {
-                template: '<root></root>'
+            .when('/profile', {
+                template: '<profile></profile>'
             })
-            .otherwise('/root');
+            .otherwise('/profile');
     });
 })();

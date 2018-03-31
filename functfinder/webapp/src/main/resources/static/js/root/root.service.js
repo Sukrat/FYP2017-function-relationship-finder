@@ -21,7 +21,9 @@
         function error(error) {
             vm.loading(false);
             var errorMsg = "";
-            if (error && error.message) {
+            if (error && error.data && error.data.message) {
+                errorMsg = error.data.message;
+            } else if (error && error.message) {
                 errorMsg = error.message;
             } else {
                 errorMsg = error;
@@ -33,8 +35,16 @@
             });
         }
 
-        function success(message) {
+        function success(response) {
             vm.loading(false);
+            var message;
+            if (response && response.data && response.data.message) {
+                message = response.data.message;
+            } else if (response && response.message) {
+                message = response.message;
+            } else {
+                message = response;
+            }
             _.forEach(vm.messageSubject.observers, function (observer) {
                 observer.next({
                     success: message
