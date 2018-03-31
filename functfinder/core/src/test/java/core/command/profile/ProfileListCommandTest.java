@@ -1,4 +1,4 @@
-package core.command.col;
+package core.command.profile;
 
 import core.command.ICommandTest;
 import core.command.profile.ProfileListCommand;

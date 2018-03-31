@@ -6,12 +6,12 @@ import core.command.CommandException;
 import core.command.ICommand;
 import core.command.IProgress;
 
-public class ProfileCreateCommand implements ICommand<Void> {
+public class ProfileDeleteCommand implements ICommand<Void> {
 
     private Operations operations;
     private String profile;
 
-    public ProfileCreateCommand(Operations operations, String profile) {
+    public ProfileDeleteCommand(Operations operations, String profile) {
         this.operations = operations;
         this.profile = profile;
     }
@@ -19,13 +19,15 @@ public class ProfileCreateCommand implements ICommand<Void> {
     @Override
     public Void execute(IProgress progress) {
         if (profile == null || profile.trim().isEmpty()) {
-            throw new CommandException("Profile name cannot be null!");
+            throw new CommandException("Profile cannot be empty when deleting!");
         }
+
         String collectionName = Util.dataCollectionName(profile);
         if (operations.collectionExists(collectionName)) {
-            throw new CommandException("'%s' profile already exists!", Util.getProfile(collectionName));
+            operations.dropCollection(collectionName);
+        } else {
+            throw new CommandException("Profile '%s' doesnot exists", profile);
         }
-        operations.collection(collectionName);
         return null;
     }
 }

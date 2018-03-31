@@ -30,4 +30,12 @@ public class ProfileCreateCommandTest extends ICommandTest {
 
         execute(sut);
     }
+
+    @Test(expected = CommandException.class)
+    public void execute_whenEmptyThrow() {
+        String profile = "";
+        sut = new ProfileCreateCommand(operations, profile);
+
+        execute(sut);
+    }
 }
