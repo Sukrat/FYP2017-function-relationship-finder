@@ -1,64 +1,69 @@
 package cmdapp.tasks;
 
 
+import cmdapp.CmdCommandExecutor;
 import cmdapp.CmdProgress;
 import cmdapp.argument.DbScanArguments;
-import core.command.data.DataUploadCommand;
-import core.command.data.DeleteDataCommand;
-import core.command.data.ListFileNamesCommand;
-import core.command.data.NormalizeCommand;
+import com.arangodb.ArangoCursor;
+import core.command.csv.CompiledRegressionToCsvCommand;
+import core.command.csv.DataToCsvCommand;
 import core.command.dbscan.DbScanAnalyseColumnCommand;
+import core.command.dbscan.DbScanAnalyseColumnsCommand;
 import core.command.dbscan.DbScanFunctionalCheckCommand;
+import core.command.dbscan.DbScanFunctionalCommand;
+import core.model.CompiledRegression;
+import core.model.Data;
+import core.service.CsvService;
+import core.service.DataService;
 import org.springframework.stereotype.Component;
 
 import java.io.*;
+import java.util.Collection;
 
 @Component
 public class DbscanTask extends Task {
 
-    private DataUploadCommand dataUploadCommand;
-    private DeleteDataCommand deleteDataCommand;
-    private ListFileNamesCommand listFileNamesCommand;
-    private DbScanFunctionalCheckCommand dbScanFunctionalCheckCommand;
-    private DbScanAnalyseColumnCommand dbScanAnalyseColumnCommand;
     private DbScanArguments dbScanArguments;
-    private NormalizeCommand normalizeCommand;
 
-    public DbscanTask(DataUploadCommand dataUploadCommand,
-                      DeleteDataCommand deleteDataCommand,
-                      ListFileNamesCommand listFileNamesCommand,
-                      DbScanFunctionalCheckCommand dbScanFunctionalCheckCommand,
-                      DbScanAnalyseColumnCommand dbScanAnalyseColumnCommand,
-                      DbScanArguments dbScanArguments, NormalizeCommand normalizeCommand) {
-        this.dataUploadCommand = dataUploadCommand;
-        this.deleteDataCommand = deleteDataCommand;
-        this.listFileNamesCommand = listFileNamesCommand;
-        this.dbScanFunctionalCheckCommand = dbScanFunctionalCheckCommand;
-        this.dbScanAnalyseColumnCommand = dbScanAnalyseColumnCommand;
+    public DbscanTask(CmdCommandExecutor cmdCommandExecutor, DataService dataService, CsvService csvService,
+                      DbScanArguments dbScanArguments) {
+        super(cmdCommandExecutor, dataService, csvService);
         this.dbScanArguments = dbScanArguments;
-        this.normalizeCommand = normalizeCommand;
     }
 
     @Override
     public void run() {
         // inserting files
-        insert(dbScanArguments, dataUploadCommand, normalizeCommand);
+        insert(dbScanArguments);
 
         if (dbScanArguments.isFunctionCheck()) {
-            ByteArrayOutputStream execute = dbScanFunctionalCheckCommand.execute(new CmdProgress(),
-                    new DbScanFunctionalCheckCommand.Param(dbScanArguments.getRadius(),
-                            dbScanArguments.getOutputRadius()));
+            ArangoCursor<Data> datas = cmdCommandExecutor.execute(new DbScanFunctionalCommand(
+                    dataService,
+                    dbScanArguments.getRadius(),
+                    dbScanArguments.getOutputRadius()
+            ));
+            ByteArrayOutputStream execute = cmdCommandExecutor.execute(new DataToCsvCommand(
+                    csvService,
+                    datas.asListRemaining()
+            ));
             save(execute, "dbscan-function-check.csv");
         }
 
         dbScanArguments.getAnalyseColumns()
                 .stream()
                 .forEach(columNo -> {
-                    ByteArrayOutputStream analyse = dbScanAnalyseColumnCommand.execute(new CmdProgress(),
-                            new DbScanAnalyseColumnCommand.Param(dbScanArguments.getOutputRadius(), columNo));
-                    save(analyse, String.format("dbscan-analyse-%d.csv", columNo));
+                    Collection<CompiledRegression> compiledRegressions = cmdCommandExecutor.execute(new DbScanAnalyseColumnsCommand(
+                            dataService,
+                            dbScanArguments.getRadius(),
+                            columNo
+                    ));
+                    ByteArrayOutputStream execute = cmdCommandExecutor.execute(new CompiledRegressionToCsvCommand(
+                            csvService,
+                            compiledRegressions
+                    ));
+                    save(execute, String.format("dbscan-analyse-%d.csv", columNo));
                 });
 
-        cleanup(listFileNamesCommand, deleteDataCommand);
+        cleanup();
     }
 }

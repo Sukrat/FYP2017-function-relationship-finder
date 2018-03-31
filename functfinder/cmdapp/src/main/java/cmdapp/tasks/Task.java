@@ -1,17 +1,30 @@
 package cmdapp.tasks;
 
+import cmdapp.CmdCommandExecutor;
 import cmdapp.CmdException;
 import cmdapp.CmdProgress;
 import cmdapp.argument.ExecutionArguments;
 import core.command.CommandException;
-import core.command.data.DataUploadCommand;
-import core.command.data.DeleteDataCommand;
-import core.command.data.ListFileNamesCommand;
-import core.command.data.NormalizeCommand;
+import core.command.csv.CsvToDataCommand;
+import core.command.data.*;
+import core.model.Data;
+import core.service.CsvService;
+import core.service.DataService;
 
 import java.io.*;
+import java.util.Collection;
 
 public abstract class Task implements Runnable {
+
+    protected CmdCommandExecutor cmdCommandExecutor;
+    protected DataService dataService;
+    protected CsvService csvService;
+
+    public Task(CmdCommandExecutor cmdCommandExecutor, DataService dataService, CsvService csvService) {
+        this.cmdCommandExecutor = cmdCommandExecutor;
+        this.dataService = dataService;
+        this.csvService = csvService;
+    }
 
     protected void save(ByteArrayOutputStream outputStream, String filename) {
         FileOutputStream fileOutputStream = null;
@@ -31,7 +44,7 @@ public abstract class Task implements Runnable {
         }
     }
 
-    protected void insert(ExecutionArguments args, DataUploadCommand command, NormalizeCommand normalizeCommand) {
+    protected void insert(ExecutionArguments args) {
         args.getFiles()
                 .stream()
                 .forEach(file -> {
@@ -41,19 +54,28 @@ public abstract class Task implements Runnable {
                     } catch (FileNotFoundException e) {
                         throw new CmdException(e.getMessage());
                     }
-                    command.execute(new CmdProgress(),
-                            new DataUploadCommand.Param(in, file.getName()));
+                    Collection<Data> datas = cmdCommandExecutor.execute(
+                            new CsvToDataCommand(
+                                    csvService,
+                                    in, file.getName()));
+                    cmdCommandExecutor.execute(new DataInsertCommand(
+                            dataService,
+                            datas
+                    ));
                 });
         if (args.isNormalise()) {
-            normalizeCommand.execute(new CmdProgress(), null);
+            cmdCommandExecutor.execute(new DataNormalizeCommand(
+                    dataService
+            ));
         }
     }
 
-    protected void cleanup(ListFileNamesCommand listFileNamesCommand, DeleteDataCommand deleteDataCommand) {
-        listFileNamesCommand.execute(new CmdProgress(), null)
-                .stream()
-                .forEach(filename -> {
-                    deleteDataCommand.execute(new CmdProgress(), filename);
-                });
+    protected void cleanup() {
+        Collection<String> fileNames = cmdCommandExecutor.execute(new DataGetFileNamesCommand(
+                dataService
+        ));
+        fileNames.stream().forEach(filename -> new DataDeleteByFileNameCommand(
+                dataService, filename
+        ));
     }
 }

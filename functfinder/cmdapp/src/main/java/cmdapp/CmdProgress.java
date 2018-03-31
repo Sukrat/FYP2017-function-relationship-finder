@@ -1,9 +1,10 @@
 package cmdapp;
 
 import core.command.CommandProgess;
+import core.command.IProgress;
 
 
-public class CmdProgress implements CommandProgess {
+public class CmdProgress implements IProgress {
 
     private int done = 0;
     private int outOf = 0;

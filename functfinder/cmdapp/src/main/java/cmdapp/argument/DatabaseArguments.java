@@ -9,7 +9,10 @@ import org.springframework.stereotype.Component;
 public class DatabaseArguments {
 
     @Parameter(names = {"--databaseName"}, description = "Name of the database")
-    private String databaseName = "functfinderCmd";
+    private String databaseName = "functfinder";
+
+    @Parameter(names = {"--profile"}, description = "Name of the profile")
+    private String profileName = "cmd";
 
     @Parameter(names = {"--user"}, description = "Username for accessing the database", order = 0)
     private String user = "root";
@@ -48,5 +51,9 @@ public class DatabaseArguments {
 
     public int getMaxConnections() {
         return maxConnections;
+    }
+
+    public String getProfileName() {
+        return profileName;
     }
 }
