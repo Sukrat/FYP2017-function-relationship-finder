@@ -19,11 +19,18 @@ public class GridArguments extends ExecutionArguments {
     @Parameter(names = {"--otol"}, description = "Tolerance of the output parameter", order = 4)
     private Double outputTolerances = 1.0;
 
+    @Parameter(names = {"--functcheck"}, description = "if you want functional check as well", order = 2)
+    private boolean functionCheck = false;
+
     public List<Double> getParameterTolerances() {
         return parameterTolerances;
     }
 
     public Double getOutputTolerances() {
         return outputTolerances;
+    }
+
+    public boolean isFunctionCheck() {
+        return functionCheck;
     }
 }

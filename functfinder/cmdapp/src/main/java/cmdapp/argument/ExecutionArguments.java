@@ -20,9 +20,6 @@ public abstract class ExecutionArguments {
     @Parameter(names = {"--cols"}, description = "List of column nos. need to be analysed (-1 for all)", order = 1)
     private List<Integer> analyseColumns = new ArrayList<>(Arrays.asList(-1));
 
-    @Parameter(names = {"--functcheck"}, description = "if you want functional check as well", order = 2)
-    private boolean functionCheck = false;
-
     @Parameter(names = {"--normalise", "--normalize"}, description = "if you want to normalize and then analyse", order = 2)
     private boolean normalise = false;
 
@@ -32,10 +29,6 @@ public abstract class ExecutionArguments {
 
     public List<Integer> getAnalyseColumns() {
         return analyseColumns;
-    }
-
-    public boolean isFunctionCheck() {
-        return functionCheck;
     }
 
     public boolean isNormalise() {

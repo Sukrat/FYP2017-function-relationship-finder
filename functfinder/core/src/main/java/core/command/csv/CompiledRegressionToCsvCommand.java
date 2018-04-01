@@ -4,11 +4,9 @@ import core.command.ICommand;
 import core.command.IProgress;
 import core.model.CompiledRegression;
 import core.service.ICsvService;
-import org.supercsv.cellprocessor.Optional;
-import org.supercsv.cellprocessor.ParseDouble;
-import org.supercsv.cellprocessor.ParseInt;
-import org.supercsv.cellprocessor.ParseLong;
+import org.supercsv.cellprocessor.*;
 import org.supercsv.cellprocessor.constraint.NotNull;
+import org.supercsv.cellprocessor.constraint.StrNotNullOrEmpty;
 import org.supercsv.cellprocessor.ift.CellProcessor;
 
 import java.io.ByteArrayOutputStream;
@@ -33,12 +31,18 @@ public class CompiledRegressionToCsvCommand implements ICommand<ByteArrayOutputS
         progress.setWork(compiledRegressions.size(), "Converting regressions to csv!");
 
         ByteArrayOutputStream outputStream = csvService.toCsv(compiledRegressions, true,
-                new String[]{"colNo", "meanM", "stdDevM", "weightedMeanM", "weightedStdDevM",
+                new String[]{"colNo",
+                        "tolerance",
+                        "meanM", "stdDevM", "weightedMeanM", "weightedStdDevM", "meanR", "stdDevR",
                         "meanC", "stdDevC", "weightedMeanC", "weightedStdDevC",
                         "numberOfOutliers", "numberOfClusters", "avgNumberOfPointsInCluster", "stdDevNumberOfPointsInCluster"},
                 new CellProcessor[]{new NotNull(new ParseInt()),
+                        new Optional(),
                         new Optional(new ParseDouble()),
                         new Optional(new ParseDouble()),
+                        new Optional(new ParseDouble()),
+                        new Optional(new ParseDouble()),
+
                         new Optional(new ParseDouble()),
                         new Optional(new ParseDouble()),
 
@@ -59,8 +63,12 @@ public class CompiledRegressionToCsvCommand implements ICommand<ByteArrayOutputS
 
                     map.put("meanM", elem.getMeanM());
                     map.put("stdDevM", elem.getStdDevM());
+
                     map.put("meanC", elem.getMeanC());
                     map.put("stdDevC", elem.getStdDevC());
+
+                    map.put("meanR", elem.getMeanR());
+                    map.put("stdDevR", elem.getStdDevR());
 
                     map.put("weightedMeanM", elem.getWeightedMeanM());
                     map.put("weightedStdDevM", elem.getWeightedStdDevM());
@@ -71,6 +79,8 @@ public class CompiledRegressionToCsvCommand implements ICommand<ByteArrayOutputS
                     map.put("numberOfClusters", elem.getNumberOfClusters());
                     map.put("avgNumberOfPointsInCluster", elem.getAvgNumberOfPointsInCluster());
                     map.put("stdDevNumberOfPointsInCluster", elem.getStdDevAvgNumberOfPointsInCluster());
+
+                    map.put("tolerance", "\"" + elem.getTolerances() + "\"");
 
                     return map;
                 });

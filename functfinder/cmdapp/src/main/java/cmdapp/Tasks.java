@@ -1,8 +1,6 @@
 package cmdapp;
 
-import cmdapp.tasks.DbscanTask;
-import cmdapp.tasks.GridTask;
-import cmdapp.tasks.Task;
+import cmdapp.tasks.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -14,6 +12,7 @@ public class Tasks {
 
     public static String GRID_COMMAND = "grid";
     public static String DBSCAN_COMMAND = "dbscan";
+    public static String CONTINUOUS_COMMAND = "cont";
 
     private String command;
     private Map<String, Task> tasks = new HashMap<>();
@@ -21,10 +20,11 @@ public class Tasks {
     @Autowired
     public Tasks(String command,
                  DbscanTask dbscanTask,
-                 GridTask gridTask) {
+                 GridTask gridTask, ContinuousTask continuousTask) {
         this.command = command;
         tasks.put(GRID_COMMAND, gridTask);
         tasks.put(DBSCAN_COMMAND, dbscanTask);
+        tasks.put(CONTINUOUS_COMMAND, continuousTask);
     }
 
     public void run() {

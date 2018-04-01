@@ -18,22 +18,18 @@ import java.io.*;
 import java.util.Collection;
 
 @Component
-public class GridTask extends Task {
+public class GridTask extends ExecutionTask {
 
     private GridArguments gridArguments;
 
     public GridTask(ICommandExecutor commandExecutor, IDataService dataService, ICsvService csvService,
                     GridArguments gridArguments) {
-        super(commandExecutor, dataService, csvService);
+        super(commandExecutor, dataService, csvService, gridArguments);
         this.gridArguments = gridArguments;
     }
 
     @Override
-    public void run() {
-        cleanup();
-        // inserting files
-        insert(gridArguments);
-
+    protected void afterInsertionRun() {
         if (gridArguments.isFunctionCheck()) {
             ArangoCursor<Data> datas = executor.execute(new GridFunctionCommand(
                     dataService,
@@ -61,6 +57,5 @@ public class GridTask extends Task {
                     ));
                     save(execute, String.format("grid-analyse-(%d).csv", columNo));
                 });
-        cleanup();
     }
 }

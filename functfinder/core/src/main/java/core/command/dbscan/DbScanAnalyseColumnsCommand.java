@@ -63,14 +63,12 @@ public class DbScanAnalyseColumnsCommand implements ICommand<Collection<Compiled
             throw new CommandException("Column number doesnot exist! (Expected: < %d and > 0 and got: )",
                     any.getRawColumns().size(), columnNo);
         }
-
-        progress.setWork(1, "Analysing columns via dbscan!");
         return analyseAll(progress, n1Radius, Arrays.asList(columnNo), any.getRawColumns().size());
     }
 
     private List<CompiledRegression> analyseAll(IProgress progress, double radius, List<Integer> colNos, int size) {
         Long totalPoints = dataService.count();
-        progress.setWork(Math.toIntExact(totalPoints), "Analysing columns via dbscan!");
+        progress.setWork(Math.toIntExact(totalPoints), "Scanning each data point to form clusters! tol: %f", radius);
 
         List<Data> datas = dataService.findAllIds().asListRemaining();
 
@@ -89,7 +87,7 @@ public class DbScanAnalyseColumnsCommand implements ICommand<Collection<Compiled
                 .parallelStream()
                 .map(group ->
                         CompiledRegression.compiledRegression(group.getKey(), group.getValue(),
-                                totalPoints, true))
+                                totalPoints, true, Double.toString(radius)))
                 .collect(Collectors.toList());
         return compiledRegressions;
     }
@@ -106,22 +104,27 @@ public class DbScanAnalyseColumnsCommand implements ICommand<Collection<Compiled
                 + "FILTER dist <= @radius\n"
                 + "COLLECT AGGREGATE\n"
                 + format("sX = SUM(ng.rawColumns.%s),\n", Data.colName(column))
-                + format("sY = SUM(ng.rawColumns.%s),\n", Data.colName(0)) + //output column
-                format("sXX = SUM(POW(ng.rawColumns.%s, 2)),\n", Data.colName(column))
+                + format("sY = SUM(ng.rawColumns.%s),\n", Data.colName(0)) //output column
+                + format("sXX = SUM(POW(ng.rawColumns.%s, 2)),\n", Data.colName(column))
+                + format("sYY = SUM(POW(ng.rawColumns.%s, 2)),\n", Data.colName(0))
                 + format("sXY = SUM(ng.rawColumns.%s * ng.rawColumns.%s),\n", Data.colName(column), Data.colName(0))
                 + "n = LENGTH(ng)\n"
-                + "return { sX: sX, sY: sY, sXX: sXX, sXY: sXY, n: n })[0]\n"
+                + "return { sX: sX, sY: sY, sXX: sXX, sYY: sYY, sXY: sXY, n: n })[0]\n"
                 + "LET a1 = (v.sX * v.sY) - (v.n * v.sXY)\n"
                 + "LET a2 = pow(v.sX, 2) - (v.n * v.sXX)\n"
                 + "LET b1 = (v.sX * v.sXY) - (v.sXX * v.sY)\n"
                 + "LET b2 = pow(v.sX, 2) - (v.n * v.sXX)\n"
+                + "let r1 = (v.n * v.sXY) - (v.sX * v.sY)\n"
+                + "let r2 = sqrt( ((v.n * v.sXX)-(v.sX * v.sX)) * ((v.n * v.sYY)-(v.sY * v.sY)) )\n"
                 + "RETURN {\n"
                 + "colNo: @colNo,\n"
                 + "numOfDataPoints: v.n,\n"
                 + "m1: a1,\n"
                 + "m2: a2,\n"
                 + "c1: b1,\n"
-                + "c2: b2\n"
+                + "c2: b2,\n"
+                + "r1: r1,\n"
+                + "r2: r2\n"
                 + "}\n";
 
         String filter = "";

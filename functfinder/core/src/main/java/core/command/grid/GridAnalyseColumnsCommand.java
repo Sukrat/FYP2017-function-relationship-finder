@@ -53,13 +53,13 @@ public class GridAnalyseColumnsCommand implements ICommand<Collection<CompiledRe
             for (int i = 1; i < any.getWorkColumns().size(); i++) {
                 colNos.add(i);
             }
-            progress.setWork(colNos.size(), "Analysing columns via grid!");
+            progress.setWork(colNos.size(), "Analysing columns via grid! tol: %s", n1Tolerances.toString());
             return analyseAll(progress, any, tolerances, colNos);
         } else if (columnNo < 0 || columnNo >= any.getRawColumns().size()) {
             throw new CommandException(format("Column number doesnot exist! (Expected: < %d and > 0 and got: )",
                     any.getRawColumns().size(), columnNo));
         }
-        progress.setWork(1, "Analysing column nos %d via grid!", columnNo);
+        progress.setWork(1, "Analysing column nos %d via grid! tol: %s", columnNo, n1Tolerances.toString());
         return analyseAll(progress, any, tolerances, Arrays.asList(columnNo));
     }
 
@@ -70,7 +70,8 @@ public class GridAnalyseColumnsCommand implements ICommand<Collection<CompiledRe
                 .map(colNo -> {
                     ArangoCursor<Regression> regressions = analyseColumnByColNos(sample, tolerances, colNo);
                     progress.increment();
-                    return CompiledRegression.compiledRegression(colNo, regressions, totalPoints, false);
+                    return CompiledRegression.compiledRegression(colNo, regressions, totalPoints, false,
+                            n1Tolerances.toString());
                 })
                 .collect(Collectors.toList());
 
@@ -90,14 +91,17 @@ public class GridAnalyseColumnsCommand implements ICommand<Collection<CompiledRe
                 format("sX = SUM(elem.rawColumns.%s),", Data.colName(colNos)),
                 format("sY = SUM(elem.rawColumns.%s),", Data.colName(0)),
                 format("sXX = SUM(POW(elem.rawColumns.%s, 2)),", Data.colName(colNos)),
+                format("sYY = SUM(POW(elem.rawColumns.%s, 2)),", Data.colName(0)),
                 format("sXY = SUM(elem.rawColumns.%s * elem.rawColumns.%s),", Data.colName(colNos), Data.colName(0)),
                 "n = LENGTH(elem)",
-                "return { sX: sX, sY: sY, sXX: sXX, sXY: sXY, n: n })[0]",
+                "return { sX: sX, sY: sY, sXX: sXX, sYY: sYY, sXY: sXY, n: n })[0]",
                 "let a1 = (v.sX * v.sY) - (v.n * v.sXY)",
                 "let a2 = pow(v.sX, 2) - (v.n * v.sXX)",
                 "let b1 = (v.sX * v.sXY) - (v.sXX * v.sY)",
                 "let b2 = pow(v.sX, 2) - (v.n * v.sXX)",
-                "RETURN { numOfDataPoints: v.n, m1: a1, m2: a2, c1: b1, c2: b2 }");
+                "let r1 = (v.n * v.sXY) - (v.sX * v.sY)",
+                "let r2 = sqrt( ((v.n * v.sXX)-(v.sX * v.sX)) * ((v.n * v.sYY)-(v.sY * v.sY)) )",
+                "RETURN { numOfDataPoints: v.n, m1: a1, m2: a2, c1: b1, c2: b2, r1: r1, r2: r2 }");
         // ignoring first tolerance as that is for ouput column
         String cols = "";
         for (int i = 1; i < sample.getWorkColumns().size(); i++) {

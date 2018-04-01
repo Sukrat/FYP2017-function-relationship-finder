@@ -19,22 +19,18 @@ import java.io.*;
 import java.util.Collection;
 
 @Component
-public class DbscanTask extends Task {
+public class DbscanTask extends ExecutionTask {
 
     private DbScanArguments dbScanArguments;
 
     public DbscanTask(ICommandExecutor commandExecutor, IDataService dataService, ICsvService csvService,
                       DbScanArguments dbScanArguments) {
-        super(commandExecutor, dataService, csvService);
+        super(commandExecutor, dataService, csvService, dbScanArguments);
         this.dbScanArguments = dbScanArguments;
     }
 
     @Override
-    public void run() {
-        cleanup();
-        // inserting files
-        insert(dbScanArguments);
-
+    protected void afterInsertionRun() {
         if (dbScanArguments.isFunctionCheck()) {
             ArangoCursor<Data> datas = executor.execute(new DbScanFunctionalCommand(
                     dataService,
@@ -62,7 +58,5 @@ public class DbscanTask extends Task {
                     ));
                     save(execute, String.format("dbscan-analyse-(%d).csv", columNo));
                 });
-
-        cleanup();
     }
 }

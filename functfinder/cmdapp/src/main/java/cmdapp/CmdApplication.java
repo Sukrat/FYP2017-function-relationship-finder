@@ -1,9 +1,6 @@
 package cmdapp;
 
-import cmdapp.argument.DatabaseArguments;
-import cmdapp.argument.DbScanArguments;
-import cmdapp.argument.GridArguments;
-import cmdapp.argument.HelpArguments;
+import cmdapp.argument.*;
 import com.beust.jcommander.JCommander;
 import com.beust.jcommander.ParameterException;
 import org.apache.commons.logging.LogFactory;
@@ -21,12 +18,14 @@ public class CmdApplication {
         HelpArguments helpArguments = new HelpArguments();
         GridArguments gridArguments = new GridArguments();
         DbScanArguments dbScanArguments = new DbScanArguments();
+        ContinuousArguments continuousArguments = new ContinuousArguments();
 
         JCommander jCommander = new JCommander.Builder()
                 .addObject(databaseArguments)
                 .addObject(helpArguments)
                 .addCommand(Tasks.GRID_COMMAND, gridArguments)
                 .addCommand(Tasks.DBSCAN_COMMAND, dbScanArguments)
+                .addCommand(Tasks.CONTINUOUS_COMMAND, continuousArguments)
                 .build();
         jCommander.setProgramName("functfinder");
         AnnotationConfigApplicationContext context = null;
@@ -47,6 +46,7 @@ public class CmdApplication {
             context.getBeanFactory().registerResolvableDependency(HelpArguments.class, helpArguments);
             context.getBeanFactory().registerResolvableDependency(GridArguments.class, gridArguments);
             context.getBeanFactory().registerResolvableDependency(DbScanArguments.class, dbScanArguments);
+            context.getBeanFactory().registerResolvableDependency(ContinuousArguments.class, continuousArguments);
             context.getBeanFactory().registerSingleton("command", jCommander.getParsedCommand());
             context.register(CoreConfiguration.class);
             context.refresh();

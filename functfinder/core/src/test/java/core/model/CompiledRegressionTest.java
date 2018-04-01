@@ -22,6 +22,8 @@ public class CompiledRegressionTest {
                 setM2(10.0);
                 setC1(105.615);
                 setC2(10.0);
+                setR1(0.5);
+                setR2(1.0);
                 setNumOfDataPoints(3L);
             }});
             add(new Regression() {{
@@ -29,6 +31,8 @@ public class CompiledRegressionTest {
                 setM2(100.);
                 setC1(2.256 * 2);
                 setC2(2.0);
+                setR1(1.4);
+                setR2(2.0);
                 setNumOfDataPoints(1L);
             }});
             add(new Regression() {{
@@ -36,11 +40,13 @@ public class CompiledRegressionTest {
                 setM2(1.0);
                 setC1(55.0);
                 setC2(0.0);
+                setR1(2.7);
+                setR2(3.0);
                 setNumOfDataPoints(3L);
             }});
         }};
 
-        CompiledRegression result = CompiledRegression.compiledRegression(10, regressionList, 10L, false);
+        CompiledRegression result = CompiledRegression.compiledRegression(10, regressionList, 10L, false, "sukhi");
 
         assertThat(result.getColNo(), is(10));
         assertThat(result.getMeanM(), is(closeTo(3.7555, DELTA)));
@@ -53,17 +59,22 @@ public class CompiledRegressionTest {
         assertThat(result.getWeightedMeanC(), is(closeTo(4.848642857, DELTA)));
         assertThat(result.getWeightedStdDevC(), is(closeTo(5.002285476, DELTA)));
 
+        assertThat(result.getMeanR(), is(closeTo(0.7, DELTA)));
+        assertThat(result.getStdDevR(), is(closeTo(0.16329931618555, DELTA)));
+
         assertThat(result.getNumberOfOutliers(), is(3L));
         assertThat(result.getNumberOfClusters(), is(3L));
         assertThat(result.getAvgNumberOfPointsInCluster(), is(closeTo(2.3333333333333, DELTA)));
         assertThat(result.getStdDevAvgNumberOfPointsInCluster(), is(closeTo(0.94280904158206, DELTA)));
+
+        assertThat(result.getTolerances(), is("sukhi"));
     }
 
     @Test
     public void compileRegression_whenListEmpty() {
         List<Regression> regressionList = new ArrayList<>();
 
-        CompiledRegression result = CompiledRegression.compiledRegression(10, regressionList, 10L, false);
+        CompiledRegression result = CompiledRegression.compiledRegression(10, regressionList, 10L, false, "sukhi");
 
         assertThat(result.getColNo(), is(10));
         assertTrue(result.getMeanC() == null);

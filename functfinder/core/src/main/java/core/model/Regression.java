@@ -12,6 +12,9 @@ public class Regression {
     private Double c1;
     private Double c2;
 
+    private Double r1;
+    private Double r2;
+
     public Double getM1() {
         return m1;
     }
@@ -58,5 +61,21 @@ public class Regression {
 
     public void setColNo(Integer colNo) {
         this.colNo = colNo;
+    }
+
+    public Double getR1() {
+        return r1;
+    }
+
+    public void setR1(Double r1) {
+        this.r1 = r1;
+    }
+
+    public Double getR2() {
+        return r2;
+    }
+
+    public void setR2(Double r2) {
+        this.r2 = r2;
     }
 }
