@@ -9,12 +9,13 @@ import com.beust.jcommander.ParameterException;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 
+import java.text.ParseException;
+
 public class CmdApplication {
 
     public static void main(String[] args) {
         System.setProperty("org.apache.commons.logging.Log",
                 "org.apache.commons.logging.impl.NoOpLog");
-        System.setProperty("java.util.concurrent.ForkJoinPool.common.parallelism", "8");
 
         DatabaseArguments databaseArguments = new DatabaseArguments();
         HelpArguments helpArguments = new HelpArguments();
@@ -30,13 +31,16 @@ public class CmdApplication {
         jCommander.setProgramName("functfinder");
         AnnotationConfigApplicationContext context = null;
         try {
-
-
             jCommander.parse(args);
             if (helpArguments.isHelp()) {
                 jCommander.usage();
                 return;
             }
+            if (databaseArguments.getMaxConnections() < 1) {
+                throw new ParameterException("Number of connections cannot be less than 1!");
+            }
+            System.setProperty("java.util.concurrent.ForkJoinPool.common.parallelism",
+                    Integer.toString(databaseArguments.getMaxConnections()));
             context = new AnnotationConfigApplicationContext();
             context.registerShutdownHook();
             context.getBeanFactory().registerResolvableDependency(DatabaseArguments.class, databaseArguments);
