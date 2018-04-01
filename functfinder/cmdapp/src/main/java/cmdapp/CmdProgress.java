@@ -20,7 +20,7 @@ public class CmdProgress implements IProgress {
     }
 
     @Override
-    public void increment() {
+    public synchronized void increment() {
         send(++done, outOf, message);
     }
 

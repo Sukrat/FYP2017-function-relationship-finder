@@ -2,6 +2,8 @@ package core.model;
 
 public class Regression {
 
+    private Integer colNo;
+
     private Long numOfDataPoints;
 
     private Double m1;
@@ -48,5 +50,13 @@ public class Regression {
 
     public void setNumOfDataPoints(Long numOfDataPoints) {
         this.numOfDataPoints = numOfDataPoints;
+    }
+
+    public Integer getColNo() {
+        return colNo;
+    }
+
+    public void setColNo(Integer colNo) {
+        this.colNo = colNo;
     }
 }

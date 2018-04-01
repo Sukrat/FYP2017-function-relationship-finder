@@ -14,6 +14,7 @@ public class CmdApplication {
     public static void main(String[] args) {
         System.setProperty("org.apache.commons.logging.Log",
                 "org.apache.commons.logging.impl.NoOpLog");
+        System.setProperty("java.util.concurrent.ForkJoinPool.common.parallelism", "8");
 
         DatabaseArguments databaseArguments = new DatabaseArguments();
         HelpArguments helpArguments = new HelpArguments();

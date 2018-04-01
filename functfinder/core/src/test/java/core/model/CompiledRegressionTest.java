@@ -40,7 +40,7 @@ public class CompiledRegressionTest {
             }});
         }};
 
-        CompiledRegression result = CompiledRegression.compiledRegression(10, regressionList, 10L);
+        CompiledRegression result = CompiledRegression.compiledRegression(10, regressionList, 10L, false);
 
         assertThat(result.getColNo(), is(10));
         assertThat(result.getMeanM(), is(closeTo(3.7555, DELTA)));
@@ -63,7 +63,7 @@ public class CompiledRegressionTest {
     public void compileRegression_whenListEmpty() {
         List<Regression> regressionList = new ArrayList<>();
 
-        CompiledRegression result = CompiledRegression.compiledRegression(10, regressionList, 10L);
+        CompiledRegression result = CompiledRegression.compiledRegression(10, regressionList, 10L, false);
 
         assertThat(result.getColNo(), is(10));
         assertTrue(result.getMeanC() == null);

@@ -9,6 +9,8 @@ import java.util.Map;
 public interface IDataService {
     Data findAny();
 
+    ArangoCursor<Data> findAllIds();
+
     Data findAnyByFileName(String fileName);
 
     ArangoCursor<Data> findAllByFileName(String fileName);

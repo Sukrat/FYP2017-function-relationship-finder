@@ -30,6 +30,17 @@ public class DataService implements IDataService {
     }
 
     @Override
+    public ArangoCursor<Data> findAllIds() {
+        String query = join(
+                "FOR r in @@col",
+                "RETURN { _id: r._id }");
+        ArangoCursor<Data> queryResult = operations.query(query, new HashMap<String, Object>() {{
+            put("@col", collectionName());
+        }}, Data.class);
+        return queryResult;
+    }
+
+    @Override
     public Data findAnyByFileName(String fileName) {
         String query = join(
                 "FOR r in @@col",

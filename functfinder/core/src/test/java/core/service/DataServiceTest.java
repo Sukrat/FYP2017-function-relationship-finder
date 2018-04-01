@@ -148,4 +148,20 @@ public class DataServiceTest extends DbTest {
 
         assertThat(result, is("abc\ndef\nfgh\n"));
     }
+
+    @Test
+    public void findAllIds() {
+        operations.insert(Faker.nextData("t1", 2, 10), collectionName);
+        operations.insert(Faker.nextData("t2", 2, 13), collectionName);
+
+        List<Data> result = sut.findAllIds()
+                .asListRemaining();
+
+        result.stream()
+                .forEach(m -> {
+                    assertThat(m.getId(), not(emptyOrNullString()));
+                    assertThat(m.getRawColumns(), is(nullValue()));
+                    assertThat(m.getWorkColumns(), is(nullValue()));
+                });
+    }
 }
