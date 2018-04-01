@@ -78,4 +78,16 @@ public class Regression {
     public void setR2(Double r2) {
         this.r2 = r2;
     }
+
+    public Double getM() {
+        return (m2 == 0.0 ? 0.0 : m1 / m2);
+    }
+
+    public Double getC() {
+        return (c2 == 0.0 ? 0.0 : c1 / c2);
+    }
+
+    public Double getR() {
+        return (r2 == 0.0 ? 0.0 : r1 / r2);
+    }
 }

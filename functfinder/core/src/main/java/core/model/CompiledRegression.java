@@ -177,49 +177,40 @@ public class CompiledRegression {
         Double mMean = 0.0;
         Double cMean = 0.0;
 
-        Double mMeanWeighted = 0.0;
-        Double cMeanWeighted = 0.0;
-
         List<Double> rList = new ArrayList<>();
         Double rMean = 0.0;
 
-        List<Long> dataPoints = new ArrayList<>();
+        Double mMeanWeighted = 0.0;
+        Double cMeanWeighted = 0.0;
+
+        List<Long> numPointList = new ArrayList<>();
         Long totalNumOfDataPoints = 0L;
         for (Regression regression : regressionIterator) {
-            Double m1 = regression.getM1();
-            Double m2 = regression.getM2();
-            Double m = (m2 == 0.0 ? 0.0 : m1 / m2);
-
-            Double c1 = regression.getC1();
-            Double c2 = regression.getC2();
-            Double c = (c2 == 0.0 ? 0.0 : c1 / c2);
-
+            Double m = regression.getM();
+            Double c = regression.getC();
             list.add(new Pair<>(m, c));
             mMean += m;
             cMean += c;
 
-            Double r1 = regression.getR1();
-            Double r2 = regression.getR2();
-            Double r = (r2 == 0.0 ? 0.0 : r1 / r2);
-
+            Double r = regression.getR();
             rList.add(r);
             rMean += r;
 
             mMeanWeighted += (m * regression.getNumOfDataPoints());
             cMeanWeighted += (c * regression.getNumOfDataPoints());
             totalNumOfDataPoints += regression.getNumOfDataPoints();
-            dataPoints.add(regression.getNumOfDataPoints());
+            numPointList.add(regression.getNumOfDataPoints());
         }
         if (list.size() == 0) {
             return compiledRegression;
         }
-        mMean = mMean / list.size();
-        cMean = cMean / list.size();
+        mMean /= list.size();
+        cMean /= list.size();
+
+        rMean /= list.size();
 
         mMeanWeighted /= totalNumOfDataPoints;
         cMeanWeighted /= totalNumOfDataPoints;
-
-        rMean /= list.size();
 
         Double mStdDev = 0.0;
         Double cStdDev = 0.0;
@@ -229,52 +220,49 @@ public class CompiledRegression {
 
         Double rStdDev = 0.0;
 
-        int tempIndex = 0;
-
         for (int i = 0; i < list.size(); i++) {
             Pair<Double, Double> elem = list.get(i);
             mStdDev += Math.pow(elem.getKey() - mMean, 2);
             cStdDev += Math.pow(elem.getValue() - cMean, 2);
 
-            mStdDevWeighted += Math.pow((elem.getKey() - mMeanWeighted), 2) * dataPoints.get(tempIndex);
-            cStdDevWeighted += Math.pow((elem.getValue() - cMeanWeighted), 2) * dataPoints.get(tempIndex);
+            mStdDevWeighted += Math.pow((elem.getKey() - mMeanWeighted), 2) * numPointList.get(i);
+            cStdDevWeighted += Math.pow((elem.getValue() - cMeanWeighted), 2) * numPointList.get(i);
 
             rStdDev += Math.pow(rList.get(i) - rMean, 2);
-            tempIndex++;
         }
 
         mStdDev = Math.sqrt(mStdDev / list.size());
         cStdDev = Math.sqrt(cStdDev / list.size());
 
+        rStdDev = Math.sqrt(rStdDev / rList.size());
+
         mStdDevWeighted = Math.sqrt(mStdDevWeighted / totalNumOfDataPoints);
         cStdDevWeighted = Math.sqrt(cStdDevWeighted / totalNumOfDataPoints);
-
-        rStdDev = Math.sqrt(rStdDev / rList.size());
 
         compiledRegression.setMeanM(mMean);
         compiledRegression.setStdDevM(mStdDev);
         compiledRegression.setMeanC(cMean);
         compiledRegression.setStdDevC(cStdDev);
 
+        compiledRegression.setMeanR(rMean);
+        compiledRegression.setStdDevR(rStdDev);
+
         compiledRegression.setWeightedMeanM(mMeanWeighted);
         compiledRegression.setWeightedStdDevM(mStdDevWeighted);
         compiledRegression.setWeightedMeanC(cMeanWeighted);
         compiledRegression.setWeightedStdDevC(cStdDevWeighted);
 
-        compiledRegression.setMeanR(rMean);
-        compiledRegression.setStdDevR(rStdDev);
-
         if (eachPointIsACluster) {
-            compiledRegression.setNumberOfOutliers(totalPoints - dataPoints.size());
+            compiledRegression.setNumberOfOutliers(totalPoints - numPointList.size());
         } else {
             compiledRegression.setNumberOfOutliers(totalPoints - totalNumOfDataPoints);
         }
-        compiledRegression.setNumberOfClusters((long) dataPoints.size());
+        compiledRegression.setNumberOfClusters((long) numPointList.size());
 
-        Double avgNumberOfPointsInCluster = totalNumOfDataPoints.doubleValue() / dataPoints.size();
+        Double avgNumberOfPointsInCluster = totalNumOfDataPoints.doubleValue() / numPointList.size();
         compiledRegression.setAvgNumberOfPointsInCluster(avgNumberOfPointsInCluster);
 
-        double varianceAvgNumberOfPointsInCluster = dataPoints.stream()
+        double varianceAvgNumberOfPointsInCluster = numPointList.stream()
                 .mapToDouble(n -> Math.pow(n - avgNumberOfPointsInCluster, 2))
                 .average().orElse(0.0);
         compiledRegression.setStdDevAvgNumberOfPointsInCluster(Math.sqrt(varianceAvgNumberOfPointsInCluster));

@@ -53,18 +53,16 @@ public class GridAnalyseColumnsCommand implements ICommand<Collection<CompiledRe
             for (int i = 1; i < any.getWorkColumns().size(); i++) {
                 colNos.add(i);
             }
-            progress.setWork(colNos.size(), "Analysing columns via grid! tol: %s", n1Tolerances.toString());
             return analyseAll(progress, any, tolerances, colNos);
         } else if (columnNo < 0 || columnNo >= any.getRawColumns().size()) {
             throw new CommandException(format("Column number doesnot exist! (Expected: < %d and > 0 and got: )",
                     any.getRawColumns().size(), columnNo));
         }
-        progress.setWork(1, "Analysing column nos %d via grid! tol: %s", columnNo, n1Tolerances.toString());
         return analyseAll(progress, any, tolerances, Arrays.asList(columnNo));
     }
 
     private List<CompiledRegression> analyseAll(IProgress progress, Data sample, List<Double> tolerances, List<Integer> colNos) {
-        progress.update(0, colNos.size(), "Analysing all columns!");
+        progress.setWork(colNos.size(), "Analysing columns via grid! tol: %s", n1Tolerances.toString());
         Long totalPoints = dataService.count();
         List<CompiledRegression> compiledRegressions = colNos.parallelStream()
                 .map(colNo -> {
@@ -74,8 +72,6 @@ public class GridAnalyseColumnsCommand implements ICommand<Collection<CompiledRe
                             n1Tolerances.toString());
                 })
                 .collect(Collectors.toList());
-
-        progress.update("Compiling data together!");
         return compiledRegressions;
     }
 
@@ -101,7 +97,16 @@ public class GridAnalyseColumnsCommand implements ICommand<Collection<CompiledRe
                 "let b2 = pow(v.sX, 2) - (v.n * v.sXX)",
                 "let r1 = (v.n * v.sXY) - (v.sX * v.sY)",
                 "let r2 = sqrt( ((v.n * v.sXX)-(v.sX * v.sX)) * ((v.n * v.sYY)-(v.sY * v.sY)) )",
-                "RETURN { numOfDataPoints: v.n, m1: a1, m2: a2, c1: b1, c2: b2, r1: r1, r2: r2 }");
+                "RETURN {",
+                format("colNo: %d,", colNos),
+                "numOfDataPoints: v.n,",
+                "m1: a1,",
+                "m2: a2,",
+                "c1: b1,",
+                "c2: b2,",
+                "r1: r1,",
+                "r2: r2",
+                "}");
         // ignoring first tolerance as that is for ouput column
         String cols = "";
         for (int i = 1; i < sample.getWorkColumns().size(); i++) {

@@ -50,25 +50,26 @@ public class DbScanFunctionalCommand implements ICommand<ArangoCursor<Data>> {
         int startIndex = 1;
         int endIndex = any.getWorkColumns().size();
 
-        String rawQuery = "LET result = (\n"
-                + "FOR r IN @@col\n"
-                + "LET neigh = (\n"
-                + "FOR ng in @@col\n"
-                + "%1$s\n"
-                + "LET dist = SQRT(%2$s)\n"
-                + "FILTER dist <= @radius\n"
-                + "FILTER ABS(ng.workColumns.col0 - r.workColumns.col0) > @outputTolerance\n"
-                + "RETURN ng)\n"
-                + "RETURN neigh\n"
-                + ")\n"
-                + "FOR i IN FLATTEN(result)\n"
-                + "RETURN DISTINCT i\n";
+        String rawQuery = dataService.join(
+                "LET result = (",
+                "FOR r IN @@col",
+                "LET neigh = (",
+                "FOR ng in @@col",
+                "%1$s",
+                "LET dist = SQRT(%2$s)",
+                "FILTER dist <= @radius",
+                "FILTER ABS(ng.workColumns.col0 - r.workColumns.col0) > @outputTolerance",
+                "RETURN ng)",
+                "RETURN neigh",
+                ")",
+                "FOR i IN FLATTEN(result)",
+                "RETURN DISTINCT i");
 
         String filter = "";
         String dist = "";
         for (int i = startIndex; i < endIndex; i++) {
-            filter += format("FILTER (ng.workColumns.%1$s >= -@radius + r.workColumns.%1$s\n", Data.colName(i));
-            filter += format("&& ng.workColumns.%1$s <= @radius + r.workColumns.%1$s)\n", Data.colName(i));
+            filter += format("FILTER (ng.workColumns.%1$s >= r.workColumns.%1$s - @radius\n", Data.colName(i));
+            filter += format("&& ng.workColumns.%1$s <= r.workColumns.%1$s) + @radius\n", Data.colName(i));
             dist += format("POW(ng.workColumns.%1$s - r.workColumns.%1$s, 2) + \n", Data.colName(i));
         }
         dist += "0";
