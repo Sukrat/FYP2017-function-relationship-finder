@@ -25,5 +25,7 @@ public interface IDataService {
 
     String collectionName();
 
+    Long count();
+
     String join(String... s);
 }

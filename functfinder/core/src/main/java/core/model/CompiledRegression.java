@@ -18,10 +18,20 @@ public class CompiledRegression {
     private Double stdDevC;
 
     private Double weightedMeanM;
+
     private Double weightedStdDevM;
 
     private Double weightedMeanC;
+
     private Double weightedStdDevC;
+
+    private Long numberOfOutliers;
+
+    private Long numberOfClusters;
+
+    private Double avgNumberOfPointsInCluster;
+
+    private Double stdDevAvgNumberOfPointsInCluster;
 
     public int getColNo() {
         return colNo;
@@ -63,7 +73,72 @@ public class CompiledRegression {
         this.stdDevC = stdDevC;
     }
 
-    public static CompiledRegression compiledRegression(int colNo, Iterable<Regression> regressionIterator) {
+    public Double getWeightedMeanM() {
+        return weightedMeanM;
+    }
+
+    public void setWeightedMeanM(Double weightedMeanM) {
+        this.weightedMeanM = weightedMeanM;
+    }
+
+    public Double getWeightedStdDevM() {
+        return weightedStdDevM;
+    }
+
+    public void setWeightedStdDevM(Double weightedStdDevM) {
+        this.weightedStdDevM = weightedStdDevM;
+    }
+
+    public Double getWeightedMeanC() {
+        return weightedMeanC;
+    }
+
+    public void setWeightedMeanC(Double weightedMeanC) {
+        this.weightedMeanC = weightedMeanC;
+    }
+
+    public Double getWeightedStdDevC() {
+        return weightedStdDevC;
+    }
+
+    public void setWeightedStdDevC(Double weightedStdDevC) {
+        this.weightedStdDevC = weightedStdDevC;
+    }
+
+    public Long getNumberOfOutliers() {
+        return numberOfOutliers;
+    }
+
+    public void setNumberOfOutliers(Long numberOfOutliers) {
+        this.numberOfOutliers = numberOfOutliers;
+    }
+
+    public Long getNumberOfClusters() {
+        return numberOfClusters;
+    }
+
+    public void setNumberOfClusters(Long numberOfClusters) {
+        this.numberOfClusters = numberOfClusters;
+    }
+
+    public Double getAvgNumberOfPointsInCluster() {
+        return avgNumberOfPointsInCluster;
+    }
+
+    public void setAvgNumberOfPointsInCluster(Double avgNumberOfPointsInCluster) {
+        this.avgNumberOfPointsInCluster = avgNumberOfPointsInCluster;
+    }
+
+    public Double getStdDevAvgNumberOfPointsInCluster() {
+        return stdDevAvgNumberOfPointsInCluster;
+    }
+
+    public void setStdDevAvgNumberOfPointsInCluster(Double stdDevAvgNumberOfPointsInCluster) {
+        this.stdDevAvgNumberOfPointsInCluster = stdDevAvgNumberOfPointsInCluster;
+    }
+
+    public static CompiledRegression compiledRegression(int colNo, Iterable<Regression> regressionIterator, Long totalPoints,
+                                                        boolean eachPointIsACluster) {
         CompiledRegression compiledRegression = new CompiledRegression();
         compiledRegression.setColNo(colNo);
 
@@ -74,7 +149,7 @@ public class CompiledRegression {
         Double mMeanWeighted = 0.0;
         Double cMeanWeighted = 0.0;
         List<Long> dataPoints = new ArrayList<>();
-        Long totalNumOfDataPoints = 0l;
+        Long totalNumOfDataPoints = 0L;
         for (Regression regression : regressionIterator) {
             Double m1 = regression.getM1();
             Double m2 = regression.getM2();
@@ -132,38 +207,22 @@ public class CompiledRegression {
         compiledRegression.setWeightedStdDevM(mStdDevWeighted);
         compiledRegression.setWeightedMeanC(cMeanWeighted);
         compiledRegression.setWeightedStdDevC(cStdDevWeighted);
+
+        if (eachPointIsACluster) {
+            compiledRegression.setNumberOfOutliers(totalPoints - dataPoints.size());
+        } else {
+            compiledRegression.setNumberOfOutliers(totalPoints - totalNumOfDataPoints);
+        }
+        compiledRegression.setNumberOfClusters((long) dataPoints.size());
+
+        Double avgNumberOfPointsInCluster = totalNumOfDataPoints.doubleValue() / dataPoints.size();
+        compiledRegression.setAvgNumberOfPointsInCluster(avgNumberOfPointsInCluster);
+
+        double varianceAvgNumberOfPointsInCluster = dataPoints.stream()
+                .mapToDouble(n -> Math.pow(n - avgNumberOfPointsInCluster, 2))
+                .average().orElse(0.0);
+        compiledRegression.setStdDevAvgNumberOfPointsInCluster(Math.sqrt(varianceAvgNumberOfPointsInCluster));
         return compiledRegression;
     }
 
-    public Double getWeightedMeanM() {
-        return weightedMeanM;
-    }
-
-    public void setWeightedMeanM(Double weightedMeanM) {
-        this.weightedMeanM = weightedMeanM;
-    }
-
-    public Double getWeightedStdDevM() {
-        return weightedStdDevM;
-    }
-
-    public void setWeightedStdDevM(Double weightedStdDevM) {
-        this.weightedStdDevM = weightedStdDevM;
-    }
-
-    public Double getWeightedMeanC() {
-        return weightedMeanC;
-    }
-
-    public void setWeightedMeanC(Double weightedMeanC) {
-        this.weightedMeanC = weightedMeanC;
-    }
-
-    public Double getWeightedStdDevC() {
-        return weightedStdDevC;
-    }
-
-    public void setWeightedStdDevC(Double weightedStdDevC) {
-        this.weightedStdDevC = weightedStdDevC;
-    }
 }

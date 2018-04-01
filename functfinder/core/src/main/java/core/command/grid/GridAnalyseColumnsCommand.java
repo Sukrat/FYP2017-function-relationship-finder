@@ -65,11 +65,12 @@ public class GridAnalyseColumnsCommand implements ICommand<Collection<CompiledRe
 
     private List<CompiledRegression> analyseAll(IProgress progress, Data sample, List<Double> tolerances, List<Integer> colNos) {
         progress.update(0, colNos.size(), "Analysing all columns!");
+        Long totalPoints = dataService.count();
         List<CompiledRegression> compiledRegressions = colNos.parallelStream()
                 .map(colNo -> {
                     ArangoCursor<Regression> regressions = analyseColumnByColNos(sample, tolerances, colNo);
                     progress.increment();
-                    return CompiledRegression.compiledRegression(colNo, regressions);
+                    return CompiledRegression.compiledRegression(colNo, regressions, totalPoints, false);
                 })
                 .collect(Collectors.toList());
 
@@ -86,10 +87,10 @@ public class GridAnalyseColumnsCommand implements ICommand<Collection<CompiledRe
                 "FILTER COUNT(members) > 1",
                 "let v = ( FOR elem IN members",
                 "COLLECT AGGREGATE",
-                format("sX = SUM(elem.workColumns.%s),", Data.colName(colNos)),
-                format("sY = SUM(elem.workColumns.%s),", Data.colName(0)),
-                format("sXX = SUM(POW(elem.workColumns.%s, 2)),", Data.colName(colNos)),
-                format("sXY = SUM(elem.workColumns.%s * elem.workColumns.%s),", Data.colName(colNos), Data.colName(0)),
+                format("sX = SUM(elem.rawColumns.%s),", Data.colName(colNos)),
+                format("sY = SUM(elem.rawColumns.%s),", Data.colName(0)),
+                format("sXX = SUM(POW(elem.rawColumns.%s, 2)),", Data.colName(colNos)),
+                format("sXY = SUM(elem.rawColumns.%s * elem.rawColumns.%s),", Data.colName(colNos), Data.colName(0)),
                 "n = LENGTH(elem)",
                 "return { sX: sX, sY: sY, sXX: sXX, sXY: sXY, n: n })[0]",
                 "let a1 = (v.sX * v.sY) - (v.n * v.sXY)",

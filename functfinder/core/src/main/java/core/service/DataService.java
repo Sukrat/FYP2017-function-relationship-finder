@@ -112,6 +112,11 @@ public class DataService implements IDataService {
     }
 
     @Override
+    public Long count() {
+        return operations.count(collectionName());
+    }
+
+    @Override
     public String join(String... s) {
         return String.join("\n", s) + "\n";
     }

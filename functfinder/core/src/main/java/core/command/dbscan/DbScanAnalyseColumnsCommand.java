@@ -68,11 +68,12 @@ public class DbScanAnalyseColumnsCommand implements ICommand<Collection<Compiled
     }
 
     private List<CompiledRegression> analyseAll(IProgress progress, double radius, List<Integer> colNos, int size) {
+        Long totalPoints = dataService.count();
         List<CompiledRegression> compiledRegressions = colNos.parallelStream()
                 .map(colNo -> {
                     ArangoCursor<Regression> regressions = analyseColumnByColNos(radius, colNo, size);
                     progress.increment();
-                    return CompiledRegression.compiledRegression(colNo, regressions);
+                    return CompiledRegression.compiledRegression(colNo, regressions, totalPoints, true);
                 })
                 .collect(Collectors.toList());
         return compiledRegressions;
@@ -89,10 +90,10 @@ public class DbScanAnalyseColumnsCommand implements ICommand<Collection<Compiled
                 + "LET dist = SQRT( %2$s )\n"
                 + "FILTER dist <= @radius\n"
                 + "COLLECT AGGREGATE\n"
-                + format("sX = SUM(ng.workColumns.%s),\n", Data.colName(column))
-                + format("sY = SUM(ng.workColumns.%s),\n", Data.colName(0)) + //output column
-                format("sXX = SUM(POW(ng.workColumns.%s, 2)),\n", Data.colName(column))
-                + format("sXY = SUM(ng.workColumns.%s * ng.workColumns.%s),\n", Data.colName(column), Data.colName(0))
+                + format("sX = SUM(ng.rawColumns.%s),\n", Data.colName(column))
+                + format("sY = SUM(ng.rawColumns.%s),\n", Data.colName(0)) + //output column
+                format("sXX = SUM(POW(ng.rawColumns.%s, 2)),\n", Data.colName(column))
+                + format("sXY = SUM(ng.rawColumns.%s * ng.rawColumns.%s),\n", Data.colName(column), Data.colName(0))
                 + "n = LENGTH(ng)\n"
                 + "return { sX: sX, sY: sY, sXX: sXX, sXY: sXY, n: n })[0]\n"
                 + "FILTER v.n > 1\n"
