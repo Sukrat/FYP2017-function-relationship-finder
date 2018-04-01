@@ -4,9 +4,9 @@ import core.command.ICommand;
 import core.command.IProgress;
 import core.model.CompiledRegression;
 import core.service.ICsvService;
+import org.springframework.validation.ValidationUtils;
 import org.supercsv.cellprocessor.*;
 import org.supercsv.cellprocessor.constraint.NotNull;
-import org.supercsv.cellprocessor.constraint.StrNotNullOrEmpty;
 import org.supercsv.cellprocessor.ift.CellProcessor;
 
 import java.io.ByteArrayOutputStream;
@@ -30,58 +30,55 @@ public class CompiledRegressionToCsvCommand implements ICommand<ByteArrayOutputS
         }
         progress.setWork(compiledRegressions.size(), "Converting regressions to csv!");
 
+        CellProcessor[] processors = new CellProcessor[]{
+                new NotNull(new ParseInt()),
+                new Optional(),
+                new Optional(new ParseDouble()),
+                new Optional(new ParseDouble()),
+                new Optional(new ParseDouble()),
+                new Optional(new ParseDouble()),
+
+                new Optional(new ParseDouble()),
+                new Optional(new ParseDouble()),
+
+                new Optional(new ParseDouble()),
+                new Optional(new ParseDouble()),
+                new Optional(new ParseDouble()),
+                new Optional(new ParseDouble()),
+
+                new Optional(new ParseLong()),
+                new Optional(new ParseLong()),
+                
+                new Optional(new ParseDouble()),
+                new Optional(new ParseDouble())
+        };
+        String[] headers = new String[]{
+                "parameter nos",
+                "tolerance",
+                "M mean", "M std_dev", "C mean", "C std_dev",
+                "R^2 mean", "R^2 std_dev",
+                "weighted M mean", "weighted M std_dev", "weighted C mean", "weighted C std_dev",
+                "outliers n", "num of clusters",
+                "avg num each cluster", "std_dev num each cluster"
+        };
         ByteArrayOutputStream outputStream = csvService.toCsv(compiledRegressions, true,
-                new String[]{"colNo",
-                        "tolerance",
-                        "meanM", "stdDevM", "weightedMeanM", "weightedStdDevM", "meanR", "stdDevR",
-                        "meanC", "stdDevC", "weightedMeanC", "weightedStdDevC",
-                        "numberOfOutliers", "numberOfClusters", "avgNumberOfPointsInCluster", "stdDevNumberOfPointsInCluster"},
-                new CellProcessor[]{new NotNull(new ParseInt()),
-                        new Optional(),
-                        new Optional(new ParseDouble()),
-                        new Optional(new ParseDouble()),
-                        new Optional(new ParseDouble()),
-                        new Optional(new ParseDouble()),
-
-                        new Optional(new ParseDouble()),
-                        new Optional(new ParseDouble()),
-
-                        new Optional(new ParseDouble()),
-                        new Optional(new ParseDouble()),
-                        new Optional(new ParseDouble()),
-                        new Optional(new ParseDouble()),
-
-                        new Optional(new ParseLong()),
-                        new Optional(new ParseLong()),
-                        new Optional(new ParseDouble()),
-                        new Optional(new ParseDouble())},
+                headers, processors,
                 (elem) -> {
                     progress.increment();
 
                     HashMap<String, Object> map = new HashMap<>();
-                    map.put("colNo", elem.getColNo());
-
-                    map.put("meanM", elem.getMeanM());
-                    map.put("stdDevM", elem.getStdDevM());
-
-                    map.put("meanC", elem.getMeanC());
-                    map.put("stdDevC", elem.getStdDevC());
-
-                    map.put("meanR", elem.getMeanR());
-                    map.put("stdDevR", elem.getStdDevR());
-
-                    map.put("weightedMeanM", elem.getWeightedMeanM());
-                    map.put("weightedStdDevM", elem.getWeightedStdDevM());
-                    map.put("weightedMeanC", elem.getWeightedMeanC());
-                    map.put("weightedStdDevC", elem.getWeightedStdDevC());
-
-                    map.put("numberOfOutliers", elem.getNumberOfOutliers());
-                    map.put("numberOfClusters", elem.getNumberOfClusters());
-                    map.put("avgNumberOfPointsInCluster", elem.getAvgNumberOfPointsInCluster());
-                    map.put("stdDevNumberOfPointsInCluster", elem.getStdDevAvgNumberOfPointsInCluster());
-
-                    map.put("tolerance", "\"" + elem.getTolerances() + "\"");
-
+                    Object[] values = new Object[]{
+                            elem.getColNo(),
+                            "\"" + elem.getTolerances() + "\"",
+                            elem.getMeanM(), elem.getStdDevM(), elem.getMeanC(), elem.getWeightedMeanC(),
+                            elem.getMeanRSq(), elem.getStdDevRSq(),
+                            elem.getWeightedMeanM(), elem.getWeightedStdDevM(), elem.getWeightedMeanC(), elem.getWeightedStdDevC(),
+                            elem.getNumberOfOutliers(), elem.getNumberOfClusters(),
+                            elem.getAvgNumberOfPointsInCluster(), elem.getStdDevAvgNumberOfPointsInCluster()
+                    };
+                    for (int i = 0; i < values.length; i++) {
+                        map.put(headers[i], values[i]);
+                    }
                     return map;
                 });
         return outputStream;

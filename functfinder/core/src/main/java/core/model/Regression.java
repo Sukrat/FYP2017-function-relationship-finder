@@ -90,4 +90,9 @@ public class Regression {
     public Double getR() {
         return (r2 == 0.0 ? 0.0 : r1 / r2);
     }
+
+    public Double getRSquared() {
+        Double r = (r2 == 0.0 ? 0.0 : r1 / r2);
+        return r * r;
+    }
 }

@@ -59,8 +59,8 @@ public class CompiledRegressionTest {
         assertThat(result.getWeightedMeanC(), is(closeTo(4.848642857, DELTA)));
         assertThat(result.getWeightedStdDevC(), is(closeTo(5.002285476, DELTA)));
 
-        assertThat(result.getMeanR(), is(closeTo(0.7, DELTA)));
-        assertThat(result.getStdDevR(), is(closeTo(0.16329931618555, DELTA)));
+        assertThat(result.getMeanRSq(), is(closeTo(0.5166666666667, DELTA)));
+        assertThat(result.getStdDevRSq(), is(closeTo(0.22939534045447, DELTA)));
 
         assertThat(result.getNumberOfOutliers(), is(3L));
         assertThat(result.getNumberOfClusters(), is(3L));

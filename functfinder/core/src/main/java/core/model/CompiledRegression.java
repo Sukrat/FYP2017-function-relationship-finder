@@ -25,9 +25,9 @@ public class CompiledRegression {
 
     private Double weightedStdDevC;
 
-    private Double meanR;
+    private Double meanRSq;
 
-    private Double stdDevR;
+    private Double stdDevRSq;
 
     private Long numberOfOutliers;
 
@@ -151,20 +151,20 @@ public class CompiledRegression {
         this.tolerances = tolerances;
     }
 
-    public Double getStdDevR() {
-        return stdDevR;
+    public Double getStdDevRSq() {
+        return stdDevRSq;
     }
 
-    public void setStdDevR(Double stdDevR) {
-        this.stdDevR = stdDevR;
+    public void setStdDevRSq(Double stdDevRSq) {
+        this.stdDevRSq = stdDevRSq;
     }
 
-    public Double getMeanR() {
-        return meanR;
+    public Double getMeanRSq() {
+        return meanRSq;
     }
 
-    public void setMeanR(Double meanR) {
-        this.meanR = meanR;
+    public void setMeanRSq(Double meanRSq) {
+        this.meanRSq = meanRSq;
     }
 
     public static CompiledRegression compiledRegression(int colNo, Iterable<Regression> regressionIterator, Long totalPoints,
@@ -178,7 +178,7 @@ public class CompiledRegression {
         Double cMean = 0.0;
 
         List<Double> rList = new ArrayList<>();
-        Double rMean = 0.0;
+        Double rSqMean = 0.0;
 
         Double mMeanWeighted = 0.0;
         Double cMeanWeighted = 0.0;
@@ -192,9 +192,9 @@ public class CompiledRegression {
             mMean += m;
             cMean += c;
 
-            Double r = regression.getR();
+            Double r = regression.getRSquared();
             rList.add(r);
-            rMean += r;
+            rSqMean += r;
 
             mMeanWeighted += (m * regression.getNumOfDataPoints());
             cMeanWeighted += (c * regression.getNumOfDataPoints());
@@ -207,7 +207,7 @@ public class CompiledRegression {
         mMean /= list.size();
         cMean /= list.size();
 
-        rMean /= list.size();
+        rSqMean /= list.size();
 
         mMeanWeighted /= totalNumOfDataPoints;
         cMeanWeighted /= totalNumOfDataPoints;
@@ -218,7 +218,7 @@ public class CompiledRegression {
         Double mStdDevWeighted = 0.0;
         Double cStdDevWeighted = 0.0;
 
-        Double rStdDev = 0.0;
+        Double rSqStdDev = 0.0;
 
         for (int i = 0; i < list.size(); i++) {
             Pair<Double, Double> elem = list.get(i);
@@ -228,13 +228,13 @@ public class CompiledRegression {
             mStdDevWeighted += Math.pow((elem.getKey() - mMeanWeighted), 2) * numPointList.get(i);
             cStdDevWeighted += Math.pow((elem.getValue() - cMeanWeighted), 2) * numPointList.get(i);
 
-            rStdDev += Math.pow(rList.get(i) - rMean, 2);
+            rSqStdDev += Math.pow(rList.get(i) - rSqMean, 2);
         }
 
         mStdDev = Math.sqrt(mStdDev / list.size());
         cStdDev = Math.sqrt(cStdDev / list.size());
 
-        rStdDev = Math.sqrt(rStdDev / rList.size());
+        rSqStdDev = Math.sqrt(rSqStdDev / rList.size());
 
         mStdDevWeighted = Math.sqrt(mStdDevWeighted / totalNumOfDataPoints);
         cStdDevWeighted = Math.sqrt(cStdDevWeighted / totalNumOfDataPoints);
@@ -244,8 +244,8 @@ public class CompiledRegression {
         compiledRegression.setMeanC(cMean);
         compiledRegression.setStdDevC(cStdDev);
 
-        compiledRegression.setMeanR(rMean);
-        compiledRegression.setStdDevR(rStdDev);
+        compiledRegression.setMeanRSq(rSqMean);
+        compiledRegression.setStdDevRSq(rSqStdDev);
 
         compiledRegression.setWeightedMeanM(mMeanWeighted);
         compiledRegression.setWeightedStdDevM(mStdDevWeighted);
