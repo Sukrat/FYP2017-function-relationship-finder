@@ -35,7 +35,6 @@ public class GridTask extends ExecutionTask {
                 args.getAnalyseColumns().toString(), args.isNormalise() ? "with normalization" : ""
         );
         if (args.isFunctionCheck()) {
-            start();
             ArangoCursor<Data> datas = executor.execute(new GridFunctionCommand(
                     dataService,
                     args.getParameterTolerances(),
@@ -46,9 +45,7 @@ public class GridTask extends ExecutionTask {
                     datas.asListRemaining()
             ));
             save(execute, "grid-fc.csv");
-            printElapsed();
         }
-        start();
         args.getAnalyseColumns()
                 .stream()
                 .forEach(columNo -> {
@@ -63,6 +60,5 @@ public class GridTask extends ExecutionTask {
                     ));
                     save(execute, String.format("grid-analyse-(%d).csv", columNo));
                 });
-        printElapsed();
     }
 }

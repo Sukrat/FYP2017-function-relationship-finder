@@ -45,7 +45,6 @@ public class ContinuousTask extends ExecutionTask {
             final int n = i;
             final Double tol = args.getFromTol() + (i * args.getIncrement());
 
-            start();
             args.getAnalyseColumns()
                     .stream()
                     .forEach(colNo -> {
@@ -77,7 +76,6 @@ public class ContinuousTask extends ExecutionTask {
                             e.printStackTrace();
                         }
                     });
-            printElapsed();
         }
         String filename;
         if (args.isGridWay()) {

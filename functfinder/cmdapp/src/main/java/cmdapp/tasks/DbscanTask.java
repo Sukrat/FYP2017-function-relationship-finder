@@ -35,7 +35,6 @@ public class DbscanTask extends ExecutionTask {
         );
 
         if (args.isFunctionCheck()) {
-            start();
             ArangoCursor<Data> datas = executor.execute(new DbScanFunctionalCommand(
                     dataService,
                     args.getRadius(),
@@ -46,10 +45,8 @@ public class DbscanTask extends ExecutionTask {
                     datas.asListRemaining()
             ));
             save(execute, "dbscan-fc.csv");
-            printElapsed();
         }
 
-        start();
         args.getAnalyseColumns()
                 .stream()
                 .forEach(columNo -> {
@@ -64,6 +61,5 @@ public class DbscanTask extends ExecutionTask {
                     ));
                     save(execute, String.format("dbscan-analyse-(%d).csv", columNo));
                 });
-        printElapsed();
     }
 }

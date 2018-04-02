@@ -8,6 +8,7 @@ public class CmdProgress implements IProgress {
     private int done = 0;
     private int outOf = 0;
     private String message = "working on...";
+    private Long start = System.currentTimeMillis();
 
     @Override
     public void setWork(int outOf, String message) {
@@ -58,7 +59,8 @@ public class CmdProgress implements IProgress {
             called = true;
             System.out.println();
         }
-        System.out.print(String.format("\r[%d / %d]: %s", this.done, this.outOf, this.message));
+        Double elapsed = (System.currentTimeMillis() - start) / 1000.0;
+        System.out.print(String.format("\r[%d / %d]: %s (%.2fsecs)", this.done, this.outOf, this.message, elapsed));
         for (int i = 0; i < previousLength - message.length(); i++) {
             System.out.print(" ");
         }

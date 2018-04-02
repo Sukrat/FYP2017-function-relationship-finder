@@ -96,15 +96,4 @@ public abstract class ExecutionTask implements Task {
             }
         }
     }
-
-    private Long timeStart = 0L;
-
-    protected void start() {
-        timeStart = System.currentTimeMillis();
-    }
-
-    protected void printElapsed() {
-        double elapsed = (System.currentTimeMillis() - timeStart) / 1000.0;
-        System.out.printf("\n[Elapsed: %.2fs]", elapsed);
-    }
 }
