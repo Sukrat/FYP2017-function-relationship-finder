@@ -38,11 +38,13 @@ public class DataInsertCommand implements ICommand<Long> {
                         sample.getWorkColumns().size(), any.getWorkColumns().size());
             }
         }
-        progress.setWork(1, "Inserting data form file: '%s'", any.getFileName());
+        progress.setWork(datas.size(), "Inserting data form file: '%s'", any.getFileName());
 
-        Collection<Data> insert = dataService.insert(datas);
-
-        progress.increment();
-        return insert.stream().count();
+        count = datas.parallelStream()
+                .map(d -> {
+                    progress.increment();
+                    return dataService.insert(d);
+                }).count();
+        return count;
     }
 }

@@ -87,6 +87,15 @@ public class DataServiceTest extends DbTest {
     }
 
     @Test
+    public void insert_single() {
+        Data data = Faker.nextData("t5", 1, 10).get(0);
+
+        Data result = sut.insert(data);
+
+        assertThat(result.getId(), not(emptyOrNullString()));
+    }
+
+    @Test
     public void insert() {
         List<Data> datas = Faker.nextData("t5", 10, 10);
 
@@ -164,4 +173,5 @@ public class DataServiceTest extends DbTest {
                     assertThat(m.getWorkColumns(), is(nullValue()));
                 });
     }
+
 }

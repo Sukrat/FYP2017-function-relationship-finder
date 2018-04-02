@@ -74,6 +74,11 @@ public class DataService implements IDataService {
     }
 
     @Override
+    public Data insert(Data data) {
+        return operations.insert(data, collectionName());
+    }
+
+    @Override
     public Collection<Data> insert(Collection<Data> datas) {
         return operations.insert(datas, collectionName());
     }

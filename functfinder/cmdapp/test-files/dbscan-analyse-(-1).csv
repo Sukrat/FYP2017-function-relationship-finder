@@ -1,1 +1,0 @@
-parameter nos,tolerance,M mean,M std_dev,C mean,C std_dev,R^2 mean,R^2 std_dev,weighted M mean,weighted M std_dev,weighted C mean,weighted C std_dev,outliers n,num of clusters,avg num each cluster,std_dev num each cluster

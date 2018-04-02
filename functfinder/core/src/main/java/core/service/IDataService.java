@@ -15,6 +15,8 @@ public interface IDataService {
 
     ArangoCursor<Data> findAllByFileName(String fileName);
 
+    Data insert(Data data);
+
     Collection<Data> insert(Collection<Data> datas);
 
     long removeByFileName(String fileName);
