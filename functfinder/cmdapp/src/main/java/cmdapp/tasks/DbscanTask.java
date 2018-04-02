@@ -1,7 +1,6 @@
 package cmdapp.tasks;
 
 
-import cmdapp.CommandExecutor;
 import cmdapp.argument.DbScanArguments;
 import com.arangodb.ArangoCursor;
 import core.command.ICommandExecutor;
@@ -21,21 +20,24 @@ import java.util.Collection;
 @Component
 public class DbscanTask extends ExecutionTask {
 
-    private DbScanArguments dbScanArguments;
+    private DbScanArguments args;
 
     public DbscanTask(ICommandExecutor commandExecutor, IDataService dataService, ICsvService csvService,
-                      DbScanArguments dbScanArguments) {
-        super(commandExecutor, dataService, csvService, dbScanArguments);
-        this.dbScanArguments = dbScanArguments;
+                      DbScanArguments args) {
+        super(commandExecutor, dataService, csvService, args);
+        this.args = args;
     }
 
     @Override
     protected void afterInsertionRun() {
-        if (dbScanArguments.isFunctionCheck()) {
+        System.out.printf("Dbscan analyse started with radius: %f, cols: %s, %s!\n",
+                args.getRadius(), args.getAnalyseColumns().toString(), args.isNormalise() ? "with normalization" : ""
+        );
+        if (args.isFunctionCheck()) {
             ArangoCursor<Data> datas = executor.execute(new DbScanFunctionalCommand(
                     dataService,
-                    dbScanArguments.getRadius(),
-                    dbScanArguments.getOutputRadius()
+                    args.getRadius(),
+                    args.getOutputRadius()
             ));
             ByteArrayOutputStream execute = executor.execute(new DataToCsvCommand(
                     csvService,
@@ -44,12 +46,12 @@ public class DbscanTask extends ExecutionTask {
             save(execute, "dbscan-fc.csv");
         }
 
-        dbScanArguments.getAnalyseColumns()
+        args.getAnalyseColumns()
                 .stream()
                 .forEach(columNo -> {
                     Collection<CompiledRegression> compiledRegressions = executor.execute(new DbScanAnalyseColumnsCommand(
                             dataService,
-                            dbScanArguments.getRadius(),
+                            args.getRadius(),
                             columNo
                     ));
                     ByteArrayOutputStream execute = executor.execute(new CompiledRegressionToCsvCommand(

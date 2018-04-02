@@ -19,32 +19,37 @@ import java.util.Collection;
 @Component
 public class ContinuousTask extends ExecutionTask {
 
-    private ContinuousArguments continuousArguments;
+    private ContinuousArguments args;
 
     public ContinuousTask(ICommandExecutor commandExecutor, IDataService dataService, ICsvService csvService,
-                          ContinuousArguments continuousArguments) {
-        super(commandExecutor, dataService, csvService, continuousArguments);
-        this.continuousArguments = continuousArguments;
+                          ContinuousArguments args) {
+        super(commandExecutor, dataService, csvService, args);
+        this.args = args;
 
-        if (continuousArguments.getFromTol() > continuousArguments.getToTol()) {
+        if (args.getFromTol() > args.getToTol()) {
             throw new CmdException("(fromtol or fromradius) value cannot be greater than (totol or toradius)");
-        } else if (continuousArguments.getIncrement() <= 0.0) {
+        } else if (args.getIncrement() <= 0.0) {
             throw new CmdException("increment tol value cannot be less than zero");
         }
     }
 
     @Override
     protected void afterInsertionRun() {
+        System.out.printf("Continuous %s analyse started from tol: %f, increment: %f, to: %f %s!\n",
+                args.isGridWay() ? "grid" : "dbscan", args.getFromTol(), args.getIncrement(), args.getToTol(),
+                args.isNormalise() ? "with normalization" : ""
+        );
         ByteArrayOutputStream main = new ByteArrayOutputStream();
-        for (Double i = continuousArguments.getFromTol(); i < continuousArguments.getToTol();
-             i = Double.sum(i, continuousArguments.getIncrement())) {
-            final Double tol = i;
-            continuousArguments.getAnalyseColumns()
+        int count = (int) ((args.getToTol() - args.getFromTol()) / args.getIncrement());
+        for (int i = 0; i < count; i++) {
+            final int n = i;
+            final Double tol = args.getFromTol() + (i * args.getIncrement());
+            args.getAnalyseColumns()
                     .stream()
                     .forEach(colNo -> {
                         Collection<CompiledRegression> compiledRegressions = null;
 
-                        if (continuousArguments.isGridWay()) {
+                        if (args.isGridWay()) {
                             compiledRegressions = executor.execute(new GridAnalyseColumnsCommand(
                                     dataService,
                                     Arrays.asList(tol),
@@ -60,7 +65,8 @@ public class ContinuousTask extends ExecutionTask {
 
                         ByteArrayOutputStream execute = executor.execute(new CompiledRegressionToCsvCommand(
                                 csvService,
-                                compiledRegressions
+                                compiledRegressions,
+                                n == 0
                         ));
                         try {
                             execute.writeTo(main);
@@ -70,16 +76,18 @@ public class ContinuousTask extends ExecutionTask {
                         }
                     });
         }
-        if (continuousArguments.isGridWay()) {
-            String.format("grid-continuous-(%f)-(%f)-(%f).csv",
-                    continuousArguments.getFromTol(),
-                    continuousArguments.getIncrement(),
-                    continuousArguments.getToTol());
+        String filename;
+        if (args.isGridWay()) {
+            filename = String.format("grid-continuous-(%f)-(%f)-(%f).csv",
+                    args.getFromTol(),
+                    args.getIncrement(),
+                    args.getToTol());
         } else {
-            String.format("dbscan-continuous-(%f)-(%f)-(%f).csv",
-                    continuousArguments.getFromTol(),
-                    continuousArguments.getIncrement(),
-                    continuousArguments.getToTol());
+            filename = String.format("dbscan-continuous-(%f)-(%f)-(%f).csv",
+                    args.getFromTol(),
+                    args.getIncrement(),
+                    args.getToTol());
         }
+        save(main, filename);
     }
 }

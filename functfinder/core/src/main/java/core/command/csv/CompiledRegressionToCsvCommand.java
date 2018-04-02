@@ -17,10 +17,18 @@ public class CompiledRegressionToCsvCommand implements ICommand<ByteArrayOutputS
 
     private ICsvService csvService;
     private Collection<CompiledRegression> compiledRegressions;
+    private boolean writeHeader = true;
 
     public CompiledRegressionToCsvCommand(ICsvService csvService, Collection<CompiledRegression> compiledRegressions) {
         this.csvService = csvService;
         this.compiledRegressions = compiledRegressions;
+    }
+
+    public CompiledRegressionToCsvCommand(ICsvService csvService, Collection<CompiledRegression> compiledRegressions
+            , boolean writeHeader) {
+        this.csvService = csvService;
+        this.compiledRegressions = compiledRegressions;
+        this.writeHeader = writeHeader;
     }
 
     @Override
@@ -48,7 +56,7 @@ public class CompiledRegressionToCsvCommand implements ICommand<ByteArrayOutputS
 
                 new Optional(new ParseLong()),
                 new Optional(new ParseLong()),
-                
+
                 new Optional(new ParseDouble()),
                 new Optional(new ParseDouble())
         };
@@ -61,7 +69,7 @@ public class CompiledRegressionToCsvCommand implements ICommand<ByteArrayOutputS
                 "outliers n", "num of clusters",
                 "avg num each cluster", "std_dev num each cluster"
         };
-        ByteArrayOutputStream outputStream = csvService.toCsv(compiledRegressions, true,
+        ByteArrayOutputStream outputStream = csvService.toCsv(compiledRegressions, writeHeader,
                 headers, processors,
                 (elem) -> {
                     progress.increment();

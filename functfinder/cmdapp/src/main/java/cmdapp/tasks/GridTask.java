@@ -1,6 +1,5 @@
 package cmdapp.tasks;
 
-import cmdapp.CommandExecutor;
 import cmdapp.argument.GridArguments;
 import com.arangodb.ArangoCursor;
 import core.command.ICommandExecutor;
@@ -20,21 +19,26 @@ import java.util.Collection;
 @Component
 public class GridTask extends ExecutionTask {
 
-    private GridArguments gridArguments;
+    private GridArguments args;
 
     public GridTask(ICommandExecutor commandExecutor, IDataService dataService, ICsvService csvService,
-                    GridArguments gridArguments) {
-        super(commandExecutor, dataService, csvService, gridArguments);
-        this.gridArguments = gridArguments;
+                    GridArguments args) {
+        super(commandExecutor, dataService, csvService, args);
+        this.args = args;
+
     }
 
     @Override
     protected void afterInsertionRun() {
-        if (gridArguments.isFunctionCheck()) {
+        System.out.printf("Dbscan analyse started with radius: %s, cols: %s, %s!\n",
+                args.getParameterTolerances().toString(),
+                args.getAnalyseColumns().toString(), args.isNormalise() ? "with normalization" : ""
+        );
+        if (args.isFunctionCheck()) {
             ArangoCursor<Data> datas = executor.execute(new GridFunctionCommand(
                     dataService,
-                    gridArguments.getParameterTolerances(),
-                    gridArguments.getOutputTolerances()
+                    args.getParameterTolerances(),
+                    args.getOutputTolerances()
             ));
             ByteArrayOutputStream execute = executor.execute(new DataToCsvCommand(
                     csvService,
@@ -43,12 +47,12 @@ public class GridTask extends ExecutionTask {
             save(execute, "grid-fc.csv");
         }
 
-        gridArguments.getAnalyseColumns()
+        args.getAnalyseColumns()
                 .stream()
                 .forEach(columNo -> {
                     Collection<CompiledRegression> compiledRegressions = executor.execute(new GridAnalyseColumnsCommand(
                             dataService,
-                            gridArguments.getParameterTolerances(),
+                            args.getParameterTolerances(),
                             columNo
                     ));
                     ByteArrayOutputStream execute = executor.execute(new CompiledRegressionToCsvCommand(

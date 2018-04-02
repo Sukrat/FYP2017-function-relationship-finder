@@ -15,7 +15,7 @@ public class ContinuousArguments extends ExecutionArguments {
     private Double toTol = 0.1;
 
     @Parameter(names = {"--increment"}, description = "increment of the tolerance", order = 4)
-    private Double increment = 0.02;
+    private Double increment = 0.01;
 
     @Parameter(names = {"--grid", "-g"}, description = "grid method continuous scanning (Default is dbscan method)", order = 4)
     private boolean gridWay = false;
