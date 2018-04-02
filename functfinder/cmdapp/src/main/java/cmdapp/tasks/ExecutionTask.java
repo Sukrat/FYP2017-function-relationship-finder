@@ -96,4 +96,22 @@ public abstract class ExecutionTask implements Task {
             }
         }
     }
+
+    protected void append(ByteArrayOutputStream outputStream, String filename) {
+        FileOutputStream fileOutputStream = null;
+        try {
+            fileOutputStream = new FileOutputStream(filename, true);
+            outputStream.writeTo(fileOutputStream);
+        } catch (IOException e) {
+            throw new CommandException(e.getMessage());
+        } finally {
+            if (fileOutputStream != null) {
+                try {
+                    fileOutputStream.close();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+    }
 }

@@ -12,7 +12,10 @@ import core.service.IDataService;
 import org.springframework.stereotype.Component;
 
 import java.io.ByteArrayOutputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.nio.file.Files;
 import java.util.Arrays;
 import java.util.Collection;
 
@@ -39,7 +42,20 @@ public class ContinuousTask extends ExecutionTask {
                 args.isGridWay() ? "grid" : "dbscan", args.getFromTol(), args.getIncrement(), args.getToTol(),
                 args.isNormalise() ? "with normalization" : ""
         );
-        ByteArrayOutputStream main = new ByteArrayOutputStream();
+        String filename;
+        if (args.isGridWay()) {
+            filename = String.format("grid-continuous-(%f)-(%f)-(%f).csv",
+                    args.getFromTol(),
+                    args.getIncrement(),
+                    args.getToTol());
+        } else {
+            filename = String.format("dbscan-continuous-(%f)-(%f)-(%f).csv",
+                    args.getFromTol(),
+                    args.getIncrement(),
+                    args.getToTol());
+        }
+        save(new ByteArrayOutputStream(), filename);
+
         int count = (int) ((args.getToTol() - args.getFromTol()) / args.getIncrement());
         for (int i = 0; i < count; i++) {
             final int n = i;
@@ -69,26 +85,8 @@ public class ContinuousTask extends ExecutionTask {
                                 compiledRegressions,
                                 n == 0
                         ));
-                        try {
-                            execute.writeTo(main);
-                            execute.reset();
-                        } catch (IOException e) {
-                            e.printStackTrace();
-                        }
+                        append(execute, filename);
                     });
         }
-        String filename;
-        if (args.isGridWay()) {
-            filename = String.format("grid-continuous-(%f)-(%f)-(%f).csv",
-                    args.getFromTol(),
-                    args.getIncrement(),
-                    args.getToTol());
-        } else {
-            filename = String.format("dbscan-continuous-(%f)-(%f)-(%f).csv",
-                    args.getFromTol(),
-                    args.getIncrement(),
-                    args.getToTol());
-        }
-        save(main, filename);
     }
 }

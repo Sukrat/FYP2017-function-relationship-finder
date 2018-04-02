@@ -1,11 +1,13 @@
 package cmdapp.argument;
 
 import com.beust.jcommander.Parameter;
+import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+@Component
 public class ContinuousArguments extends ExecutionArguments {
 
     @Parameter(names = {"--fromtol", "--fromradius"}, description = "analyse tolerance start", order = 3)
