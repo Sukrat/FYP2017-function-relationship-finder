@@ -10,15 +10,10 @@
                 vm.connected = false;
 
                 StompClient.connect({}, function (frame) {
+                    StompClient.debug = null;
                     console.log('Connected: ' + frame);
                     $scope.$apply(function () {
                         vm.connected = true;
-                    });
-                    StompClient.subscribe('/reply/data', function (reply) {
-                        var msg = JSON.parse(reply.body);
-                        $scope.$apply(function () {
-                            vm.loadingText = "".concat(msg.done, '/', msg.totalWork, ': ', msg.message);
-                        });
                     });
                 }, function (message) {
                     console.log('Connection Lost: ' + message);
@@ -36,6 +31,10 @@
                         vm.loadingText = "Loading...";
                     }
                     vm.loading = loading;
+                });
+
+                RootService.subscribeLoadingText(function (loadingText) {
+                    vm.loadingText = loadingText;
                 });
             }]
     })

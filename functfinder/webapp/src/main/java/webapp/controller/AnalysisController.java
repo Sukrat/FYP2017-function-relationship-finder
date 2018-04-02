@@ -33,15 +33,13 @@ public class AnalysisController {
     private WebSocketProgressService webSocketProgressService;
     private DataServiceCreator dataServiceCreator;
     private ICsvService csvService;
-    private SyncCommandExecutor syncCommandExecutor;
 
     @Autowired
     public AnalysisController(WebSocketProgressService webSocketProgressService, DataServiceCreator dataServiceCreator,
-                              ICsvService csvService, SyncCommandExecutor syncCommandExecutor) {
+                              ICsvService csvService) {
         this.webSocketProgressService = webSocketProgressService;
         this.dataServiceCreator = dataServiceCreator;
         this.csvService = csvService;
-        this.syncCommandExecutor = syncCommandExecutor;
     }
 
     @RequestMapping(value = "/grid/functioncheck", method = RequestMethod.POST)
@@ -51,13 +49,13 @@ public class AnalysisController {
             @RequestBody List<Double> ntolerances) {
         String filename = format("grid-fc-(%f).csv", oTolerance);
 
-        ArangoCursor<Data> datas = syncCommandExecutor.execute(new GridFunctionCommand(
+        ArangoCursor<Data> datas = webSocketProgressService.create(profile).execute(new GridFunctionCommand(
                 dataServiceCreator.create(profile),
                 ntolerances,
                 oTolerance
         ));
 
-        ByteArrayOutputStream file = syncCommandExecutor.execute(new DataToCsvCommand(
+        ByteArrayOutputStream file = webSocketProgressService.create(profile).execute(new DataToCsvCommand(
                 csvService,
                 datas.asListRemaining()
         ));
@@ -71,16 +69,18 @@ public class AnalysisController {
             @RequestBody List<Double> n1tolerances) {
         String filename = format("grid-analyse-(%d).csv", columnNo);
 
-        Collection<CompiledRegression> compiledRegressions = syncCommandExecutor.execute(new GridAnalyseColumnsCommand(
-                dataServiceCreator.create(profile),
-                n1tolerances,
-                columnNo
-        ));
+        Collection<CompiledRegression> compiledRegressions = webSocketProgressService
+                .create(profile).execute(new GridAnalyseColumnsCommand(
+                        dataServiceCreator.create(profile),
+                        n1tolerances,
+                        columnNo
+                ));
 
-        ByteArrayOutputStream file = syncCommandExecutor.execute(new CompiledRegressionToCsvCommand(
-                csvService,
-                compiledRegressions
-        ));
+        ByteArrayOutputStream file = webSocketProgressService.create(profile)
+                .execute(new CompiledRegressionToCsvCommand(
+                        csvService,
+                        compiledRegressions
+                ));
         return returnFile(filename, file);
     }
 
@@ -91,16 +91,18 @@ public class AnalysisController {
             @RequestBody double oRadius) {
         String filename = format("dbscan-fc-(%f)-(%f).csv", nRadius, oRadius);
 
-        ArangoCursor<Data> datas = syncCommandExecutor.execute(new DbScanFunctionalCommand(
-                dataServiceCreator.create(profile),
-                nRadius,
-                oRadius
-        ));
+        ArangoCursor<Data> datas = webSocketProgressService.create(profile)
+                .execute(new DbScanFunctionalCommand(
+                        dataServiceCreator.create(profile),
+                        nRadius,
+                        oRadius
+                ));
 
-        ByteArrayOutputStream file = syncCommandExecutor.execute(new DataToCsvCommand(
-                csvService,
-                datas.asListRemaining()
-        ));
+        ByteArrayOutputStream file = webSocketProgressService.create(profile)
+                .execute(new DataToCsvCommand(
+                        csvService,
+                        datas.asListRemaining()
+                ));
         return returnFile(filename, file);
     }
 
@@ -111,16 +113,18 @@ public class AnalysisController {
             @RequestBody int columnNo) {
         String filename = format("dbscan-analyse-(%f)-(%d).csv", n1radius, columnNo);
 
-        Collection<CompiledRegression> compiledRegressions = syncCommandExecutor.execute(new DbScanAnalyseColumnsCommand(
-                dataServiceCreator.create(profile),
-                n1radius,
-                columnNo
-        ));
+        Collection<CompiledRegression> compiledRegressions = webSocketProgressService.create(profile)
+                .execute(new DbScanAnalyseColumnsCommand(
+                        dataServiceCreator.create(profile),
+                        n1radius,
+                        columnNo
+                ));
 
-        ByteArrayOutputStream file = syncCommandExecutor.execute(new CompiledRegressionToCsvCommand(
-                csvService,
-                compiledRegressions
-        ));
+        ByteArrayOutputStream file = webSocketProgressService.create(profile)
+                .execute(new CompiledRegressionToCsvCommand(
+                        csvService,
+                        compiledRegressions
+                ));
         return returnFile(filename, file);
     }
 

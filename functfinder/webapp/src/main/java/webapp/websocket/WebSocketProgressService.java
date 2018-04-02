@@ -17,7 +17,7 @@ public class WebSocketProgressService {
         this.messageSendingOperations = messageSendingOperations;
     }
 
-    public WebSocketProgress create(String url) {
-        return new WebSocketProgress(UUID.randomUUID().toString(), url, messageSendingOperations);
+    public CommandExecutorWithWebsocket create(String profile) {
+        return new CommandExecutorWithWebsocket(profile, messageSendingOperations);
     }
 }

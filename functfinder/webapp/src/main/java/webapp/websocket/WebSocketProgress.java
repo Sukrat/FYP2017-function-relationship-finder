@@ -9,7 +9,7 @@ public class WebSocketProgress implements IProgress {
     private String id;
     private int outOf = 0;
     private int done = 0;
-    private String message = "Process Started";
+    private String message = "Operation started...";
     private String topic;
     private SimpMessageSendingOperations messageSendingOperations;
 
@@ -23,17 +23,17 @@ public class WebSocketProgress implements IProgress {
 
     @Override
     public void setWork(int outOf, String message) {
-
+        send(done, outOf, message);
     }
 
     @Override
     public void setWork(int outOf, String message, Object... args) {
-
+        send(done, outOf, String.format(message, args));
     }
 
     @Override
-    public void increment() {
-
+    public synchronized void increment() {
+        send(++done, outOf, message);
     }
 
     @Override
@@ -61,7 +61,7 @@ public class WebSocketProgress implements IProgress {
         send(done, outOf, String.format(format, args));
     }
 
-    private void send(int done, int outOf, String message) {
+    private synchronized void send(int done, int outOf, String message) {
         this.done = done;
         this.outOf = outOf;
         this.message = message;

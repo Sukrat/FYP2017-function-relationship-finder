@@ -5,11 +5,17 @@
             var vm = this;
             vm.messageSubject = new rx.Subject();
             vm.loadingSubject = new rx.Subject();
+            vm.loadingTextSubject = new rx.Subject();
+
             vm.subscribeMessage = subscribeMessage;
             vm.subscribeLoading = subscribeLoading;
+            vm.subscribeLoadingText = subscribeLoadingText;
+
             vm.error = error;
             vm.success = success;
             vm.loading = loading;
+            vm.loadingText = loadingText;
+
             vm.profile = profile;
             vm.textDecoder = new TextDecoder();
 
@@ -19,6 +25,10 @@
 
             function subscribeLoading(onNext) {
                 return vm.loadingSubject.subscribe({next: onNext});
+            }
+
+            function subscribeLoadingText(onNext) {
+                return vm.loadingTextSubject.subscribe({next: onNext});
             }
 
             function error(error) {
@@ -62,6 +72,12 @@
             function loading(isOn) {
                 _.forEach(vm.loadingSubject.observers, function (observer) {
                     observer.next(isOn);
+                });
+            }
+
+            function loadingText(msg) {
+                _.forEach(vm.loadingTextSubject.observers, function (observer) {
+                    observer.next(msg);
                 });
             }
 
