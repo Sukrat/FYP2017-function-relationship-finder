@@ -35,6 +35,6 @@ public class CompiledRegressionToCsvCommandTest extends ICommandTest {
 
         ByteArrayOutputStream result = execute(sut);
 
-        assertThat(result.size(), is(0));
+        assertThat(result.size(), is(greaterThan(0)));
     }
 }

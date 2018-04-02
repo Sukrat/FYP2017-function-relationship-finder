@@ -10,6 +10,7 @@ import org.supercsv.cellprocessor.constraint.NotNull;
 import org.supercsv.cellprocessor.ift.CellProcessor;
 
 import java.io.ByteArrayOutputStream;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 
@@ -34,7 +35,7 @@ public class CompiledRegressionToCsvCommand implements ICommand<ByteArrayOutputS
     @Override
     public ByteArrayOutputStream execute(IProgress progress) {
         if (compiledRegressions == null || compiledRegressions.isEmpty()) {
-            return new ByteArrayOutputStream();
+            this.compiledRegressions = new ArrayList<>();
         }
         progress.setWork(compiledRegressions.size(), "Converting regressions to csv!");
 
