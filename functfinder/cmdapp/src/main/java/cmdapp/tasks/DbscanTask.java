@@ -30,10 +30,12 @@ public class DbscanTask extends ExecutionTask {
 
     @Override
     protected void afterInsertionRun() {
-        System.out.printf("Dbscan analyse started with radius: %f, cols: %s, %s!\n",
+        System.out.printf("\nDbscan analyse started with radius: %f, cols: %s, %s!",
                 args.getRadius(), args.getAnalyseColumns().toString(), args.isNormalise() ? "with normalization" : ""
         );
+
         if (args.isFunctionCheck()) {
+            start();
             ArangoCursor<Data> datas = executor.execute(new DbScanFunctionalCommand(
                     dataService,
                     args.getRadius(),
@@ -44,8 +46,10 @@ public class DbscanTask extends ExecutionTask {
                     datas.asListRemaining()
             ));
             save(execute, "dbscan-fc.csv");
+            printElapsed();
         }
 
+        start();
         args.getAnalyseColumns()
                 .stream()
                 .forEach(columNo -> {
@@ -60,5 +64,6 @@ public class DbscanTask extends ExecutionTask {
                     ));
                     save(execute, String.format("dbscan-analyse-(%d).csv", columNo));
                 });
+        printElapsed();
     }
 }

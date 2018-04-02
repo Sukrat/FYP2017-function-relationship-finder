@@ -58,11 +58,10 @@ public class CmdProgress implements IProgress {
             called = true;
             System.out.println();
         }
-        System.out.print(String.format("[%d / %d]: %s", this.done, this.outOf, this.message));
+        System.out.print(String.format("\r[%d / %d]: %s", this.done, this.outOf, this.message));
         for (int i = 0; i < previousLength - message.length(); i++) {
             System.out.print(" ");
         }
-        System.out.print("\r");
         System.out.flush();
     }
 }

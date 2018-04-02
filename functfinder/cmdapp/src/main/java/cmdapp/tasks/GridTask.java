@@ -30,11 +30,12 @@ public class GridTask extends ExecutionTask {
 
     @Override
     protected void afterInsertionRun() {
-        System.out.printf("Dbscan analyse started with radius: %s, cols: %s, %s!\n",
+        System.out.printf("\nDbscan analyse started with radius: %s, cols: %s, %s!",
                 args.getParameterTolerances().toString(),
                 args.getAnalyseColumns().toString(), args.isNormalise() ? "with normalization" : ""
         );
         if (args.isFunctionCheck()) {
+            start();
             ArangoCursor<Data> datas = executor.execute(new GridFunctionCommand(
                     dataService,
                     args.getParameterTolerances(),
@@ -45,8 +46,9 @@ public class GridTask extends ExecutionTask {
                     datas.asListRemaining()
             ));
             save(execute, "grid-fc.csv");
+            printElapsed();
         }
-
+        start();
         args.getAnalyseColumns()
                 .stream()
                 .forEach(columNo -> {
@@ -61,5 +63,6 @@ public class GridTask extends ExecutionTask {
                     ));
                     save(execute, String.format("grid-analyse-(%d).csv", columNo));
                 });
+        printElapsed();
     }
 }

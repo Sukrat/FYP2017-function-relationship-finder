@@ -35,7 +35,7 @@ public class ContinuousTask extends ExecutionTask {
 
     @Override
     protected void afterInsertionRun() {
-        System.out.printf("Continuous %s analyse started from tol: %f, increment: %f, to: %f %s!\n",
+        System.out.printf("\nContinuous %s analyse started from tol: %f, increment: %f, to: %f %s!",
                 args.isGridWay() ? "grid" : "dbscan", args.getFromTol(), args.getIncrement(), args.getToTol(),
                 args.isNormalise() ? "with normalization" : ""
         );
@@ -44,6 +44,8 @@ public class ContinuousTask extends ExecutionTask {
         for (int i = 0; i < count; i++) {
             final int n = i;
             final Double tol = args.getFromTol() + (i * args.getIncrement());
+
+            start();
             args.getAnalyseColumns()
                     .stream()
                     .forEach(colNo -> {
@@ -75,6 +77,7 @@ public class ContinuousTask extends ExecutionTask {
                             e.printStackTrace();
                         }
                     });
+            printElapsed();
         }
         String filename;
         if (args.isGridWay()) {
