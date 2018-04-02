@@ -3,3 +3,5 @@ gradle build -p=../ && java -jar ..\build\libs\functfinder-2.0.jar --password ro
 gradle build -p=../ && java -jar ..\build\libs\functfinder-2.0.jar --password root grid --files test-data.csv --ptol 2
 
 gradle build -p=../ && java -jar ..\build\libs\functfinder-2.0.jar --password root dbscan --files test-data.csv --pradius 2
+
+gradle build -p=../ && java -jar ..\build\libs\functfinder-2.0.jar --password root cont --files small-dataset.csv --normalize --fromradius 0.0 --increment 0.005 --toradius 0.1
