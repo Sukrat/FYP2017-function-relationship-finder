@@ -77,7 +77,7 @@ public class CompiledRegressionToCsvCommand implements ICommand<ByteArrayOutputS
                     HashMap<String, Object> map = new HashMap<>();
                     Object[] values = new Object[]{
                             elem.getColNo(),
-                            "\"" + elem.getTolerances() + "\"",
+                            elem.getTolerances(),
                             elem.getMeanM(), elem.getStdDevM(), elem.getMeanC(), elem.getWeightedMeanC(),
                             elem.getMeanRSq(), elem.getStdDevRSq(),
                             elem.getWeightedMeanM(), elem.getWeightedStdDevM(), elem.getWeightedMeanC(), elem.getWeightedStdDevC(),

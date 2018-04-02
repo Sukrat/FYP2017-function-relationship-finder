@@ -85,7 +85,7 @@ public class DbScanAnalyseColumnsCommand implements ICommand<Collection<Compiled
                 .parallelStream()
                 .map(group ->
                         CompiledRegression.compiledRegression(group.getKey(), group.getValue(),
-                                totalPoints, true, Double.toString(n1Radius)))
+                                totalPoints, true, Arrays.asList(n1Radius)))
                 .collect(Collectors.toList());
         return compiledRegressions;
     }

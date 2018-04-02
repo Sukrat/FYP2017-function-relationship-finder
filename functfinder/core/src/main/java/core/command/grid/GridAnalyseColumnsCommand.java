@@ -69,7 +69,7 @@ public class GridAnalyseColumnsCommand implements ICommand<Collection<CompiledRe
                     ArangoCursor<Regression> regressions = analyseColumnByColNos(sample, tolerances, colNo);
                     progress.increment();
                     return CompiledRegression.compiledRegression(colNo, regressions, totalPoints, false,
-                            n1Tolerances.toString());
+                            n1Tolerances);
                 })
                 .collect(Collectors.toList());
         return compiledRegressions;

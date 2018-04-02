@@ -168,11 +168,16 @@ public class CompiledRegression {
     }
 
     public static CompiledRegression compiledRegression(int colNo, Iterable<Regression> regressionIterator, Long totalPoints,
-                                                        boolean eachPointIsACluster, String tolerances) {
+                                                        boolean eachPointIsACluster, List<Double> tolerances) {
         CompiledRegression compiledRegression = new CompiledRegression();
         compiledRegression.setColNo(colNo);
-        compiledRegression.setTolerances(tolerances);
-
+        if (tolerances == null || tolerances.isEmpty()) {
+            compiledRegression.setTolerances("");
+        } else if (tolerances.size() == 1) {
+            compiledRegression.setTolerances(tolerances.get(0).toString());
+        } else {
+            compiledRegression.setTolerances("\"" + tolerances.toString() + "\"");
+        }
         List<Pair<Double, Double>> list = new ArrayList<>();
         Double mMean = 0.0;
         Double cMean = 0.0;

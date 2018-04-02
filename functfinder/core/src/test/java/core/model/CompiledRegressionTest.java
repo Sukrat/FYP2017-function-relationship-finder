@@ -3,6 +3,7 @@ package core.model;
 import org.junit.Test;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import static org.hamcrest.Matchers.closeTo;
@@ -46,7 +47,7 @@ public class CompiledRegressionTest {
             }});
         }};
 
-        CompiledRegression result = CompiledRegression.compiledRegression(10, regressionList, 10L, false, "sukhi");
+        CompiledRegression result = CompiledRegression.compiledRegression(10, regressionList, 10L, false, Arrays.asList(5.0));
 
         assertThat(result.getColNo(), is(10));
         assertThat(result.getMeanM(), is(closeTo(3.7555, DELTA)));
@@ -67,20 +68,21 @@ public class CompiledRegressionTest {
         assertThat(result.getAvgNumberOfPointsInCluster(), is(closeTo(2.3333333333333, DELTA)));
         assertThat(result.getStdDevAvgNumberOfPointsInCluster(), is(closeTo(0.94280904158206, DELTA)));
 
-        assertThat(result.getTolerances(), is("sukhi"));
+        assertThat(result.getTolerances(), is("5.0"));
     }
 
     @Test
     public void compileRegression_whenListEmpty() {
         List<Regression> regressionList = new ArrayList<>();
 
-        CompiledRegression result = CompiledRegression.compiledRegression(10, regressionList, 10L, false, "sukhi");
+        CompiledRegression result = CompiledRegression.compiledRegression(10, regressionList, 10L, false, Arrays.asList(5.0, 5.0));
 
         assertThat(result.getColNo(), is(10));
         assertTrue(result.getMeanC() == null);
         assertTrue(result.getStdDevC() == null);
         assertTrue(result.getMeanM() == null);
         assertTrue(result.getStdDevM() == null);
+        assertThat(result.getTolerances(), is("\"" + Arrays.asList(5.0, 5.0).toString() + "\""));
     }
 
 }
