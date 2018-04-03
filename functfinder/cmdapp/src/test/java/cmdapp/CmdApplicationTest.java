@@ -25,12 +25,6 @@ public class CmdApplicationTest {
         run("-?");
     }
 
-    @Test
-    public void main_withCorrectDatabase() {
-        run("--password");
-        run("root");
-    }
-
     private void run(String... args) {
         CmdApplication.main(args);
     }

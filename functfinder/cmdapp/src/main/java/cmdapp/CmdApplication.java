@@ -55,8 +55,6 @@ public class CmdApplication {
         } catch (ParameterException ex) {
             jCommander.usage();
             System.out.println(String.format("ERROR: %s", ex.getMessage()));
-        } catch (Exception ex) {
-            System.out.println(String.format("ERROR: %s", ex.getMessage()));
         } finally {
             if (context != null) {
                 context.close();
