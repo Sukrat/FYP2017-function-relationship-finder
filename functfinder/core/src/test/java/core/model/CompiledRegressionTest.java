@@ -63,6 +63,11 @@ public class CompiledRegressionTest {
         assertThat(result.getMeanRSq(), is(closeTo(0.5166666666667, DELTA)));
         assertThat(result.getStdDevRSq(), is(closeTo(0.22939534045447, DELTA)));
 
+        assertThat(result.getMeanR(), is(closeTo(0.7, DELTA)));
+        assertThat(result.getStdDevR(), is(closeTo(0.16329931618555, DELTA)));
+
+        assertThat(result.getNumOfNullR2(), is(0));
+
         assertThat(result.getNumberOfOutliers(), is(3L));
         assertThat(result.getNumberOfClusters(), is(3L));
         assertThat(result.getAvgNumberOfPointsInCluster(), is(closeTo(2.3333333333333, DELTA)));

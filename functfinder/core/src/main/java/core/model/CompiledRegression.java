@@ -25,6 +25,12 @@ public class CompiledRegression {
 
     private Double weightedStdDevC;
 
+    private Double meanR;
+
+    private Double stdDevR;
+
+    private Integer numOfNullR2;
+
     private Double meanRSq;
 
     private Double stdDevRSq;
@@ -182,14 +188,18 @@ public class CompiledRegression {
         Double mMean = 0.0;
         Double cMean = 0.0;
 
-        List<Double> rList = new ArrayList<>();
+        List<Double> rSqList = new ArrayList<>();
         Double rSqMean = 0.0;
+
+        List<Double> rList = new ArrayList<>();
+        Double rMean = 0.0;
 
         Double mMeanWeighted = 0.0;
         Double cMeanWeighted = 0.0;
 
         List<Long> numPointList = new ArrayList<>();
         Long totalNumOfDataPoints = 0L;
+        int nullR2 = 0;
         for (Regression regression : regressionIterator) {
             Double m = regression.getM();
             Double c = regression.getC();
@@ -197,14 +207,22 @@ public class CompiledRegression {
             mMean += m;
             cMean += c;
 
-            Double r = regression.getRSquared();
+            Double rSq = regression.getRSquared();
+            rSqList.add(rSq);
+            rSqMean += rSq;
+
+            Double r = regression.getR();
             rList.add(r);
-            rSqMean += r;
+            rMean += r;
 
             mMeanWeighted += (m * regression.getNumOfDataPoints());
             cMeanWeighted += (c * regression.getNumOfDataPoints());
             totalNumOfDataPoints += regression.getNumOfDataPoints();
             numPointList.add(regression.getNumOfDataPoints());
+
+            if (regression.isR2Null()) {
+                nullR2++;
+            }
         }
         if (list.size() == 0) {
             return compiledRegression;
@@ -212,7 +230,9 @@ public class CompiledRegression {
         mMean /= list.size();
         cMean /= list.size();
 
-        rSqMean /= list.size();
+        rSqMean /= rSqList.size();
+
+        rMean /= rList.size();
 
         mMeanWeighted /= totalNumOfDataPoints;
         cMeanWeighted /= totalNumOfDataPoints;
@@ -224,6 +244,7 @@ public class CompiledRegression {
         Double cStdDevWeighted = 0.0;
 
         Double rSqStdDev = 0.0;
+        Double rStdDev = 0.0;
 
         for (int i = 0; i < list.size(); i++) {
             Pair<Double, Double> elem = list.get(i);
@@ -233,13 +254,16 @@ public class CompiledRegression {
             mStdDevWeighted += Math.pow((elem.getKey() - mMeanWeighted), 2) * numPointList.get(i);
             cStdDevWeighted += Math.pow((elem.getValue() - cMeanWeighted), 2) * numPointList.get(i);
 
-            rSqStdDev += Math.pow(rList.get(i) - rSqMean, 2);
+            rSqStdDev += Math.pow(rSqList.get(i) - rSqMean, 2);
+            rStdDev += Math.pow(rList.get(i) - rMean, 2);
         }
 
         mStdDev = Math.sqrt(mStdDev / list.size());
         cStdDev = Math.sqrt(cStdDev / list.size());
 
-        rSqStdDev = Math.sqrt(rSqStdDev / rList.size());
+        rSqStdDev = Math.sqrt(rSqStdDev / rSqList.size());
+
+        rStdDev = Math.sqrt(rStdDev / rList.size());
 
         mStdDevWeighted = Math.sqrt(mStdDevWeighted / totalNumOfDataPoints);
         cStdDevWeighted = Math.sqrt(cStdDevWeighted / totalNumOfDataPoints);
@@ -251,6 +275,11 @@ public class CompiledRegression {
 
         compiledRegression.setMeanRSq(rSqMean);
         compiledRegression.setStdDevRSq(rSqStdDev);
+
+        compiledRegression.setMeanR(rMean);
+        compiledRegression.setStdDevR(rStdDev);
+
+        compiledRegression.setNumOfNullR2(nullR2);
 
         compiledRegression.setWeightedMeanM(mMeanWeighted);
         compiledRegression.setWeightedStdDevM(mStdDevWeighted);
@@ -273,5 +302,29 @@ public class CompiledRegression {
         compiledRegression.setStdDevAvgNumberOfPointsInCluster(Math.sqrt(varianceAvgNumberOfPointsInCluster));
 
         return compiledRegression;
+    }
+
+    public Double getMeanR() {
+        return meanR;
+    }
+
+    public void setMeanR(Double meanR) {
+        this.meanR = meanR;
+    }
+
+    public Double getStdDevR() {
+        return stdDevR;
+    }
+
+    public void setStdDevR(Double stdDevR) {
+        this.stdDevR = stdDevR;
+    }
+
+    public Integer getNumOfNullR2() {
+        return numOfNullR2;
+    }
+
+    public void setNumOfNullR2(Integer numOfNullR2) {
+        this.numOfNullR2 = numOfNullR2;
     }
 }

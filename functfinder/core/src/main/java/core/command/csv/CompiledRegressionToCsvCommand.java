@@ -52,6 +52,9 @@ public class CompiledRegressionToCsvCommand implements ICommand<ByteArrayOutputS
 
                 new Optional(new ParseDouble()),
                 new Optional(new ParseDouble()),
+
+                new Optional(new ParseDouble()),
+                new Optional(new ParseDouble()),
                 new Optional(new ParseDouble()),
                 new Optional(new ParseDouble()),
 
@@ -59,16 +62,20 @@ public class CompiledRegressionToCsvCommand implements ICommand<ByteArrayOutputS
                 new Optional(new ParseLong()),
 
                 new Optional(new ParseDouble()),
-                new Optional(new ParseDouble())
+                new Optional(new ParseDouble()),
+
+                new Optional(new ParseInt()),
         };
         String[] headers = new String[]{
                 "parameter nos",
                 "tolerance",
                 "M mean", "M std_dev", "C mean", "C std_dev",
+                "R mean", "R std_dev",
                 "R^2 mean", "R^2 std_dev",
                 "weighted M mean", "weighted M std_dev", "weighted C mean", "weighted C std_dev",
                 "outliers n", "num of clusters",
-                "avg num each cluster", "std_dev num each cluster"
+                "avg num each cluster", "std_dev num each cluster",
+                "Num null R2"
         };
         ByteArrayOutputStream outputStream = csvService.toCsv(compiledRegressions, writeHeader,
                 headers, processors,
@@ -80,10 +87,12 @@ public class CompiledRegressionToCsvCommand implements ICommand<ByteArrayOutputS
                             elem.getColNo(),
                             elem.getTolerances(),
                             elem.getMeanM(), elem.getStdDevM(), elem.getMeanC(), elem.getWeightedMeanC(),
+                            elem.getMeanR(), elem.getStdDevR(),
                             elem.getMeanRSq(), elem.getStdDevRSq(),
                             elem.getWeightedMeanM(), elem.getWeightedStdDevM(), elem.getWeightedMeanC(), elem.getWeightedStdDevC(),
                             elem.getNumberOfOutliers(), elem.getNumberOfClusters(),
-                            elem.getAvgNumberOfPointsInCluster(), elem.getStdDevAvgNumberOfPointsInCluster()
+                            elem.getAvgNumberOfPointsInCluster(), elem.getStdDevAvgNumberOfPointsInCluster(),
+                            elem.getNumOfNullR2()
                     };
                     for (int i = 0; i < values.length; i++) {
                         map.put(headers[i], values[i]);
