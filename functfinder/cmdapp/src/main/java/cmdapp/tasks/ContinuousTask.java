@@ -18,6 +18,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Collections;
 
 @Component
 public class ContinuousTask extends ExecutionTask {
@@ -44,15 +45,17 @@ public class ContinuousTask extends ExecutionTask {
         );
         String filename;
         if (args.isGridWay()) {
-            filename = String.format("grid-continuous-(%f)-(%f)-(%f).csv",
+            filename = String.format("grid-continuous-(%.3f)-(%.3f)-(%.3f)-(%d).csv",
                     args.getFromTol(),
                     args.getIncrement(),
-                    args.getToTol());
+                    args.getToTol(),
+                    args.getAnalyseColumns().get(0));
         } else {
-            filename = String.format("dbscan-continuous-(%f)-(%f)-(%f).csv",
+            filename = String.format("dbscan-continuous-(%.3f)-(%.3f)-(%.3f)-(%d).csv",
                     args.getFromTol(),
                     args.getIncrement(),
-                    args.getToTol());
+                    args.getToTol(),
+                    args.getAnalyseColumns().get(0));
         }
         save(new ByteArrayOutputStream(), filename);
 
@@ -62,14 +65,13 @@ public class ContinuousTask extends ExecutionTask {
             final Double tol = args.getFromTol() + (i * args.getIncrement());
 
             args.getAnalyseColumns()
-                    .stream()
                     .forEach(colNo -> {
                         Collection<CompiledRegression> compiledRegressions = null;
 
                         if (args.isGridWay()) {
                             compiledRegressions = executor.execute(new GridAnalyseColumnsCommand(
                                     dataService,
-                                    Arrays.asList(tol),
+                                    Collections.singletonList(tol),
                                     colNo
                             ));
                         } else {

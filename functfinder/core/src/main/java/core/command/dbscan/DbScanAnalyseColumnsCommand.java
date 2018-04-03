@@ -47,7 +47,7 @@ public class DbScanAnalyseColumnsCommand implements ICommand<Collection<Compiled
                 .collect(Collectors.toList());
 
         columns.parallelStream()
-                .forEach(m -> dataService.ensureSkipListIndex(Arrays.asList(m)));
+                .forEach(m -> dataService.ensureSkipListIndex(Collections.singletonList(m)));
 
         if (columnNo == -1) {
             List<Integer> colNos = new ArrayList<>();
@@ -61,7 +61,7 @@ public class DbScanAnalyseColumnsCommand implements ICommand<Collection<Compiled
             throw new CommandException("Column number doesnot exist! (Expected: < %d and > 0 and got: )",
                     any.getRawColumns().size(), columnNo);
         }
-        return analyseAll(progress, Arrays.asList(columnNo), any.getRawColumns().size());
+        return analyseAll(progress, Collections.singletonList(columnNo), any.getRawColumns().size());
     }
 
     private List<CompiledRegression> analyseAll(IProgress progress, List<Integer> colNos, int size) {
@@ -80,7 +80,7 @@ public class DbScanAnalyseColumnsCommand implements ICommand<Collection<Compiled
                     progress.increment();
                     return regressions;
                 })
-                .collect(Collectors.groupingByConcurrent(regression -> regression.getColNo()))
+                .collect(Collectors.groupingByConcurrent(Regression::getColNo))
                 .entrySet()
                 .parallelStream()
                 .map(group ->
@@ -92,7 +92,6 @@ public class DbScanAnalyseColumnsCommand implements ICommand<Collection<Compiled
 
     private Regression analyse(String id, int column, int size) {
         int startIndex = 1;
-        int endIndex = size;
 
         String rawQuery = dataService.join(
                 "LET r = FIRST(FOR elem in @@col FILTER elem._id == @id LIMIT 1 RETURN elem)",
@@ -128,7 +127,7 @@ public class DbScanAnalyseColumnsCommand implements ICommand<Collection<Compiled
 
         String filter = "";
         String dist = "";
-        for (int i = startIndex; i < endIndex; i++) {
+        for (int i = startIndex; i < size; i++) {
             if (i == column) {
                 continue;
             }
