@@ -101,7 +101,8 @@ public abstract class ExecutionTask implements Task {
     protected void append(ByteArrayOutputStream outputStream, String filename) {
         FileOutputStream fileOutputStream = null;
         try {
-            fileOutputStream = new FileOutputStream(filename, true);
+			String prefix = executionArguments.isOnNormalisedValue() ? "on-norm" : "";
+            fileOutputStream = new FileOutputStream(prefix + filename, true);
             outputStream.writeTo(fileOutputStream);
         } catch (IOException e) {
             throw new CommandException(e.getMessage());
