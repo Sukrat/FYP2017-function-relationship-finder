@@ -23,6 +23,9 @@ public abstract class ExecutionArguments {
     @Parameter(names = {"--normalise", "--normalize"}, description = "if you want to normalize and then analyse", order = 2)
     private boolean normalise = false;
 
+    @Parameter(names = {"--onNormalised", "--onNormalized"}, description = "if you want to analyse on normalized value", order = 2)
+    private boolean onNormalisedValue = false;
+
     public List<File> getFiles() {
         return files;
     }
@@ -33,5 +36,9 @@ public abstract class ExecutionArguments {
 
     public boolean isNormalise() {
         return normalise;
+    }
+
+    public boolean isOnNormalisedValue() {
+        return onNormalisedValue;
     }
 }

@@ -22,11 +22,19 @@ public class DbScanAnalyseColumnsCommand implements ICommand<Collection<Compiled
     private IDataService dataService;
     private Double n1Radius;
     private Integer columnNo;
+    private boolean onNormalizedValue = false;
 
     public DbScanAnalyseColumnsCommand(IDataService dataService, Double n1Radius, Integer columnNo) {
         this.dataService = dataService;
         this.n1Radius = n1Radius;
         this.columnNo = columnNo;
+    }
+
+    public DbScanAnalyseColumnsCommand(IDataService dataService, Double n1Radius, Integer columnNo, boolean onNormalizedValue) {
+        this.dataService = dataService;
+        this.n1Radius = n1Radius;
+        this.columnNo = columnNo;
+        this.onNormalizedValue = onNormalizedValue;
     }
 
     @Override
@@ -92,7 +100,7 @@ public class DbScanAnalyseColumnsCommand implements ICommand<Collection<Compiled
 
     private Regression analyse(String id, int column, int size) {
         int startIndex = 1;
-
+        String colName = onNormalizedValue ? "workColumns" : "rawColumns";
         String rawQuery = dataService.join(
                 "LET r = FIRST(FOR elem in @@col FILTER elem._id == @id LIMIT 1 RETURN elem)",
                 "LET v = FIRST(",
@@ -101,11 +109,12 @@ public class DbScanAnalyseColumnsCommand implements ICommand<Collection<Compiled
                 "LET dist = SQRT( %2$s )",
                 "FILTER dist <= @radius",
                 "COLLECT AGGREGATE",
-                format("sX = SUM(ng.rawColumns.%s),", Data.colName(column)),
-                format("sY = SUM(ng.rawColumns.%s),", Data.colName(0)),//output column
-                format("sXX = SUM(POW(ng.rawColumns.%s, 2)),", Data.colName(column)),
-                format("sYY = SUM(POW(ng.rawColumns.%s, 2)),", Data.colName(0)),
-                format("sXY = SUM(ng.rawColumns.%s * ng.rawColumns.%s),", Data.colName(column), Data.colName(0)),
+                format("sX = SUM(ng.%s.%s),",colName, Data.colName(column)),
+                format("sY = SUM(ng.%s.%s),",colName, Data.colName(0)),//output column
+                format("sXX = SUM(POW(ng.%s.%s, 2)),",colName, Data.colName(column)),
+                format("sYY = SUM(POW(ng.%s.%s, 2)),",colName, Data.colName(0)),
+                format("sXY = SUM(ng.%1$s.%2$s * ng.%1$s.%3$s),",colName,
+                        Data.colName(column), Data.colName(0)),
                 "n = LENGTH(ng)",
                 "return { sX: sX, sY: sY, sXX: sXX, sYY: sYY, sXY: sXY, n: n })",
                 "LET a1 = (v.sX * v.sY) - (v.n * v.sXY)",

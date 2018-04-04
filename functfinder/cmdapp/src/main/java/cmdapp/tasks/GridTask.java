@@ -52,7 +52,8 @@ public class GridTask extends ExecutionTask {
                     Collection<CompiledRegression> compiledRegressions = executor.execute(new GridAnalyseColumnsCommand(
                             dataService,
                             args.getParameterTolerances(),
-                            columNo
+                            columNo,
+                            args.isOnNormalisedValue()
                     ));
                     ByteArrayOutputStream execute = executor.execute(new CompiledRegressionToCsvCommand(
                             csvService,

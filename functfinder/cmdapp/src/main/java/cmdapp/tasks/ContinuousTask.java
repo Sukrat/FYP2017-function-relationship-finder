@@ -72,7 +72,8 @@ public class ContinuousTask extends ExecutionTask {
                             compiledRegressions = executor.execute(new GridAnalyseColumnsCommand(
                                     dataService,
                                     Collections.singletonList(tol),
-                                    colNo
+                                    colNo,
+                                    args.isOnNormalisedValue()
                             ));
                         } else {
                             compiledRegressions = executor.execute(new DbScanAnalyseColumnsCommand(

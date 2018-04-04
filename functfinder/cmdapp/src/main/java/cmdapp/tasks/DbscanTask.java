@@ -53,7 +53,8 @@ public class DbscanTask extends ExecutionTask {
                     Collection<CompiledRegression> compiledRegressions = executor.execute(new DbScanAnalyseColumnsCommand(
                             dataService,
                             args.getRadius(),
-                            columNo
+                            columNo,
+                            args.isOnNormalisedValue()
                     ));
                     ByteArrayOutputStream execute = executor.execute(new CompiledRegressionToCsvCommand(
                             csvService,

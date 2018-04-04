@@ -20,11 +20,20 @@ public class GridAnalyseColumnsCommand implements ICommand<Collection<CompiledRe
     private IDataService dataService;
     private List<Double> n1Tolerances;
     private Integer columnNo;
+    private boolean onNormalizedValue = false;
 
     public GridAnalyseColumnsCommand(IDataService dataService, List<Double> n1Tolerances, Integer columnNo) {
         this.dataService = dataService;
         this.n1Tolerances = n1Tolerances;
         this.columnNo = columnNo;
+    }
+
+    public GridAnalyseColumnsCommand(IDataService dataService, List<Double> n1Tolerances, Integer columnNo,
+                                     boolean onNormalizedValue) {
+        this.dataService = dataService;
+        this.n1Tolerances = n1Tolerances;
+        this.columnNo = columnNo;
+        this.onNormalizedValue = onNormalizedValue;
     }
 
     @Override
@@ -76,6 +85,7 @@ public class GridAnalyseColumnsCommand implements ICommand<Collection<CompiledRe
     }
 
     private ArangoCursor<Regression> analyseColumnByColNos(Data sample, List<Double> tolerances, int colNos) {
+        String colName = onNormalizedValue ? "workColumns" : "rawColumns";
         // ax + b = y where a is a1/a2 and b is b1/b2
         String rawQuery = dataService.join(
                 "FOR r IN @@col",
@@ -84,11 +94,12 @@ public class GridAnalyseColumnsCommand implements ICommand<Collection<CompiledRe
                 "FILTER COUNT(members) > 1",
                 "let v = ( FOR elem IN members",
                 "COLLECT AGGREGATE",
-                format("sX = SUM(elem.rawColumns.%s),", Data.colName(colNos)),
-                format("sY = SUM(elem.rawColumns.%s),", Data.colName(0)),
-                format("sXX = SUM(POW(elem.rawColumns.%s, 2)),", Data.colName(colNos)),
-                format("sYY = SUM(POW(elem.rawColumns.%s, 2)),", Data.colName(0)),
-                format("sXY = SUM(elem.rawColumns.%s * elem.rawColumns.%s),", Data.colName(colNos), Data.colName(0)),
+                format("sX = SUM(elem.%s.%s),", colName, Data.colName(colNos)),
+                format("sY = SUM(elem.%s.%s),", colName, Data.colName(0)),
+                format("sXX = SUM(POW(elem.%s.%s, 2)),", colName, Data.colName(colNos)),
+                format("sYY = SUM(POW(elem.%s.%s, 2)),", colName, Data.colName(0)),
+                format("sXY = SUM(elem.%1$s.%2$s * elem.%1$s.%3$s),", colName,
+                        Data.colName(colNos), Data.colName(0)),
                 "n = LENGTH(elem)",
                 "return { sX: sX, sY: sY, sXX: sXX, sYY: sYY, sXY: sXY, n: n })[0]",
                 "let a1 = (v.sX * v.sY) - (v.n * v.sXY)",
