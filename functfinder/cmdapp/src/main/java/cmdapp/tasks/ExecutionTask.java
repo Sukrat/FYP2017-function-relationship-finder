@@ -82,7 +82,8 @@ public abstract class ExecutionTask implements Task {
     protected void save(ByteArrayOutputStream outputStream, String filename) {
         FileOutputStream fileOutputStream = null;
         try {
-            fileOutputStream = new FileOutputStream(filename);
+            String prefix = executionArguments.isOnNormalisedValue() ? "on-norm" : "";
+            fileOutputStream = new FileOutputStream(prefix + filename);
             outputStream.writeTo(fileOutputStream);
         } catch (IOException e) {
             throw new CommandException(e.getMessage());
