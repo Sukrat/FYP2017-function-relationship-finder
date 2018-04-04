@@ -4,15 +4,34 @@ Many designers are increasingly utilizing dynamic hardware adaptations to improv
 
 First let's look at energy consumption. Energy consumption is the power (Usually in watts) consumed by a system. This system could be the processor/CPU, memory, disk, I/O (Input/Output) system, chipset or the whole computer system itself. So, one can take any of the peripherals and read the power consumption for various performance events. Then analyse if there exists a functional dependence to begin with. If the system is not able to disprove the dataset, one could then try to find a function which could help understand relation between each event and predict for any given system. Reading of these performance events can be during a idle state as well as running certain computations.
 
-Now let's look at what are performance events, performance events can be any event which can affect the consumption of energy in some way. Selection of performance events is quite challenging. A simple example would be the effect of cache misses in the processor. For a typical processor, the highest level of cache would be L3 or L2 depending on the type of processor. Now for some transaction which could not be found in the highest level of cache (cache miss) would cause a cache block size access to the main memory. Thus, number of main memory access would be directly proportional to the cache misses. Since these memory access is off-chip, power is consumed in the memory controller and DRAM. Even though, the relation is not simple as it seems but we can see a strong casual relationship between the cache miss and the main memory power consumption~\cite{bircher2007complete}.
+Now let's look at what are performance events, performance events can be any event which can affect the consumption of energy in some way. Selection of performance events is quite challenging. A simple example would be the effect of cache misses in the processor. For a typical processor, the highest level of cache would be L3 or L2 depending on the type of processor. Now for some transaction which could not be found in the highest level of cache (cache miss) would cause a cache block size access to the main memory. Thus, number of main memory access would be directly proportional to the cache misses. Since these memory access is off-chip, power is consumed in the memory controller and DRAM. Even though, the relation is not simple as it seems but we can see a strong casual linear relationship between the cache miss and the main memory power consumption~\cite{bircher2007complete}.
 
-We can use number of other performance events like Instructions executed. As we know on each instruction being executed, more units of the system are on. Hence, power is consumed as opposed to when the processor is in its idle state~\cite{gilberto2005power}. 
+We can use number of other performance events like Instructions executed. As we know on each instruction being executed, more units of the system are on. Hence, power is consumed as opposed to when the processor is in its idle state~\cite{gilberto2005power}.
 
-Cache miss, TLB misses are also a good performance events as they seem to have a strong relationship between the power consumption as processor needs to handle memory page walks. Same can be said for Page faults where a program is not able to find mapped address in physical memory as it has not been loaded yet. This causes a trap which can result into number of situations, one of them which is to get the data from disk. In simple terms it is longer walk from cache miss. This walk to the disk and raising of exceptions would consume more energy by the disk as well as the CPU.
+Cache miss, TLB misses are also a good performance events as they seem to have a strong relationship between the power consumption as processor needs to handle memory page walks. Same can be said for Page faults where a program is not able to find mapped address in physical memory as it has not been loaded yet. This causes a trap which can result into number of situations, one of them which is to get the data from disk. In simple terms it is longer walk from cache miss. This walk to the disk and raising of exceptions would consume more energy by the disk as well as the CPU. Another thing to note here most of the relations that we saw above are directly proportional to each other. Increase in the variable like cache miss, number of cycles in CPU etc gives rise to energy consumption by the system. Making linear model a good point to start when analysing the relationship between the performance events variables and energy consumption.
 
-\section{Proofs}
+\section{Related Work}
 
-The Proofs below are for different approaches that have been discussed to find the non-existence of a functional relations between energy consumption and number of performance events.
+In this section, some of the prior researches are discussed. Hardware performance counter's links to processor power consumption was first demonstrated by Bellosa. In \cite{bellosa2000benefits}, Bellosa demonstrated the high correlation between performance counters such as memory references, L2 cache, floating point operations to processor power consumption.
+
+Gilbert in \cite{gilberto2005power}, predicted the power consumption for Intel XScale processors using performance monitoring unit events. Since power consumption is greatly dependent on executing workload, power estimation was done using HPCs (Hardware performance counters) such as Instruction cache miss, TLB misses etc. Linear parmaterisation of power consumption based on performance events was done based on performance events. 
+
+In \cite{yang2016performance}, proposed a full system power model for CPU-intensive and memory intensive applications with active cycles, instruction retired and LLC missed as performance events. A full power model for I/O intensive applications was also proposed considering the system level utilization as a complement for performance events. Many machine learning based algorithms like logistic regression, elastic net and k-nearest neighbours were applied to real world application. 
+
+Bircher approached in a distinct way by using events local to the processor and eliminating the need for sensors spread across various parts of the systems \cite{bircher2012complete}. Linear regression modeling was done in order to predict the power consumption at runtime. Multiple linear and polynomial regression was done only when accuracy was not obtained. 
+
+High correlation between performance events and power consumption was demonstrated by all of them. Many different models were used to predict the power consumption using CPU events. But in this project, an attempt is made in order to understand the monotonic relation between the events and power.
+
+
+\section{Existence of functional relation}
+
+\textbf{Definition}: \textit{Given a dataset of pairs \((x_i, y_i)\) where \(i \in [1, n]\) of two variables \(x\) and \(y\), and the range \(X\) of \(x\), \(y\) is a function of \(x\) iff for each \(x_0 \in X\), there is exactly one value of \(y\), say \(y_0\), such that \((x_0, y_0)\) is in dataset.}~\cite{zembowicz1993testing}
+
+Above is the definition of functional relation. In our case the \(x_i = (p_1, p_2, \ldots p_k)\) and \(y_i = E_i\) where \(p\) are the performance events and \(k\) is the number of events and \(E\) is the energy consumption.
+
+In other words, functional relationship is an one to one mapping between our input variables \(p_1, p_2, \ldots p_k\) and output \(E_i\). This reasoning can be explained quite intuitively as assuming functional relation is there we can formulate a \(f(p_1, p_2, \ldots p_k) = E_i\) where \(f\) is function. Now if one \((p_1, p_2, \ldots p_k)\) can give more than one output then that \(f\) function is either not correct or \(f\) does not exist. A question that immediately arises is what if two different \((p_1, p_2, \ldots p_k)\) gives same output \(E_i\). The answer is it is possible and it doesnot violate the functional relation definition as there is still 1 to 1 mapping from input to output. The only difference is the functional relation is not surjective any more which means that one cannot figure out the input values from output values (i.e. the other way around). But we are only interested in predicting the output rather than inputs from the output variables.
+
+The Proof of the existence of functional relation is given below:
 
 But first let's look at our dataset that will be provided.
 We know that the data will be in the following format:
@@ -25,88 +44,142 @@ Let \(k\) be the number of parameters for the energy and \(n\) be the number of 
 \(E_n,\ x_{n1},\ x_{n2},\ \ldots x_{nk}\)\\
 where \(E_n\) is the dynamic energy for the nth tuple and \(x_{nk}\) corresponds to the \(k\)th performance event for \(n\)th record.
 
-We will use mathematical definition of functional relationship to prove the approaches:
-
-\textbf{Definition}: \textit{Given a dataset of pairs \((x_i, y_i)\) where \(i \in [1, n]\) of two variables \(x\) and \(y\), and the range \(X\) of \(x\), \(y\) is a function of \(x\) iff for each \(x_0 \in X\), there is exactly one value of \(y\), say \(y_0\), such that \((x_0, y_0)\) is in dataset.}~\cite{zembowicz1993testing}
+We will use mathematical definition of functional relationship given above to prove the approaches:
 
 \textbf{Prove:} We need to prove that finding atleast 2 equal performance events with different dynamic energies ensures that there exists no functional relationship in the dataset.
 
-\textbf{Proof:}\\
-Let us assume that there exists a functional relation such that:
+\begin{proof}
+	Let us assume that there exists a functional relation such that:
 
-\(f(x_{n1},\ x_{n2},\ \ldots x_{nk}) = E_n\)\\
-where \(f\) is the functional relation for the dataset.
+	\(f(x_{n1},\ x_{n2},\ \ldots x_{nk}) = E_n\)\\
+	where \(f\) is the functional relation for the dataset.
 
-Our task is to find \(f(x_{i1},\ x_{i2},\ \ldots x_{ik}) = E_i\) and \(f(x_{j1},\ x_{j2},\ \ldots x_{jk}) = E_j\) 
-where \(i \neq j\) and \(E_i \neq E_j\) and \((x_{i1},\ x_{i2},\ \ldots x_{ik}) = (x_{j1},\ x_{j2},\ \ldots x_{jk})\).
+	Our task is to find \(f(x_{i1},\ x_{i2},\ \ldots x_{ik}) = E_i\) and \(f(x_{j1},\ x_{j2},\ \ldots x_{jk}) = E_j\)
+	where \(i \neq j\) and \(E_i \neq E_j\) and \((x_{i1},\ x_{i2},\ \ldots x_{ik}) = (x_{j1},\ x_{j2},\ \ldots x_{jk})\).
 
-If such \(i\) and \(j\) exists. Then, we can conclude that the \(f\) is not a function by using the definition of a function as this assumed function has two images.
+	If such \(i\) and \(j\) exists. Then, we can conclude that the \(f\) is not a function by using the definition of a function as this assumed function has two images.
 
-Which contradicts from our hypothesis stated above.
-Hence by proof of contradiction we could say that \(f\) is not a function on the dataset.
+	Which contradicts from the hypothesis stated above.
+	Hence by proof of contradiction we could say that \(f\) is not a function on the dataset.
+\end{proof}
 
-Restating the above we can say dataset does not contain a functional relation.
+Now the task is to find similar \(x_{11},\ x_{12},\ \ldots x_{1k}\) input variables. If it was equality, it could be performed trivially by sorting the data records on the basis of \(x_{11},\ x_{12},\ \ldots x_{1k}\). Followed by going throught the data records in that order to find equal records. As equal records will be next to each other when sorted.
 
-\textbf{Prove:} Assuming that the dataset given has linear relationship and if we are able to find the constant for any one of the events. And if it does not apply to the other tuples of data that means linear relationship doesnot exist between the dataset.
+But the dataset accumulated is collected from experimental setup. Experimental setups data have some error/tolerance associated to it. As the equipment or software that cannot accurately measure and have some tolerance associated to it. e.g. Energy consumption is measured by a power meter which will have its own error. The tolerance associated with the dataset no longer allows to perform equality on input variables. Hence, a method is needed to measure the equality with the tolerance.
 
-\textbf{Proof:}\\
-Let us assume that the energy consumption is a linear combination of the performance events.
+Now after knowing the tolerances the data records in the dataset now looks more of the form:
 
-\(f(x_{i1},\ x_{i2},\ \ldots x_{ik}) = E_i\)\\
-\(f(x_{i1},\ x_{i2},\ \ldots x_{ik}) = (\alpha _1\times x_{i1}) + (\alpha_2\times x_{i2}) + \cdots + (\alpha_k\times x_{ik}) + \alpha_{k+1}\)\\
-where \(\alpha_i\) are the constants in the linear combination of performance events and \(i\in[1\ldots k+1]\)
+\(E_n \pm e_E,\ x_{n1} \pm e_1,\ x_{n2} \pm e_2,\ \ldots x_{nk} \pm e_n\)\\
+where \(e\) is now the error associated with the variable
+A point to note hear is that since the variable represent different entities their units will be different and so will their error associated with it.
 
-Lets find \(\alpha_i\) where \(i\in[1\ldots k+1]\)\\
-To find this we will have to find atleast 3 records which have their parameter events equal \(x_{1},\ x_{2},\ \ldots x_{k}\) except \(x_{i}\) where this \(x\) values are value belonging to a row in the dataset.
+\section{Analysing functional relation}
 
-If we found three records such as:
+The above analysis of data which corresponds to finding the existence of a functional relation. Now this section corresponds to analysing the functional relation. A functional relation can of many forms, there can be logarithmic functional relation, exponential, linear, polynomial etc. According to \cite{bircher2007complete}, shows that functional relation between performance event and dynamic energy is of the linear form. This is due to the trickle down effect of the performance events.
+Hence, Linear model is assumed to understand the relationship between the events and the consumption. 
 
-\(E_a,\ x_{a1},\ x_{a2}, \ldots x_{ak}\)\\
-\(E_b,\ x_{b1},\ x_{b2}, \ldots x_{bk}\)\\
-\(E_c,\ x_{c1},\ x_{c2}, \ldots x_{ck}\)\\
-where the tuples \\
-\((x_{a1}\ldots \ x_{a(i-1)},\ x_{a(i+1)}\ \ldots x_{ak})\), \((x_{b1}\ldots \ x_{b(i-1)},\ x_{b(i+1)}\ \ldots x_{bk})\) and \((x_{c1}\ldots \ x_{c(i-1)},\ x_{c(i+1)}\ \ldots x_{ck})\) are equal to each other, except \(x_{i}\) for some \(i\in[1\ldots k+1]\) where \(a, b, c \in [1, n]\) and \(a, b, c\) are not equal to each other.
+This project is more interested in finding whether a strong relation of monotonicity exists in the relation or not. And linear regression are best suited for this kind of task. Linear regression is an approach determine how strongly two variables correlate with each other. Correlation not necessarily means causation. Looking at the data points and linear regression values such as Pearson coefficient, $R^2$ can determine how strong the correlation is between 2 values but it cannot explain the cause of it. Since, it is in the interest of the project to analyse functional relationship which is known to have a linear relation linear regression is proposed.
 
-Then
+Dataset contains \(k\) parameter variables, to analyse relation between the parameter variables and the output variable. One parameter is chosen at a time. To see the change in the parameter variable chosen and output variable, isolation of the other variables is required. Isolation is done by grouping the data by \(k-1\) parameter variable forming a number of clusters with similar \(k-1\) paramters. These clusters are then visited and linear regression is performed on the \(k^{th}\) variable and the output variable. 
 
-\(E_a - E_b\)\\
-\(= f(x_{a1},\ x_{a2},\ \ldots x_{ak}) - f(x_{b1},\ x_{b2},\ \ldots x_{bk})\)\\
-{\footnotesize \{ By our assumption that \(E\) is a linear combination of its parameters \} }\\
-\(= ((\alpha _1\times x_{a1}) + \cdots + (\alpha_{k}\times x_{ak}) + \alpha_{k+1}) - ((\alpha _1\times x_{b1}) + \cdots + (\alpha_k\times x_{bk}) + \alpha_{k+1})\)\\
-{\footnotesize \{ Gathering terms \}}\\
-\(= \alpha_1 \times (x_{a1} - x_{b1}) + \ldots + \alpha_k \times (x_{ak} - x_{bk}) + (\alpha_{k+1} - \alpha_{k+1})\)\\
-{\footnotesize \{ Since we know except \(x_{mi}\) and \(x_{ni}\) all are equal \}}\\
-\(= \alpha_i \times (x_{ai} - x_{bi})\)
+From the algorithm, it can be observed the parameter to be analysed is isolated by grouping the dataset with the variables that are not being analysed and are equivalent. Since, clustering of dataset is performed again but with different vector dimension of \(k-1\), the clustering algorithms are needed by both the objectives.
 
-From the above we get:
 
-\(\alpha_i = (E_a - E_b)/(x_{ai} - x_{bi})\)\\
-where \((x_{ai} - x_{bi}) \neq 0\) as \(x_{ai} \neq x_{bi}\) by above during our finding phase.
+\subsection{Grid based clustering}
 
-Then we know that using the \(\alpha_i\) and applying to result to this equation \(E_a - E_c = \alpha_i \times (x_{ai} - x_{ci})\) must be true as well.
+With the addition of tolerance in the variable. The definition of equality changes from \(x_{ia} = x_{ja}\) to \(|x_{ia} - x_{ja}| \leq e_a\). Now, the sort and search for similar variable would not work correctly as equivalent records would not be next to each other. They might non-equivalent records in between.
 
-If this is false then \(\alpha_i\) is not a constant which contradicts our assumption that our \(E\) is linear combination of its parameter is false.
+Example data to illustrate the same:
+\begin{center}
+	\begin{tabular}{ | c | c | c |}
+		\hline
+		\(E\) & \(x_1\) & \(x_2\) \\ \hline
+		3.5   & 4.5     & 6.5     \\\hline
+		4.1   & 4.6     & 10.6    \\\hline
+		0.2   & 4.7     & 6.5     \\\hline
+		1.6   & 4.7     & 7.6     \\\hline
+		\hline
+	\end{tabular}
+\end{center}
 
-Hence using proof by contradiction we can say that the dataset is not linear combination of its parameters.
+The above three records are sorted by their parameters \(x_1, x_2\). We can see that if the \(e = 0.5\) is the absolute error. Then record number 1 and 3 are similar to each other but donot lie next to each other. This increases the complexity of finding similar records from \(O(N \log(N))\) to \(O(N^2)\) as we donot know where the similar records will lie, so N into N search must be performed which is quite inefficient.
 
-\textbf{Prove:} Keeping our assumption that the dataset is additive. Creating Pseudo records by simple addition with other records if results into a record whose energy consumption lies in the dataset but with different performance events shows that the dataset is not linear.
+To make it effecient, instead of finding similar records in the dataset. The whole \(k-dimensional\) space is divided into small \(k-cubes\) whose dimensions are \((e_1 * e_2 * \ldots e_k)\). Each \(k-cube\) has its own integer coordinates in space. The data records are grouped together with respect to their respective \(k-cube\) coordinates. Since the coordinates are integers (equality can be performed). They can be grouped in \(O(N\log(N))\) time. The calculation of the coordinates in which the data point belongs to can be calculated in \(O(1)\) time by the following.
 
-\textbf{Proof:}\\
-Let us assume that there exists a linear function \(f\) such that:
+\[coordinate = (\Bigl\lfloor \frac{x_{n1}}{e_1} \Bigl\rfloor, \Bigl\lfloor \frac{x_{n2}}{e_2} \Bigl\rfloor, \ldots \Bigl\lfloor \frac{x_{nk}}{e_k} \Bigl\rfloor)\]
 
-\(f(x_{i1} + x_{j1},\ x_{i2}+ x_{j2},\ \ldots x_{ik} + x_{jk}) = E_i + E_j\)\\ and 
-\(f(x_{i1},\ x_{i2},\ \ldots x_{ik}) + f(x_{j1},\ x_{j2},\ \ldots x_{jk}) = E_i + E_j\)\\
-where \(\alpha_i\) are the constants in the linear combination of performance events and \(i\in[1\ldots k+1]\)
+Every data point will have a corresponding coordinate they belong to. Data points are then grouped together by their coordinates. Each and every grouped coordinate is a \(k-dimensional\) cube. Each of these cubes are then visited and analyse their output variables value. Data points in the same cube with very output variables are collected. They are used for further analysis.
 
-We know that if \(f\) is additive, hence new records can be generated via addition of records in the dataset.
+If the user agrees that there is no fault in the dataset collected, then it is concluded that no functional relation exists between the output and the parameters provided. If the user feels that the following data might be faulty, they can be removed from the dataset and the analysis is done again.
 
-Let \(V\) be the set of all dataset rows and dataset rows possible by combining various records in the dataset and pseudo records.
+If no data points are found that violates the functional relation, it is then said that there might be an existence of relation. The word might is used here because the dataset are always sample of the population. Hence, there is a possibility of existence of a record in population that could violate our functional relation.
 
-Now if we are able to find data record with \((x_{i1},\ x_{i2},\ \ldots x_{ik}) = (x_{j1},\ x_{j2},\ \ldots x_{jk})\) where \(i \neq j\) and \(E_i \neq E_j\) , where both records belong to the set \(V\).
+\begin{algorithm}
+	\caption{Functional relation existence}\label{gridExistence}
+	\begin{algorithmic}[1]
+		\Procedure{grid}{$a,b$}
+		\State \textbf{Input} $dataset$: a list of data points, $e$: errors for each variable
+		\State \textbf{Result} subset of the data points that violate functional relation
+		\State $clusters = Dictionary.empty$
+		\For{\textbf{each} $point$ \textbf{in} $dataset$}
+		\State $coordinate = (\lfloor point.x_{1}/e_1 \rfloor, \ldots \lfloor point.x_{k}/e_k \rfloor)$
+		\State $clusters.put(coordinate, point)$
+		\EndFor
+		\For{\textbf{each} $entry$ \textbf{in} $clusters$}
+		\State $output = Dictionary.empty$
+		\For{\textbf{each} $point$ \textbf{in} $entry.values$}
+		\State $output.put(\Bigl\lfloor point.y/e_y \Bigl\rfloor, point)$
+		\EndFor
+		\If{$output.size > 1$} \Comment{more than one output in same cluster}
+		\State add $entry.values$ to the $result$
+		\EndIf
+        \EndFor
+        \State\Return $result$
+		\EndProcedure
+	\end{algorithmic}
+\end{algorithm}
 
-Then, by the first proof, \(f\) is not an linear function. Which contradicts our assumption.
+A thing to note here is that, since the space is divided into cube of certain dimension. The cubes are actually next to each other and they donot overlap. It can be imagined as a building of boxes stack on top and side of each other. There will be points which lie on the edges of the \(n-cube\). Since the cubes donot overlap. They will be close to some of points in the cubes next to them. But in the algorithm one data point is assigned only one cluster. This problem is solved by the next approach which is the distance based clustering. The problem that is seen here comes with performance advantage. Finding and assigning each point clusters of their comes with very time and space complexity.
 
-Hence using proof by contradiction we can say that the dataset does not contain a linear function.
+\subsection{Distance based clustering}
+
+In this method, data points are thought of as vectors in euclidean space of \(n-dimension\) where \(n\) is number of parameters considered when clustering. The equality of vectors according to which clustering should take place is done by using the euclidean distance between two vectors. Two vectors are said to be equivalent if the distance between the two vectors is less than the tolerance specified.
+
+Let \(u\) and \(v\) be two vectors in space with dimension \(n\),\\
+then the euclidean distance is define as: \\
+\[dist(u, v) = \sqrt{(u[1] - v[1])^2 + (u[2] - v[2])^2 + \ldots (u[n] - v[n])^2}\]
+
+Now, two vectors \(u\) and \(v\) are said to be equal or close enough when:\\
+\[dist(u,v) < tol\]  where \(tol\) is the maximum distance between two points to call them neighbours.
+
+This tolerance can be thought of as the total tolerance of the between two data points. Since, the difference between two points in all of their different dimensions are squared and ``added'' together and then square rooted and then limited by a tolerance. It signifies the total tolerance that is allowed between two datapoints. 
+
+This clustering is creating spheres of \(n-dimension\) for each data point. Here, overlapping of spheres is allowed. Incuring huge performance cost.
+
+In this, algorithm each data point creates it's own sphere with itself in the centre. Data points which lie in that sphere are found. This cluster is then analysed to see if output of each data point to similar to each other. If data points are found which violate the relationship are then returned to the user as a proof of the non existence functional relation.
+
+\begin{algorithm}
+	\caption{Functional relation existence}\label{dbscanExistence}
+	\begin{algorithmic}[1]
+		\Procedure{distance\_based}{$a,b$}
+		\State \textbf{Input} $dataset$: a list of data points, $tol$: tolerance, $oTol$: output tolerance
+		\State \textbf{Result} subset of the data points that violate functional relation		
+        \For{\textbf{each} $point$ \textbf{in} $dataset$}
+        \For{\textbf{each} $neighbour$ \textbf{in} $dataset$}
+        \If{$dist < tol$ and $|point.y - neighbour.y| > oTol$}
+        \State add $neighbour$ and $point$ to the $result$
+        \EndIf
+        \EndFor
+        \EndFor
+        \State\Return distinct $result$
+		\EndProcedure
+	\end{algorithmic}
+\end{algorithm}
+
+It can be seen from the pseudocode that the time complexity is \(O(N^2)\). Optimisation to the above algorithm will discussed later. At the end in the pseudocode we are returning distinct because the neighbour and the point are actually added twice in the result because of \(N \times N\) iteration and the symmetric nature of \(dist\) relation. (i.e \(dist(a,b) = dist(b,a)\))
+
+
+
 
 \section{Applications}
 
