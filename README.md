@@ -1,4 +1,3 @@
-
 # UCD Final year project 2017 (Function relationship finder)
 The project nicknamed as functfinder. functfinder is Java based application which uses ArangoDB backend. This project helps finding non-existence of functional relationship in the dataset provided. It also helps in analysing the consistency of linear models on the dataset. 
 
@@ -13,9 +12,9 @@ These instructions will get you a copy of the project up and running on your loc
 3. [Gradle v4.6](https://gradle.org/)
 4. Optional [IntelliJ](https://www.jetbrains.com/idea/)
 
-## Building
+### Building
 
-### Go to bash or cmd
+#### Go to bash or cmd
 
 Clone the repository
 
@@ -35,15 +34,42 @@ Build the project
 gradle build
 ```
 
+Build the project without running the test
+
+```
+gradle build -x
+```
+
+#### Web application
 To run the Web application
 
 ```
-gradle build && java -jar /webapp/build/libs/webapp.jar
+java -jar webapp/build/libs/functfinder-web-2.0.jar
 ```
 
-To run the commandline application
+Go to browser
 
 ```
-gradle build && java -jar /cmdapp/build/libs/functfinder-2.0.jar -?
+http://localhost:8080
+```
+
+For changing the arangodb settings like password
+
+```
+Change the settings in the file functfinder/webapp/src/main/resources/arangodb.properties
+```
+
+Similarly for changing arangodb setting like password for the test
+
+```
+Change the settings in the file functfinder/webapp/src/test/resources/arangodb.properties
+```
+
+#### Command line 
+
+To display the usages or help of the command line
+
+```
+java -jar cmdapp/build/libs/functfinder-cmd-2.0.jar -?
 ```
 
