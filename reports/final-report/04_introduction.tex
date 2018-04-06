@@ -9,31 +9,31 @@ According to~\cite{pickavet2008worldwide}, the power consumption growth rates of
 	\caption{\label{fig:energypie} Energy consumption distribution of data centers.}
 \end{figure}
 
-The major roles of power consumption by a data ware house is played by the servers and the cooling system which is used to cool down the server physical parts. The figure~\ref{fig:energypie}, shows that both the servers and the cooling systems account to 80\% of the total consumption with both accounting for 40\% each~\cite{rong2016optimizing}. Making power and energy one of the key challenges in system and software designs. In order to improve processor's performance while limiting power consumption, designers have increasingly utilized dynamic hardware adaptions. But to guide to these hardware adaptions it is necessary to measure the power of systems accurately. Such adaptations can reduce power consumption and chip temperature by reducing the amount of available performance. Temperature sensors are slow in reponse due to the thermal inertial of the micro processor. Relying on them would give slow response and detection of temperature changes. Many demonstrations have been done to show that performance counter / performance events are effective proxies of power measurement \cite{bellosa2000benefits}.
+The major roles of power consumption by a data ware house is played by the servers and the cooling system which is used to cool down the physical parts of the server. The figure~\ref{fig:energypie}, shows that both the servers and the cooling systems account to 80\% of the total consumption with both accounting for 40\% each~\cite{rong2016optimizing}. Making power and energy one of the key challenges in system and software designs. In order to improve processor's performance while limiting power consumption, designers have increasingly utilized dynamic hardware adaptions. But to guide to these hardware adaptions it is necessary to measure the power of systems accurately. Such adaptations can reduce power consumption and chip temperature by reducing the amount of available performance. Temperature sensors are slow in reponse due to the thermal inertial of the micro processor. Relying on them would give slow response and detection of temperature changes. Many demonstrations have been done to show that performance counter / performance events are effective proxies of power measurement \cite{bellosa2000benefits}.
 
-The study of the relations between different performance counters and energy consumption has become crucial. The existence and analysis of relations can enable minimization of power consumption leading to less heat generation from the CPU. This decrease in temperature can further reduce the usage of cooling system. This all in turn leads to cost minimization and a step towards eco-friendly environment.
+The study of the relations between different performance counters and energy consumption has become crucial. The existence and analysis of the functinal relation between them will enable minimization of power consumption leading to less heat generation from the CPU. This decrease in temperature will further reduce the usage of cooling system. Which all in turn leads to cost minimization and a step towards eco-friendly environment.
 
-Thus, discovery of the functional relation between the power consumption and the performance events (PMCs) of system, will enable the ability to adjust, and predict the energy consumption for certain computations.
+Thus, discovery of the functional relation between the power consumption and the performance events (PMCs) of system, will enable the ability to predict the energy consumption for certain computations.
 
 \section{Aims}
 
-The project aims to create a piece of software that will help understanding and finding relations between energy consumption and performance counters. The software must aim to be extensible, easy to use and performant. It should be able to perform analysis like regression and clustering on the data. These actions will help in showcasing the relationship of various parameters and the output. In this case, the parameters are the performance events and output is the energy consumption by the systems. Following are the objectives that are attempted to be accomplished.
+The project aims to create a piece of software that will help understanding and finding relations between energy consumption and performance counters. The software must aim to be extensible, easy to use and performant. It should be able to perform analysis like regression and clustering on the data. These actions will help in showcasing the relationship of various parameters and the output. The parameters are the performance events and output is the energy consumption by the systems. Following are the objectives that are attempted to be accomplished.
 
 \subsection{Existence of functional relation}
 
-Datasets are mostly pair of multiple inputs and a single output. And the possibility of the existence of a relation is what have to be found. Is it possible to define the data in a form of function? Question like this is one of the aims. Defining the data in a form of function can be thought of as explaining the dataset in a form of a formula which can combine various parts of the input parameters and match the output. It is quite impossible to tell that whether a function definetly exists as the data is always a subset of the population and there are number of records which are either not in the dataset or it is not know. But, regardless it can definitely explain the non-existence of a formula by finding a pair of input parameters and outputs that violate the definition of a function.
+Datasets are mostly pair of multiple inputs and a single output. And the possibility of the existence of a relation is what have to be found. Is it possible to define the data in a form of function? Question like this is one of the aims. Defining the data in a form of function can be thought of as explaining the dataset in a form of a formula which can combine various parts of the input parameters and match the output. It is quite impossible to tell that whether a function definetly exists. This is because the data is always a subset of the population and there are number of records which are either not in the dataset or it is not know. But, regardless it can definitely explain the non-existence of a functional relation by finding a pair of input parameters and output that violate the definition of a function.
 
-The pair which violates the definition of a function must be looked at as there is high probability of that data set record being corrupt or if not it can actually act as a contradictiona and explain the non existence. If this outlier is in fact corrupt, this process can be used for data cleanups as well.
+The pair which violates the definition of a function must be looked at as there is high probability of that data set record being corrupt or if not it can actually act as a contradiction and explain the non existence. If this outlier is in fact corrupt, this process can be used for data cleanups as well.
 
 \subsection{Analysis of functional relation}
 
-Once, it is not possible to prove functional non existence in the dataset. The dataset must be analysed. In order to better understand the the functional relation of the parameters with the output. The analysis of the relation explains the contribution of a parameter to the result. It gives better understanding about the correlation between two quantities. Does high page faults correlates to high energy consumption? Questions like this is what the analysis of change in parameters with their corresponding change in output answers. This can also be thought of an explaination of the resultant parameter.
+Once, it is not possible to prove functional non existence in the dataset anymore. The dataset must be analysed in order to better understand the the functional relation of the parameters and the output. The analysis of the relation explains the contribution of a parameter to the result. It gives better understanding about the correlation between two quantities. Does high page faults correlates to high energy consumption? Questions like this is what the analysis tries to answer. This can also be thought of an explaination of the resultant parameter.
 
 In other words, understanding the correlation is the other aim. Once it is know that there is high correlation. Further investigation can be done in order to find the form of the relation.
 
 \section{Approach}
 
-For each of the aims, two approaches have been employed. Both the approaches tries to achieve the same conclusions but with different methodology.
+For each aim, two approaches have been employed. Both the approaches tries to achieve the same conclusions but with different methodology.
 
 The experimental data sets provided has the following format:
 
@@ -55,27 +55,25 @@ It is infact easier to find two equal records by ordering the dataset by their p
 
 First approach:
 
-The data records are imagined as data points in \(k-space\) as we have \(k\) number of parameters. Then the whole space is divided into small \(k-dimension cubes\) with dimensions \((t_1, t_2, \ldots t_k)\) where \(t_i\) is the tolerance of each parameter. The data points are then put in their respective cubes. And each cube is then analysed to see whether the output of the data points are similar to each other as well.
+The data records are imagined as data points in \(k-space\) as we have \(k\) number of parameters. Then the whole space is divided into small \(k-dimension\) cubes with dimensions \((t_1, t_2, \ldots t_k)\) where \(t_i\) is the tolerance of each parameter. The data points are then put in their respective cubes. When two points lie in the same cube that means there paramters are similar and so must be there output. If they donot have similar output within some tolerance then they violate the functional relation.
 
 Second approach:
 
-The data points in \(k-space\) are similar if the euclidean distance between them is less than the \(t\) provided, where \(t\) is the total/max tolerance. Data points which are infact found to be close to each other, their output is compared to see if they are similar to each other.
+The data points in \(k-space\) are said to be similar if the euclidean distance between them is less than the \(t\) provided, where \(t\) is the total/max tolerance. In this method, clustering is done using the distance between the parameter vector of the data points.
 
 \subsection{Analysis of functional relation}
 
-Many different type of relations can exists between two variables. But, since correlation betweent the variables is the objective been set. A more general trend of the dynamic energy consumption with the performance events is analysed. Many researches have been done that successfully using linear models, to understand the relation between energy consumption and performance events.\cite{o2017survey} The preference given to linear models is due to the trickle down effect of the performance events.\cite{bircher2007complete} Hence, Linear regression is used to analyse the relationship.
+Many different type of relations can exists between two variables. But, since the correlation between the variables are know to be linear. Linear regression is done between the dynamic energy consumption with the performance events. Many researches have have been successful in estimating using linear models to estimate energy consumption using performance events.\cite{o2017survey} The preference given to linear models is due to the trickle down effect of the performance events.\cite{bircher2007complete} Hence, Linear regression is used to analyse the relationship.
 
-Linear regression is done with 2 variables but there are \(k\) variables relation to energy consumption making it hard to understand the nature. Multiple linear regression tries to find the best fit to the data. Best fit to the data hinders the tolerance factor in the dataset and also undermines the actual relation. As multiple regression tries to find the best fit and is interested in predicting the output variable. Hence to analyse one of the variable, the data point must be grouped such that their other \(k-1\) variables are constant. Each cluster is then visited and linear regression is performed. Two approaches are employed to cluster which are similar to finding similar records in finding the existence of the relation.
+Linear regression is done with 2 variables but there are \(k\) variables relation to energy consumption making it hard to understand the nature. Multiple linear regression tries to find the best fit to the data. But best fit to the data hinders the tolerance factor in the dataset and also undermines the actual relation. As multiple regression is also interested in predicting the output variable. Hence to analyse one of the variable, the data point must be grouped using their other \(k-1\) variables. Each grouped cluster is then visited and linear regression is performed. Two approaches are employed to cluster the dataset. These are similar to clustering techniques used in finding the existence of the relation.
 
 First approach:
 
-Data points are clustered by putting the data points in the respective \(k-1\) dimension cube. Forming a cluster with almost similar \(k-1\) variables.
+Data points are clustered by putting the data points in the respective \(k-1\) dimension cube. Forming a cluster with almost similar \(k-1\) variables. Each data point is put in one of the cube. These data points have similar \(k-1\) performance event vector but varying one of the parameters and output variable. Regression line calculated corresponds to the effect of the parameter variable to the output variable in a particular situation. The situation is the similar \(k-1\) parameter values.
 
 Second approach:
 
-Euclidean distance is used to isolate similar \(k-1 variables\). A \(k-1\) dimension sphere can be imagined for simplicity with its radius being the total/max tolerance.
-
-In both approaches, linear regression is performed on the cluster with the variable which was not used in clustering and the output variable which corresponds to the dynamic energy consumption.
+Euclidean distance is used to isolate similar \(k-1\) variables. A \(k-1\) dimension sphere can be imagined for simplicity with its radius being the total/max tolerance. Here, each data point has its own small sphere. The regression line calculated for each data point act as the tangent to the data point in the direction of its neighbours.
 
 \section{Structure of report}
 

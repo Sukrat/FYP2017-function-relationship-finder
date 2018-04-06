@@ -1,14 +1,14 @@
-Many designers are increasingly utilizing dynamic hardware adaptations to improve performance while limiting the power consumption. Some are using software to decrease power usage for e.g. putting the system in sleep mode when it's in idle state. The main goal remains the same, which is to extract maximum performance while minimizing the temperature and power. Whereas, we want to study and examine the relationship affecting the consumption and then analyse the result to minimize or predict the consumption of energy.
+Many designers are increasingly utilizing dynamic hardware adaptations to improve performance while limiting the power consumption. Whereas Some are using software to decrease power usage for e.g. putting the system in sleep mode when it's in idle state. The main goal remains the same, which is to extract maximum performance while minimizing the temperature and power. The study and examination of the events affecting the consumption will help us to predict and minimize the consumption of energy with very high accuracy.
 
 \section{Energy consumption and Performance Events}
 
-First let's look at energy consumption. Energy consumption is the power (Usually in watts) consumed by a system. This system could be the processor/CPU, memory, disk, I/O (Input/Output) system, chipset or the whole computer system itself. So, one can take any of the peripherals and read the power consumption for various performance events. Then analyse if there exists a functional dependence to begin with. If the system is not able to disprove the dataset, one could then try to find a function which could help understand relation between each event and predict for any given system. The values can be read for these performance events can be during a idle state as well as running certain computations.
+First let's look at energy consumption. Energy consumption is the power (usually in watts) consumed by a system. This system could be the processor/CPU, memory, disk, I/O (Input/Output) system, chipset or the whole computer system itself. It has been known that power consumption of any system has a high correlation to its usage. Since the correlation is high for its usage. It means usage is a is a good way to understand the power consumption. Performance events are one of the better ways to measure the usage of a system as they are known much more faster than the temperature sensors. As temperature sensors are slow in response due to the thermal inertial of the micro processor.
 
-Now let's look at what are performance events, performance events can be any event which can affect the consumption of energy in some way. Selection of performance events is quite challenging. A simple example would be the effect of cache misses in the processor. For a typical processor, the highest level of cache would be L3 or L2 depending on the type of processor. Now for some transaction which could not be found in the highest level of cache (cache miss) would cause a cache block size access to the main memory. Thus, number of main memory access would be directly proportional to the cache misses. Since these memory access is off-chip, power is consumed in the memory controller and DRAM. Even though, the relation is not simple as it seems but a strong casual linear relationship between the cache miss and the main memory power consumption~\cite{bircher2007complete}.
+Now let's look at what are performance events, performance events are any events that affect the consumption of energy in some way. Selection of performance events is quite challenging. A simple example would be the effect of cache misses in the processor. For a typical processor, the highest level of cache would be L3 or L2 depending on the type of processor. Now for some transaction which could not be found in the highest level of cache (cache miss) would cause a cache block size access to the main memory. Thus, number of main memory access would be directly proportional to the cache misses. Since these memory access is off-chip, power is consumed in the memory controller and DRAM. Even though, the relation is not simple as it seems but a strong casual linear relationship between the cache miss and the main memory power consumption~\cite{bircher2007complete}.
 
-A number of other performance events like Instructions executed. The more instruction being executed, will turn on and use  more units of the system. Hence, power is consumed as opposed to when the processor is in its idle state~\cite{gilberto2005power}.
+Another performance event can be instructions executed. The more instruction being executed, will turn on and use more units of the system. Hence, power is consumed as opposed to when the processor is in its idle state~\cite{gilberto2005power}.
 
-Cache miss, TLB misses are also a good performance events as they seem to have a strong relationship between the power consumption as processor needs to handle memory page walks. Same can be said for Page faults where a program is not able to find mapped address in physical memory as it has not been loaded yet. This causes a trap which can result into number of situations, one of them which is to get the data from disk. In simple terms it is longer walk from cache miss. This walk to the disk and raising of exceptions would consume more energy by the disk as well as the CPU. Another thing to note here most of the relations that we saw above are directly proportional to each other. Increase in the variable like cache miss, number of cycles in CPU etc gives rise to energy consumption by the system. Making linear model a good point to start when analysing the relationship between the performance events variables and energy consumption.
+Cache miss, TLB misses are also a good performance events as they seem to have a strong relationship between the power consumption as processor needs to handle memory page walks. Same can be said for Page faults where a program is not able to find mapped address in physical memory as it has not been loaded yet. This causes a trap which can result into number of situations, one of them which is to get the data from disk. In simple terms it is longer walk from cache miss. This walk to the disk and raising of exceptions would consume more energy by the disk as well as the CPU. Another thing to note here most of the relations that we saw above are directly proportional to each other. Increase in the variable like cache miss, number of cycles in CPU etc gives rise to energy consumption by the system. This makes linear model a good point to start when analysing the relationship between the performance events variables and energy consumption.
 
 \section{Related Work}
 
@@ -20,7 +20,7 @@ In \cite{yang2016performance}, proposed a full system power model for CPU-intens
 
 Bircher approached in a distinct way by using events local to the processor and eliminating the need for sensors spread across various parts of the systems \cite{bircher2012complete}. Linear regression modeling was done in order to predict the power consumption at runtime. Multiple linear and polynomial regression was done only when accuracy was not obtained. 
 
-High correlation between performance events and power consumption was demonstrated by all of them. Many different models were used to predict the power consumption using CPU events. But in this project, an attempt is made in order to understand the monotonic relation between the events and power.
+High correlation between performance events and power consumption was demonstrated by all of them. But all of them tried to predict the power consumption using sytem events. They use various methodolgies in predicting so. In \cite{yang2016performance}, a number of machine learning algorithms were used. But in this project, an attempt is made to understand the monotonic relation between the events and power. The predictive models would work on a particular specification of system. But understanding the relation will help define a model on the architecture level. This will also help in verifying the models that already exist.
 
 
 \section{Existence of functional relation}
@@ -29,7 +29,7 @@ High correlation between performance events and power consumption was demonstrat
 
 Above is the definition of functional relation. In our case the \(x_i = (p_1, p_2, \ldots p_k)\) and \(y_i = E_i\) where \(p\) are the performance events and \(k\) is the number of events and \(E\) is the energy consumption.
 
-In other words, functional relationship is an one to one mapping between our input variables \(p_1, p_2, \ldots p_k\) and output \(E_i\). This reasoning can be explained quite intuitively as assuming functional relation is there we can formulate a \(f(p_1, p_2, \ldots p_k) = E_i\) where \(f\) is function. Now if one \((p_1, p_2, \ldots p_k)\) can give more than one output \(E_i\) then that \(f\) function is either not correct or \(f\) does not exist. A question that immediately arises is what if two different \((p_1, p_2, \ldots p_k)\) gives same output \(E_i\). The answer is it is possible and it doesnot violate the functional relation definition as there is still 1 to 1 mapping from input to output. The only difference is the functional relation is not surjective any more which means that one cannot figure out the input values from output values (i.e. the other way around). But we are only interested in predicting the output rather than inputs from the output variables.
+In other words, functional relationship is an one to one mapping between our input variables \(p_1, p_2, \ldots p_k\) and output \(E_i\). This reasoning can be explained quite intuitively as assuming functional relation we can formulate a \(f(p_1, p_2, \ldots p_k) = E_i\) where \(f\) is function. Now if one \((p_1, p_2, \ldots p_k)\) can give more than one output \(E_i\) then that \(f\) function is either not correct or \(f\) does not exist. A question that immediately arises is what if two different \((p_1, p_2, \ldots p_k)\) gives same output \(E_i\). The answer is it is possible and it doesnot violate the functional relation definition as there is still 1 to 1 mapping from input to output. The only difference is the functional relation is not surjective any more which means that one cannot figure out the input values from output values (i.e. the other way around). But we are only interested in predicting the output rather than inputs from the output variables.
 
 The Proof of the existence of functional relation is given below:
 
@@ -46,16 +46,15 @@ where \(E_n\) is the dynamic energy for the nth tuple and \(x_{nk}\) corresponds
 
 We will use mathematical definition of functional relationship given above to prove the approaches:
 
-\textbf{Prove:} We need to prove that finding atleast 2 equal performance events with different dynamic energies ensures that there exists no functional relationship in the dataset.
+\textbf{To Prove:} We need to prove that finding atleast 2 equal performance events with different dynamic energies ensures that there exists no functional relationship in the dataset.
 
 \begin{proof}
-	Let us assume that there exists a functional relation such that:
-
+	Let us assume that there exists a functional relation such that:\\
 	\(f(x_{n1},\ x_{n2},\ \ldots x_{nk}) = E_n\)\\
 	where \(f\) is the functional relation for the dataset.
 
-	Our task is to find \(f(x_{i1},\ x_{i2},\ \ldots x_{ik}) = E_i\) and \(f(x_{j1},\ x_{j2},\ \ldots x_{jk}) = E_j\)
-	where \(i \neq j\) and \(E_i \neq E_j\) and \((x_{i1},\ x_{i2},\ \ldots x_{ik}) = (x_{j1},\ x_{j2},\ \ldots x_{jk})\).
+	If we have \(f(x_{i1},\ x_{i2},\ \ldots x_{ik}) = E_i\) and \(f(x_{j1},\ x_{j2},\ \ldots x_{jk}) = E_j\)
+	where \(E_i \neq E_j\) and \((x_{i1},\ x_{i2},\ \ldots x_{ik}) = (x_{j1},\ x_{j2},\ \ldots x_{jk})\)
 
 	If such \(i\) and \(j\) exists. Then, we can conclude that the \(f\) is not a function by using the definition of a function as this assumed function has two images.
 
@@ -65,20 +64,20 @@ We will use mathematical definition of functional relationship given above to pr
 
 Now the task is to find similar \(x_{11},\ x_{12},\ \ldots x_{1k}\) input variables. If it was equality, it could be performed trivially by sorting the data records on the basis of \(x_{11},\ x_{12},\ \ldots x_{1k}\). Followed by going throught the data records in that order to find equal records. As equal records will be next to each other when sorted.
 
-But the dataset accumulated is collected from experimental setup. Experimental setups data have some error/tolerance associated to it. As the equipment or software that cannot accurately measure and have some tolerance associated to it. e.g. Energy consumption is measured by a power meter which will have its own error. The tolerance associated with the dataset no longer allows to perform equality on input variables. Hence, a method is needed to measure the equality with the tolerance.
+But the dataset accumulated is collected from experimental setup. Experimental setups data have some error/tolerance associated to it. As the equipment or software cannot accurately measure and have some error associated to it. e.g. Energy consumption is measured by a power meter which does have a confidence interval. The tolerance associated with the dataset no longer allows to perform equality on input variables. Hence, a method is needed to measure the equality with the tolerance.
 
 Now after knowing the tolerances the data records in the dataset now looks more of the form:
 
 \(E_n \pm e_E,\ x_{n1} \pm e_1,\ x_{n2} \pm e_2,\ \ldots x_{nk} \pm e_n\)\\
-where \(e\) is now the error associated with the variable
-A point to note hear is that since the variable represent different entities their units will be different and so will their error associated with it.
+where \(e\) is now the error associated with the variable.
+
+Hence dataset must be clustered with the tolerances associated to them. Data points having similar \(k\) parameters will fall in the same cluster. The output variable \(E_n \pm e_E\) must be close to each other within some tolerance for all the points in the cluster. If they are not, it violates the functional relation and the data points are picked and must be given to the user to either discard if corrupt. This removal of corrupt data records is known as Data cleanups. If they are not corrupt then it proves the non-functional relation in the dataset. Analysis of functional relation can be done when no records are found that contradicts the functional relation definition.
 
 \section{Analysing functional relation}
 
-The above analysis of data which corresponds to finding the existence of a functional relation. Now this section corresponds to analysing the functional relation. A functional relation can of many forms, there can be logarithmic functional relation, exponential, linear, polynomial etc. According to \cite{bircher2007complete}, shows that functional relation between performance event and dynamic energy is of the linear form. This is due to the trickle down effect of the performance events.
-Hence, Linear model is assumed to understand the relationship between the events and the consumption. 
+Now this section corresponds to analysing the functional relation. A functional relation can of many forms, there can be logarithmic functional relation, exponential, linear, polynomial etc. According to \cite{bircher2007complete}, shows that functional relation between performance event and dynamic energy is of the linear form. This is due to the trickle down effect of the performance events. Hence, Linear model is used to understand the relationship between the events and the consumption. 
 
-This project is more interested in finding whether a strong relation of monotonicity exists in the relation or not. And linear regression are best suited for this kind of task. Linear regression is an approach determine how strongly two variables correlate with each other. Correlation not necessarily means causation. Looking at the data points and linear regression values such as Pearson coefficient, $R^2$ can determine how strong the correlation is between 2 values but it cannot explain the cause of it. Since, it is in the interest of the project to analyse functional relationship which is known to have a linear relation linear regression is proposed.
+This project is more interested in finding whether a strong relation of monotonicity exists in the dataset or not. And linear regression are best suited for this kind of task. Linear regression is an approach determine how strongly two variables correlate with each other. Correlation not necessarily means causation. Looking at the data points and linear regression values such as Pearson coefficient, $R^2$ can determine how strong the correlation is between 2 values but it cannot explain the cause of it.
 
 Dataset contains \(k\) parameter variables, to analyse relation between the parameter variables and the output variable. One parameter is chosen at a time. To see the change in the parameter variable chosen and output variable, isolation of the other variables is required. Isolation is done by grouping the data by \(k-1\) parameter variable forming a number of clusters with similar \(k-1\) paramters. These clusters are then visited and linear regression is performed on the \(k^{th}\) variable and the output variable. 
 
@@ -90,13 +89,13 @@ This section introduces two clustering algorithm that was used to cluster data p
 
 Clustering involves grouping similar data by their attributes. There were number of clustering algorithms like Heirarchial clustering, K means clustering, Graph based clustering e.g. Chameleon. But we chose, Grid based clustering and Distance based clustering.
 
-Most of clustering algorithms like K means clustering requires the number of clusters to be formed. In the dataset, number of clusters need to be form is not know. IN Heirarchial clustering, heirarchy of dataset is used but the relation is functional and not heirarchial. Graph based clustering usually requires edges, and edges could be formed but they would increase the space complexity exponential. As more storage will be required to store the edges of the dataset.
+Most of clustering algorithms like K means clustering requires the number of clusters to be formed. In the dataset, number of clusters need to be form is not known. In Heirarchial clustering, heirarchy of dataset is used but the relation is functional and not heirarchial. Graph based clustering usually requires edges, and edges could be formed but they would increase the space complexity exponential. As more storage will be required to store the edges of the dataset.
 
-The two types of clustering algorithms chosen, uses some facts about the dataset. Clustering algorithm which uses tolerances as a measure to cluster the data points would be best suited for this project.
+The two types of clustering algorithms chosen, uses some facts about the dataset. Datasets with tolerances for clustering would be best suited to use these algorithms.
 
 \subsection{Grid based clustering}
 
-Since tolerance must be used as a measure of clustering datapoints. The definition of equality changes from \(x_{ia} = x_{ja}\) to \(|x_{ia} - x_{ja}| \leq e_a\). Now, if simple sort and search for similar variable would be employed, it would not work correctly as equivalent records would not be next to each other. They might non-equivalent records in between.
+Since tolerance must be used as a measure of clustering datapoints. The definition of equality for a variable changes from \(x_{ia} = x_{ja}\) to \(|x_{ia} - x_{ja}| \leq e_a\). Now, if simple sort and search for similar variable would be employed, it would not work correctly as equivalent records would not be next to each other. They might non-equivalent records in between.
 
 Example data to illustrate the same:
 \begin{center}
@@ -117,16 +116,10 @@ To make it effecient, instead of finding similar records in the dataset. The who
 
 \[coordinate = (\Bigl\lfloor \frac{x_{n1}}{e_1} \Bigl\rfloor, \Bigl\lfloor \frac{x_{n2}}{e_2} \Bigl\rfloor, \ldots \Bigl\lfloor \frac{x_{nk}}{e_k} \Bigl\rfloor)\]
 
-Every data point will have a corresponding coordinate they belong to. Data points are then grouped together by their coordinates. Each and every grouped coordinate is a \(k-dimensional\) cube. Each of these cubes are then visited and analyse their output variables value. Data points in the same cube with very output variables are collected. They are used for further analysis.
-
-If the user agrees that there is no fault in the dataset collected, then it is concluded that no functional relation exists between the output and the parameters provided. If the user feels that the following data might be faulty, they can be removed from the dataset and the analysis is done again.
-
-If no data points are found that violates the functional relation, it is then said that there might be an existence of relation. The word might is used here because the dataset are always sample of the population. Hence, there is a possibility of existence of a record in population that could violate our functional relation.
-
-After this using the same clustering method, but clustering them by \(k-1\) parameters, regression is performed on the \(k^th\) parameter chosen and the output.
+Every data point will have a corresponding coordinate they belong to. Data points are then grouped together by their coordinates. Each and every grouped coordinate is a \(k-dimensional\) cube. 
 
 \begin{algorithm}
-	\caption{Grid based clustering}\label{gridExistence}
+	\caption{Grid based clustering}\label{alg:gridExistence}
 	\begin{algorithmic}[1]
 		\Procedure{grid}{$a,b$}
 		\State \textbf{Input} $dataset$: a list of data points, $e$: errors for each variable
@@ -143,11 +136,11 @@ After this using the same clustering method, but clustering them by \(k-1\) para
 	\end{algorithmic}
 \end{algorithm}
 
-It can be seen, since the space is divided into cube of certain dimension. The cubes are actually next to each other and they donot overlap. It can be imagined as a building of boxes stack on top and side of each other. There will be points which lie on the edges of the \(n-cube\). Since the cubes donot overlap. They will be close to some of points in the cubes next to them. But in the algorithm one data point is assigned only one cluster. This problem is solved by the next approach which is the distance based clustering. The problem that is seen here comes with performance advantage. Finding and assigning each point clusters of their comes with very time and space complexity.
+It can be seen, since the space is divided into cube of certain dimension. The cubes are disjoint and they donot overlap. It can be imagined as a building of boxes stack on top and side of each other. There will be points which lie on the edges of the \(n-cube\). Since the cubes donot overlap. They will be close to some of points in the cubes next to them. But in the algorithm one data point is assigned to only one cluster. This problem is solved by the next approach which is the distance based clustering. This problem comes with performance advantage. 
 
 The algorithm complexity can be measured. 
 \begin{itemize}
-	\item Time complexity \(O(N log(N))\): This is because of sorting which is the slowest operation in the algorithm, but neverthless optimizations can be done by using a Dictionary or Binary search tree to group data with equal coordinates. Using Dictionary will give complexity of \(O(N)\)
+	\item Time complexity \(O(N log(N))\): This is because of sorting which is the slowest operation in the algorithm, but neverthless optimizations can be done by using a Dictionary or Binary search tree to group data with equal coordinates. Using Dictionary will give complexity of \(O(N)\).
 	\item Space complexity \(O(N)\): For each data point only the corresponding \(coordinate\) is stored.
 \end{itemize}
 
@@ -160,16 +153,14 @@ then the euclidean distance is define as: \\
 \[dist(u, v) = \sqrt{(u[1] - v[1])^2 + (u[2] - v[2])^2 + \ldots (u[n] - v[n])^2}\]
 
 Now, two vectors \(u\) and \(v\) are said to be equal or close enough when:\\
-\[dist(u,v) < tol\]  where \(tol\) is the maximum distance between two points to call them neighbours.
+\[dist(u,v) \leq tol\]  where \(tol\) is the maximum distance between two points to call them neighbours.
 
-This tolerance can be thought of as the total tolerance of the between two data points. Since, the difference between two points in all of their different dimensions are squared and ``added'' together and then square rooted and then limited by a tolerance. It signifies the total tolerance that is allowed between two datapoints. 
+This tolerance can be thought of as the total tolerance of the between two data points. Because, the difference between two points in all of their different dimensions are squared and ``added'' together and then square rooted. It signifies the total tolerance that is allowed between two datapoints. 
 
-This clustering is creating spheres of \(n-dimension\) for each data point. Here, overlapping of spheres is allowed. Incuring huge performance cost.
-
-In this, algorithm each data point creates it's own sphere with itself in the centre. Data points which lie in that sphere are found. This cluster is then analysed to see if output of each data point to similar to each other. If data points are found which violate the relationship are then returned to the user as a proof of the non existence functional relation.
+This clustering is creating spheres of \(k-dimension\) for each data point. Here, overlapping of spheres is allowed. Incuring huge performance cost.
 
 \begin{algorithm}
-	\caption{Distance based clustering}\label{dbscanExistence}
+	\caption{Distance based clustering}\label{alg:dbscanExistence}
 	\begin{algorithmic}[1]
 		\Procedure{distance\_based}{$a,b$}
 		\State \textbf{Input} $dataset$: a list of data points, $tol$: tolerance, $oTol$: output tolerance
@@ -211,10 +202,10 @@ With this, conclusion was made to use Java as the programming language and Arang
 
 \section{Applications}
 
-The reason for making a software like this verifies and gives the one the confidence. If data do not fit any functional hypothesis in a space, much time could be saved by preventing the unneeded search. It also analysis the linear relation of the dataset. It assumes data is linear, does linear regression on various cluster and returns multitude of values describing the data (e.g. number of cluster formed, number of outliers, mean of Pearson's coefficient R etc.).
+The reason for making a software like this verifies and gives the confidence about the dataset. If data do not fit any functional hypothesis in a space, much time could be saved by preventing the unneeded search. It also analysis the linear relation of the dataset. It assumes data is linear, does linear regression on various cluster and returns multitude of values describing the data (e.g. number of cluster formed, number of outliers, mean of Pearson's coefficient R etc.).
 
 It can be used to confirm the linear models already presented by \cite{bircher2007complete}\cite{bellosa2000benefits}\cite{o2017survey}. The tool can be used to find linear relationship in the dataset. 
 
 The software is not restricted to the use of only on dataset which consists of performance events and power consumption. It is a general-purpose software which will for work for any kind of dataset in which user wants to know the existence of functional relation. The refuting of the claim of functional relation on dataset is the objective of the software.
 
-We also know that the dataset provided is usually experimentally measured values which are not accurate. Every measuring device has some margin of error. The software will be flexible in the sense that the equality comparison of values in the approaches will always be done keeping in the margin of error provided. It can also iterate certain of tolerance which can further be used to study the effect of tolerance on the dataset.
+We also know that the dataset provided is usually experimentally measured values which are not accurate. Every measuring device has some margin of error. The software will be flexible in the sense that the equality comparison of values in the approaches will always be done keeping in the margin of error provided. It can also iterate certain of tolerance which will further be used to study the effect of tolerance on the dataset.
