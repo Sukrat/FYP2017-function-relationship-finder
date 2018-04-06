@@ -29,6 +29,11 @@ idea {
     }
 }
 
+jar {
+    baseName = 'functfinder-web'
+    version =  '2.0'
+}
+
 dependencies {
     compile group: 'org.springframework.boot', name: 'spring-boot-starter-web', version: '1.5.10.RELEASE'
     compile group: 'org.springframework.boot', name: 'spring-boot-devtools', version: '1.5.10.RELEASE'
