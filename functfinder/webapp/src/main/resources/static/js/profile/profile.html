@@ -1,0 +1,46 @@
+<div class="row">
+    <div class="col">
+        <form class="form-inline">
+            <label class="sr-only" for="profileName">Name</label>
+            <input type="text" class="form-control mb-2 mr-sm-2" id="profileName" placeholder="Profile name"
+                   ng-model="$ctrl.profileName">
+            <button type="button" class="btn btn-primary mb-2"
+                    ng-click="$ctrl.createProfile($ctrl.profileName)">
+                Create new profile
+            </button>
+        </form>
+    </div>
+</div>
+<div class="row">
+    <div class="col">
+        <div class="table-responsive">
+            <table class="table table-hover table-bordered">
+                <thead>
+                <tr>
+                    <th scope="col">#</th>
+                    <th scope="col">Profile Name</th>
+                    <th scope="col">Delete</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr ng-repeat="profile in $ctrl.data" ng-if="$ctrl.data.length > 0">
+                    <td>
+                        {{$index}}
+                    </td>
+                    <td>
+                        <a ng-href="#!/work/{{profile}}">{{profile}}</a></td>
+                    <td>
+                        <button type="button" class="btn btn-danger btn-sm"
+                                ng-click="$ctrl.deleteProfile(profile)">
+                            Delete
+                        </button>
+                    </td>
+                </tr>
+                <tr ng-if="$ctrl.data.length == 0">
+                    <td colspan="3">No Profile created yet!</td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>

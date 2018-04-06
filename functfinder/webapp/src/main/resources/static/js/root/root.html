@@ -1,0 +1,48 @@
+<!-- header -->
+<header>
+    <nav class="navbar navbar-expand-md navbar-dark bg-dark">
+        <span class="navbar-brand mb-0 h1">functlyser</span>
+        <div class="collapse navbar-collapse" id="navbarText">
+            <ul class="navbar-nav mr-auto">
+                <li class="nav-item">
+                    <a class="nav-link" href="#!/profile">Profile</a>
+                </li>
+            </ul>
+            <span class="navbar-text">
+                <span class="badge badge-success" ng-if="$ctrl.connected">Connected</span>
+                <span class="badge badge-danger" ng-if="!$ctrl.connected">Disconnected! Please refresh the page!</span>
+            </span>
+        </div>
+    </nav>
+</header>
+<!-- main body -->
+<main class="container-fluid" role="main">
+    <br/>
+    <div class="row">
+        <div class="col-12">
+            <div class="loader loader-default is-active" data-text="{{$ctrl.loadingText}}" ng-if="$ctrl.loading">
+            </div>
+            <div class="row">
+                <div class="col">
+                    <div class="alert alert-success" role="alert" ng-if="$ctrl.message.success">
+                        {{$ctrl.message.success}}
+                    </div>
+                    <div class="alert alert-danger" role="alert" ng-if="$ctrl.message.error">
+                        {{$ctrl.message.error}}
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col">
+                    <div ng-view></div>
+                </div>
+            </div>
+        </div>
+    </div>
+</main>
+<!-- footer -->
+<footer class="footer">
+    <div class="container">
+        <span class="text-muted">© Sukrat Kashyap 2018</span>
+    </div>
+</footer>
