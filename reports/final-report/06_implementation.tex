@@ -46,7 +46,38 @@ The application maps the REST APIs to the Commands in the core module. The UI of
 
 The command line application also uses the core module to do similar task. The mapping is from command line arguments to core module's command. In this module, as well a different implementation is done for the progress and command executor interfaces as this time the diplay and execution is in commandline. Since the core module uses IoC container. Spring-context was added and application context was created at the start of the applicaton. The arguments were parsed via the JCommander library. 
 
-\section{Results and Optimizations}
+\section{Optimizations}
 
-\section{Existence of functional relation}
+In this section, we discuss Optimizations that were done to speed up the computations.
 
+\subsection{Grid clustering algorithm}
+
+As per the pseudocode\ref{alg:gridExistence}, it can be seen that the Time complexity is \(O(N\log(N)\) which was due to the sorting performed on the coordinate of the box calculated for each data point. But as one can see from the pseudocode the two \(N\) iterations were performed. First for calculating the coordinate of the \(k-cube\) they belong to and then for the grouping the datapoints into the result. This result is then used for either finding violation of functional relation or for analysing the relation between the parameters. 
+
+The two extra \(N\) iterations were optimised by the ArangoDB by dividing the 3 iterations into 2 nodes. First node sorted the data points by calculating the coordinates of the \(k-cube\) on the go and attaching it temporarily to the dataset for reuse if the data set is accessed again by the sort. After sorting the datapoints with its coordinates are send to the second node. The second node then groups the data on the fly as the groups are accessed. This is because the all the groups with equal coordinate lies next to each other. The groups and the data coming from the second node is pipelined to our computations that are performed on the nodes. 
+
+It is impossible to parallelize this algorithm because of its aggregating nature, where one point cannot be in more than one cluster. But due to its \(O(N\log(N))\) complexity, overall the algorithm is quite fast and linear.
+
+\subsection{Distance based clustering}
+
+In the distance based clustering\ref{alg:dbscanExistence}, we calculated the time complexity to be \(O(N^2\). This was due to nature of the algorithm to find neighbouring data points for every data point in the dataset. 
+
+It is not possible to reduce the first outer iteration, as we have to go through each data point for analysing the whole dataset. The second one, it is not required to go through the entire data points as long as we can find all the points that are close to each other within some tolerance. This makes it possible for optimisations. One of the approaches is to save \(N^2\) distances between each and every data point and then making it easier for all the subsequent queries. This is very practical and blazingly fast as only one time slow operation is required for saving all the distances between each and every point. Then finding neighbours is a trivial task of going through the entire edges and getting all those points where the distance is less than the specified tolerance. This is practical for smaller dataset but due to the square space complexity. But as the number of records get larger it becomes in efficient to not only run the one time insertion but also storing the same.
+
+So, another way was chosen in which indexes were created to fasten the search to find the neighbours. We filter the data with conditions such that data points whose possibility of becoming neighbour is zero is filtered before the distance is actually and calculate and confirmed.
+
+We use the fact that \(dist(v, u) \geq 0\) always where \(v, u\) are two data points vectors in space. 
+
+Let the \(tol\) be the max distance (tolerance) allowed between two data points. 
+Let \(u\) be the data point vector with dimension \(k\) whose neighbours are to be found.
+Let \(v\) be any vector in the dataset.
+
+Then for any value of:
+\[v[i] > u[i] + tol \vee v[i] < u[i] - tol\] where \(i \in [0, k-1]\)
+\[\implies dist(u, v) > tol\]
+
+The reason is if any one of the values in vector \(v\) is more than \(tol\) units away then because the distance is added from all the other values of the vector as well. The total distance will definitely be more than \(tol\).
+
+But this filtering method is still not good as we still have to go through all the dataset to check whether any of the value is greater than \(tol\) or not. ArangoDB provides APIs to create indexes on the fields of documents for faster access to documents. It provides many different types of indexes such as Hash index, skip list index, full text index etc. Each index uses a special data structure to fasten different types of searches. As we are interested in range based queries. Skip list comes into play. Skiplist maintains a separate linked heirarchy of ordered values. They fasten up the equality lookups, range queries and sorting. The skiplist is added on to every parameter of the dataset and then when the filtering out condition is used before calculating the distance. The number of iteration will drop from \(N\) to the \(Amortised-N\).
+
+Another performance improvement that is done is by parallelising the outer loops. As ArangoDB supports multiple reads at the same time and the inner loop has no dependency on other iteration. Outer loop is parallelised which further decreases the running time by the number of threads the CPU can handle at a time. 
