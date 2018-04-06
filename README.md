@@ -37,7 +37,7 @@ gradle build
 Build the project without running the test
 
 ```
-gradle build -x
+gradle build -x test
 ```
 
 #### Web application
